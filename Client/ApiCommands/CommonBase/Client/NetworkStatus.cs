@@ -1,4 +1,4 @@
-﻿namespace WispCloudClient.ApiTypes
+﻿namespace DeusClient.ApiCommands.CommonBase.Client
 {
     public enum NetworkStatus
     {

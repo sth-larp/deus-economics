@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WispCloud
+namespace DeusCloud.Exceptions
 {
     public class DeusException : Exception
     {

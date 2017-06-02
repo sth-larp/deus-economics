@@ -11,7 +11,7 @@ namespace DeusCloud.Api.Controllers
     public sealed class AccountsController : ApiController
     {
         /// <summary>Get current user profile</summary>
-        /// <returns>User profile</returns>
+        /// <returns>Person profile</returns>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
@@ -44,6 +44,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
+        [DeusAuthorize]
         [HttpPost]
         [Route("accounts/changepassword")]
         public IHttpActionResult ChangePassword(ChangePasswordClientData clientData)
@@ -52,20 +53,7 @@ namespace DeusCloud.Api.Controllers
             return Ok();
         }
 
-        /// <summary>Restore password</summary>
-        /// <remarks>Generate new passsword for user and send it to user mail</remarks>
-        /// <param name="email">User email</param>
-        /// <response code="200">OK</response>
-        /// <response code="400">Bad request</response>
-        /// <response code="500">Internal Server Error</response>
-        [HttpPost]
-        [Route("accounts/restorepassword")]
-        public IHttpActionResult RestorePassword([FromBody] string email)
-        {
-            UserContext.Accounts.RestoreUserPassword(email);
-            return Ok();
-        }
-
+        
         /// <summary>Set roles for account</summary>
         /// <param name="clientData">Login and roles</param>
         /// <response code="200">OK</response>
@@ -76,7 +64,7 @@ namespace DeusCloud.Api.Controllers
         [Route("accounts/properties")]
         public IHttpActionResult SetAccountProperties(AccPropertyClientData clientData)
         {
-            UserContext.Rights.SetProperties(clientData);
+            UserContext.Rights.SetAccountProperties(clientData);
             return Ok();
         }
 
@@ -92,7 +80,7 @@ namespace DeusCloud.Api.Controllers
         [Route("accounts/access")]
         public IHttpActionResult SetAccountAccesses(string slave, string master, AccountAccessClientData accessData)
         {
-            UserContext.Rights.SetAccountAccesses(slave, master, accessData);
+            UserContext.Rights.SetAccountAccess(slave, master, accessData);
             return Ok();
         }
     }

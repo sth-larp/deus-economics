@@ -1,10 +1,10 @@
-﻿using RestSharp;
-using System;
+﻿using System;
 using System.Threading.Tasks;
-using WispCloudClient.ApiCommands;
-using WispCloudClient.ApiTypes;
+using DeusClient.ApiCommands.Accounts;
+using DeusClient.ApiCommands.Accounts.Client;
+using RestSharp;
 
-namespace WispCloudClient
+namespace DeusClient.Client
 {
     public sealed class CloudClient : IDisposable
     {

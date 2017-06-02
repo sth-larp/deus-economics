@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WispCloud.Logic.EventArgs
+namespace DeusCloud.Logic.Events.Client
 {
     public abstract class BaseEventArgs
     {

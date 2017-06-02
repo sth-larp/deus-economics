@@ -9,7 +9,7 @@ namespace DeusCloud.Data.Entities
     public class AccountAccess
     {
         [Key, Column(Order = 0)]
-        public long Slave { get; protected set; }
+        public string Slave { get; protected set; }
 
         [JsonIgnore]
         [ForeignKey("Slave")]
@@ -32,11 +32,11 @@ namespace DeusCloud.Data.Entities
         {
         }
 
-        public AccountAccess(Account master, Account slave, AccountAccessRoles role)
+        public AccountAccess(Account master, Account slave, AccountAccessRoles roles)
         {
             MasterAccount = master;
             SlaveAccount = slave;
-            Role = role;
+            Role = roles;
         }
 
     }

@@ -1,12 +1,10 @@
 ﻿using System.Linq;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
+using DeusCloud.Identity;
 using DeusCloud.Logic.Accounts.Client;
 using DeusCloud.Logic.CommonBase;
 using Microsoft.AspNet.Identity;
-using WispCloud;
-using WispCloud.Identity;
-using WispCloud.Templates;
 
 namespace DeusCloud.Logic.Accounts
 {
@@ -22,32 +20,19 @@ namespace DeusCloud.Logic.Accounts
 
         public UserAccount Registration(RegistrationClientData clientData)
         {
-            var newUser = new UserAccount(clientData.Email, AccountRole.Master); //register all users as superusers for debug and tests
+            var newUser = new UserAccount(clientData.Email, AccountRole.Admin);
+                //register all users as superusers for debug and tests
             newUser.Settings = clientData.Settings;
+            newUser.Cash = 100000;
 
             var result = _userManager.Create(newUser, clientData.Password);
             if (!result.Succeeded)
                 throw new DeusException(result.Errors.First());
 
-            //var mailBody = TemplateRenderer.GetEmbeddedResource("WispCloud.Templates.Files.RegistrationEmail.html");
+            //var mailBody = TemplateRenderer.GetEmbeddedResource("StaticConstants.Templates.Files.RegistrationEmail.html");
             //var sendTask = _userManager.SendEmailAsync(newUser.Login, "Welcome to Wisp", mailBody);
 
             return newUser;
-        }
-
-        public void RestoreUserPassword(string email)
-        {
-            var account = _userManager.FindById(email);
-            Try.NotNull(account, $"Cant find account with email: {email}.");
-            Try.Condition(account.Active, $"Cant restore password for not active user.");
-            Try.Condition(account.Role != AccountRole.Hub, $"Cant restore password for hub.");
-
-            var newPassword = NewPassword(account.Login);
-
-            var mailBody = TemplateRenderer.RenderTemplate(
-                    "WispCloud.Templates.Files.RestorePasswordEmail.cshtml",
-                    new RestorePasswordModel() { NewPassword = newPassword });
-            var sendTask = _userManager.SendEmailAsync(account.Login, "Restore Wisp password", mailBody);
         }
 
         public void ChangePassword(ChangePasswordClientData clientData)
@@ -55,23 +40,23 @@ namespace DeusCloud.Logic.Accounts
             var account = _userManager.FindById(clientData.Login);
             Try.NotNull(account, $"Cant find account with login: {clientData.Login}.");
 
-            var result = _userManager.ChangePassword(clientData.Login, clientData.CurrentPassword, clientData.NewPassword);
+            IdentityResult result;
+            if (clientData.Login != UserContext.CurrentUser.Login)
+            {
+                Try.Condition((UserContext.CurrentUser.Role | AccountRole.Admin) > 0,
+                    $"Only Administrators can change user account password: {clientData.Login}.");
+                result = _userManager.NewPassword(clientData.Login, clientData.NewPassword);
+            }
+            else
+            {
+                result = _userManager.ChangePassword(clientData.Login, clientData.CurrentPassword,
+                    clientData.NewPassword);
+            }
+
             if (!result.Succeeded)
                 throw new DeusException(result.Errors.First());
         }
 
-        public string NewPassword(string login)
-        {
-            var newPassword = StaticRandom.GenerateString(8);
-
-            var result = _userManager.NewPassword(login, newPassword);
-            if (!result.Succeeded)
-                throw new DeusException(result.Errors.First());
-
-            return newPassword;
-        }
-
-        
         public Account Get(string login)
         {
             return _userManager.FindById(login);
@@ -88,7 +73,5 @@ namespace DeusCloud.Logic.Accounts
             if (!result.Succeeded)
                 throw new DeusException(result.Errors.First());
         }
-
     }
-
 }

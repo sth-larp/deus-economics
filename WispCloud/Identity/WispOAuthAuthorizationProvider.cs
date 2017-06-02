@@ -1,17 +1,15 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security.OAuth;
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
-using WispCloud.Data;
-using WispCloud.Logic;
-using WispCloud.Templates;
+using DeusCloud.Templates;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security.OAuth;
 
-namespace WispCloud.Users
+namespace DeusCloud.Identity
 {
     public sealed class WispAuthorizationProvider : OAuthAuthorizationServerProvider
     {
@@ -21,7 +19,7 @@ namespace WispCloud.Users
         static WispAuthorizationProvider()
         {
             LoginOrPasswordIncorrectMessage = "The login or password is incorrect;";
-            UserInactiveMessage = "User inactive;";
+            UserInactiveMessage = "Person inactive;";
         }
 
         ClaimsIdentity GetBearerIdentity(Account user)
@@ -49,7 +47,7 @@ namespace WispCloud.Users
 
             if (!formData.Any())
             {
-                context.Response.RenderEmbeddedResource("WispCloud.Templates.Files.OAuth2AuthorizationForm.html");
+                context.Response.RenderEmbeddedResource("DeusCloud.Templates.Files.OAuth2AuthorizationForm.html");
                 context.RequestCompleted();
 
                 return;
@@ -63,7 +61,7 @@ namespace WispCloud.Users
 
             var user = context.GetContext().Accounts.Get(login, password);
             Try.NotNull(user, LoginOrPasswordIncorrectMessage);
-            Try.Condition(user.Active, UserInactiveMessage);
+            Try.Condition(user.Status == AccountStatus.Active, UserInactiveMessage);
 
             var authentication = context.OwinContext.Authentication;
             authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
@@ -88,7 +86,7 @@ namespace WispCloud.Users
 
             var user = context.GetContext().Accounts.Get(context.UserName, context.Password);
             Try.NotNull(user, LoginOrPasswordIncorrectMessage);
-            Try.Condition(user.Active, UserInactiveMessage);
+            Try.Condition(user.Status == AccountStatus.Active, UserInactiveMessage);
 
             context.Validated(GetBearerIdentity(user));
 

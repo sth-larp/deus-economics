@@ -1,4 +1,4 @@
-﻿namespace WispCloud.Logic
+﻿namespace DeusCloud.Logic.Events.Client
 {
     public enum EventActionType
     {

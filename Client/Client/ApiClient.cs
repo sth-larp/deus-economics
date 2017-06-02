@@ -1,16 +1,16 @@
-﻿using log4net;
-using Newtonsoft.Json.Linq;
-using RestSharp;
-using System;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.IO;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using log4net;
+using Newtonsoft.Json.Linq;
+using RestSharp;
 
-namespace WispCloudClient
+namespace DeusClient.Client
 {
     internal class ApiClient : RestClient
     {

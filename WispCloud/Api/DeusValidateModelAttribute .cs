@@ -4,8 +4,6 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
-using WispCloud;
-using WispCloud.Exceptions;
 
 namespace DeusCloud.Api
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WispCloudClient.SignalRTypes
+namespace DeusClient.SignalRTypes.PushTypes.Events
 {
     public class BaseEventArgs
     {

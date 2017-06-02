@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNet.SignalR.Hubs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using WispCloud.Users;
-using System;
 using DeusCloud.Exceptions;
+using DeusCloud.Identity;
+using Microsoft.AspNet.SignalR.Hubs;
 
-namespace WispCloud.SignalR
+namespace DeusCloud.SignalR
 {
     public class ConnectionMapping
     {

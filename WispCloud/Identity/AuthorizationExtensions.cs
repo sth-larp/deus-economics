@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 
-namespace WispCloud.Users
+namespace DeusCloud.Identity
 {
     public static class AuthorizationExtensions
     {

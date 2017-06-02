@@ -2,8 +2,6 @@
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
-using WispCloud;
-using WispCloud.Data;
 
 namespace DeusCloud.Logic.Accounts.Client
 {

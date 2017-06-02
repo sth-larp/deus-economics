@@ -1,7 +1,6 @@
 ﻿using System.Net.Http;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Provider;
-using WispCloud.Logic;
 
 namespace DeusCloud.Logic.CommonBase
 {

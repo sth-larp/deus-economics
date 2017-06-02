@@ -1,12 +1,10 @@
-﻿using log4net;
-using Microsoft.AspNet.SignalR.Client;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Net;
-using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using log4net;
+using Microsoft.AspNet.SignalR.Client;
 
-namespace WispCloudClient
+namespace DeusClient.Client
 {
     public sealed class SignalRClient : IDisposable
     {

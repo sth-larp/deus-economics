@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Logic.CommonBase;
+using DeusCloud.Logic.Events.Client;
+using DeusCloud.SignalR.Hubs;
 using Microsoft.AspNet.SignalR;
-using WispCloud.Logic;
-using WispCloud.Logic.EventArgs;
-using WispCloud.SignalR.Hubs;
 
 namespace DeusCloud.Logic.Events
 {
@@ -17,14 +15,6 @@ namespace DeusCloud.Logic.Events
             : base(context)
         {
             this._hubContext = EventsHub.HubContext;
-        }
-
-        List<string> GetLoginsForInstallation(long installationID)
-        {
-            return UserContext.Data.AccountAccesses
-                .Where(x => x.InstallationID == installationID)
-                .Select(x => x.Login)
-                .ToList();
         }
 
         public void InstallationChange(long installationID, EventActionType action)

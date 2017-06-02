@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WispCloudClient.ApiCommands
+namespace DeusClient.ApiCommands.CommonBase
 {
     public abstract class InputCommand<Input> : BaseCommand, IInputCommand<Input>
     {

@@ -1,73 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using DeusCloud.Data.Entities;
-using DeusCloud.Data.Entities.Accounts;
+﻿using DeusCloud.Data.Entities;
 using DeusCloud.Exceptions;
+using DeusCloud.Identity;
 using DeusCloud.Logic.CommonBase;
+using DeusCloud.Logic.Events.Client;
+using DeusCloud.Logic.Rights;
 using Microsoft.AspNet.Identity;
-using WispCloud.Identity;
-using WispCloud.Logic;
 
 namespace DeusCloud.Logic.Transactions
 {
     public sealed class TransactionsManager : ContextHolder
     {
         private UserManager _userManager;
+        private RightsManager _rightsManager;
 
-        public TransactionsManager(UserContext context)
-            : base(context)
+        public TransactionsManager(UserContext context): base(context)
         {
             _userManager = new UserManager(UserContext);
+            _rightsManager = new RightsManager(UserContext);
         }
 
-        public InstallationClientData Create()
+        public void Transfer(string sender, string receiver, float amount)
         {
-            UserContext.Rights.CheckRole(AccountRole.SeviceEnginier | AccountRole.Installer);
+            _rightsManager.CheckCurrentUserActive();
 
-            using (var transaction = UserContext.Data.Database.BeginTransaction())
-            {
-                UserContext.Data.BeginFastSave();
-
-                var newInstallation = Installation.CreateWithNextID(UserContext.Data);
-                UserContext.Data.Installations.Add(newInstallation);
-
-                var access = UserContext.Rights.CreateInstallationAccess(
-                    newInstallation, UserContext.CurrentUser,
-                    AccountAccessRoles.Administrator);
-
-                UserContext.Data.SaveChanges();
-                transaction.Commit();
-
-                UserContext.Events.InstallationChange(newInstallation.InstallationID, EventActionType.Create);
-
-                return new InstallationClientData(newInstallation, UserContext.CurrentUser);
-            }
-        }
-
-        public void Transfer(string login, string sender, string receiver, float amount)
-        {
             var receiverAcc = _userManager.FindById(receiver);
             Try.NotNull(receiverAcc, $"Cant find account with login: {receiver}.");
 
             var senderAcc = _userManager.FindById(sender);
-            Try.NotNull(senderAcc, $"Cant find account with login: {receiver}.");
+            Try.NotNull(senderAcc, $"Cant find account with login: {sender}.");
 
             using (var transaction = UserContext.Data.Database.BeginTransaction())
             {
                 UserContext.Data.BeginFastSave();
 
-                var access = UserContext.Rights.CreateInstallationAccess(
-                    newInstallation, UserContext.CurrentUser,
-                    AccountAccessRoles.Administrator);
+                _rightsManager.CheckForAccessOverSlave(sender, AccountAccessRoles.Withdraw);
+
+                Try.Condition(senderAcc.Cash >= amount, $"Not enought money");
+                Try.Condition(amount > 0, $"Can't transfer negative or zero funds");
+
+                senderAcc.Cash -= amount;
+                receiverAcc.Cash += amount;
 
                 UserContext.Data.SaveChanges();
                 transaction.Commit();
-
-                UserContext.Events.InstallationChange(newInstallation.InstallationID, EventActionType.Create);
-
-                return new InstallationClientData(newInstallation, UserContext.CurrentUser);
             }
         }
     }

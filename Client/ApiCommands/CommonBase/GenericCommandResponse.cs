@@ -1,6 +1,6 @@
 ﻿using RestSharp;
 
-namespace WispCloudClient.ApiCommands
+namespace DeusClient.ApiCommands.CommonBase
 {
     public class CommandResponse<ContentType> : CommandResponse
     {

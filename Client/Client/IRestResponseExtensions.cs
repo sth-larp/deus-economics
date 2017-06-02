@@ -1,6 +1,6 @@
 ﻿using RestSharp;
 
-namespace WispCloudClient
+namespace DeusClient.Client
 {
     public static class IRestResponseExtensions
     {

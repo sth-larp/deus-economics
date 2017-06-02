@@ -1,6 +1,5 @@
 ﻿using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
-using WispCloud;
 
 namespace DeusCloud.Logic.Accounts.Client
 {
@@ -16,7 +15,5 @@ namespace DeusCloud.Logic.Accounts.Client
             Try.NotEmpty(CurrentPassword, $"CurrentPassword cant be empty.");
             Try.NotEmpty(NewPassword, $"NewPassword cant be empty.");
         }
-
     }
-
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace WispCloud.Templates
+namespace DeusCloud.Templates
 {
     public static class MimeTypes
     {

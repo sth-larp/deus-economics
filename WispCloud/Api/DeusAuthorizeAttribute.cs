@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using WispCloud;
+using DeusCloud.Exceptions;
 
 namespace DeusCloud.Api
 {

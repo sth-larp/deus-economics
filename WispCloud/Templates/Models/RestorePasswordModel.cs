@@ -1,4 +1,4 @@
-﻿namespace WispCloud.Templates
+﻿namespace DeusCloud.Templates.Models
 {
     public sealed class RestorePasswordModel
     {

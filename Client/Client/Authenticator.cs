@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNet.SignalR.Client;
+﻿using DeusClient.ApiCommands.Accounts.Client;
+using Microsoft.AspNet.SignalR.Client;
 using RestSharp;
 using RestSharp.Authenticators;
-using WispCloudClient.ApiTypes;
 
-namespace WispCloudClient
+namespace DeusClient.Client
 {
     public sealed class Authenticator : IAuthenticator
     {

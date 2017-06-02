@@ -9,8 +9,6 @@ using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic;
-using WispCloud;
-using WispCloud.Data;
 
 namespace DeusCloud.Data
 {

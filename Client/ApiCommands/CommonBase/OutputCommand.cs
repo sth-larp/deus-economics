@@ -1,8 +1,9 @@
-﻿using RestSharp;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using DeusClient.Client;
+using RestSharp;
 
-namespace WispCloudClient.ApiCommands
+namespace DeusClient.ApiCommands.CommonBase
 {
     public abstract class OutputCommand<Output> : BaseCommand, IOutputCommand<Output>
     {

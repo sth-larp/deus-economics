@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace WispCloud
+namespace DeusCloud.Exceptions
 {
     public class DeusHttpException : DeusException
     {

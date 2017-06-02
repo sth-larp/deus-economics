@@ -1,31 +1,29 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using System;
+using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Dispatcher;
+using System.Web.Http.ExceptionHandling;
+using DeusCloud;
+using DeusCloud.Api;
+using DeusCloud.Exceptions.Handlers;
+using DeusCloud.Helpers;
+using DeusCloud.Identity;
+using DeusCloud.Serialization;
+using DeusCloud.Swashbuckle;
+using log4net;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json;
 using Owin;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
-using System;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Dispatcher;
-using System.Web.Http.ExceptionHandling;
-using DeusCloud.Api;
-using DeusCloud.Exceptions.Handlers;
-using DeusCloud.Helpers;
-using DeusCloud.Serialization;
-using DeusCloud.Swashbuckle;
-using log4net;
-using WispCloud;
-using WispCloud.Api;
-using WispCloud.Exceptions.Handlers;
-using WispCloud.Users;
 
-[assembly: OwinStartup(typeof(WispCloudStartup))]
+[assembly: OwinStartup(typeof(CloudStartup))]
 
-namespace WispCloud
+namespace DeusCloud
 {
-    public sealed class WispCloudStartup
+    public sealed class CloudStartup
     {
         string _rootUrl;
         bool _enableSwagger;
@@ -34,14 +32,14 @@ namespace WispCloud
         string _oauth2AuthorizeEndpoint;
         string _oauth2TokenEndpoint;
 
-        public WispCloudStartup()
+        public CloudStartup()
         {
-            this._rootUrl = AppSettings.Url("rootUrl");
-            this._enableSwagger = AppSettings.Is("enableSwagger");
-            this._enableSwaggerUI = AppSettings.Is("enableSwaggerUI");
-            this._oauth2DefaultScope = "User";
-            this._oauth2AuthorizeEndpoint = "/oauth2/authorize";
-            this._oauth2TokenEndpoint = "/oauth2/token";
+            _rootUrl = AppSettings.Url("rootUrl");
+            _enableSwagger = AppSettings.Is("enableSwagger");
+            _enableSwaggerUI = AppSettings.Is("enableSwaggerUI");
+            _oauth2DefaultScope = "Person";
+            _oauth2AuthorizeEndpoint = "/oauth2/authorize";
+            _oauth2TokenEndpoint = "/oauth2/token";
         }
 
         public void Configuration(IAppBuilder app)
@@ -99,7 +97,7 @@ namespace WispCloud
             config.Formatters.Clear();
             config.Formatters.Add(new WispJsonMediaTypeFormatter());
 
-            config.Services.Replace(typeof(IHttpControllerSelector), new DeusControllerSelector(config));
+            config.Services.Replace(typeof(IHttpControllerSelector), new ControllerSelector(config));
             config.Services.Replace(typeof(IHttpActionSelector), new DeusActionSelector());
             config.Services.Replace(typeof(IExceptionHandler), new PassthroughHandler());
 
@@ -140,8 +138,8 @@ namespace WispCloud
                         .AuthorizationUrl($"{_rootUrl}{_oauth2AuthorizeEndpoint}")
                         .TokenUrl($"{_rootUrl}{_oauth2TokenEndpoint}");
 
-                    x.SingleApiVersion("v1", "Wisp cloud API")
-                        .Description("Api for control and synchronize all Wisp devices and apps");
+                    x.SingleApiVersion("v1", "DeusEx Economy API")
+                        .Description("DeusEx Economy API");
                 });
 
             if (_enableSwaggerUI)

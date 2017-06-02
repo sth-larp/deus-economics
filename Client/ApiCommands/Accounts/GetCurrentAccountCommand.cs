@@ -1,8 +1,10 @@
-﻿using RestSharp;
-using System.Threading.Tasks;
-using WispCloudClient.ApiTypes;
+﻿using System.Threading.Tasks;
+using DeusClient.ApiCommands.Accounts.Client;
+using DeusClient.ApiCommands.CommonBase;
+using DeusClient.Client;
+using RestSharp;
 
-namespace WispCloudClient.ApiCommands
+namespace DeusClient.ApiCommands.Accounts
 {
     public sealed class GetCurrentAccountCommand : OutputCommand<Account>
     {

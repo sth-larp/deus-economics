@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNet.SignalR;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DeusCloud.Logic;
-using WispCloud.Logic;
+using Microsoft.AspNet.SignalR;
 
-namespace WispCloud.SignalR.Hubs
+namespace DeusCloud.SignalR.Hubs
 {
     public abstract class BaseHub : Hub
     {

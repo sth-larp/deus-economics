@@ -1,4 +1,4 @@
-﻿namespace WispCloud.Logic.EventArgs
+﻿namespace DeusCloud.Logic.Events.Client
 {
     public sealed class InstallationEventArgs : BaseEventArgs
     {

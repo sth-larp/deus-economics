@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
-using DeusCloud.Data;
-using DeusCloud.Data.Entities;
 
-namespace WispCloud.Data
+namespace DeusCloud.Data
 {
     public class DeusDBInitializer : CreateDatabaseIfNotExists<DeusData>
     {
@@ -16,8 +14,6 @@ namespace WispCloud.Data
             var random = new Random();
 
             //make id for installations that hard to count
-            data.Database.ExecuteSqlCommand($"CREATE SEQUENCE {Installation.SequenceName} AS bigint START WITH {random.Next(1000000, 1000000000)} INCREMENT BY {random.Next(100, 1000)}");
-
             //make unique index on hub login with nulls
         }
 

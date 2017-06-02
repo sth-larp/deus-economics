@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Exceptions;
-using WispCloud;
 
 namespace DeusCloud.Data
 {

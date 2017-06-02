@@ -24,7 +24,11 @@ namespace DeusCloud.Data.Entities.Accounts
         public Guid TokenSalt { get; set; }
 
         [Required]
+        [JsonIgnore]
         public AccountRole Role { get; set; }
+
+        [NotMapped]
+        public IEnumerable<AccountRole> Roles { get { return Role.GetFlags(); } }
 
         [Required]
         public float Cash { get; set; }

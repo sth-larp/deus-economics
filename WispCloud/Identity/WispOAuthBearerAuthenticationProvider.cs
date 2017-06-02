@@ -1,11 +1,12 @@
-﻿using Microsoft.Owin.Security.OAuth;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
-using WispCloud.Logic;
+using Microsoft.Owin.Security.OAuth;
 
-namespace WispCloud.Users
+namespace DeusCloud.Identity
 {
     public class WispOAuthBearerAuthenticationProvider : OAuthBearerAuthenticationProvider
     {
@@ -15,7 +16,7 @@ namespace WispCloud.Users
             var identity = context.Ticket.Identity;
 
             var account = wispContext.Accounts.Get(identity.Name);
-            if (account == null || !account.Active)
+            if (account == null || account.Status != AccountStatus.Active )
                 throw new DeusHttpException(System.Net.HttpStatusCode.Unauthorized);
 
             var tokenSalt = identity.Claims.FirstOrDefault(x => x.Type == ClaimTypes.UserData);

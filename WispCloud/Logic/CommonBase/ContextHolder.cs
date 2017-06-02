@@ -1,6 +1,4 @@
-﻿using WispCloud.Logic;
-
-namespace DeusCloud.Logic.CommonBase
+﻿namespace DeusCloud.Logic.CommonBase
 {
     public class ContextHolder : IContextHolder
     {

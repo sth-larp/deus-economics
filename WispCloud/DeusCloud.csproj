@@ -167,7 +167,7 @@
     <Compile Include="Api\DeusActionSelector.cs" />
     <Compile Include="Api\ApiController.cs" />
     <Compile Include="Api\DeusAuthorizeAttribute.cs" />
-    <Compile Include="Api\DeusControllerSelector.cs" />
+    <Compile Include="Api\ControllerSelector.cs" />
     <Compile Include="Api\DeusTraceLoggingAttribute.cs" />
     <Compile Include="Api\DeusValidateModelAttribute .cs" />
     <Compile Include="Data\Entities\Accounts\AccountRole.cs" />
@@ -183,7 +183,7 @@
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Identity\AuthorizationExtensions.cs" />
-    <Compile Include="Identity\Services\WispEmailService.cs" />
+    <Compile Include="Identity\Services\EmailService.cs" />
     <Compile Include="Identity\WispOAuthAuthorizationProvider.cs" />
     <Compile Include="Identity\WispOAuthBearerAuthenticationProvider.cs" />
     <Compile Include="Identity\UserManager.cs" />
@@ -232,7 +232,7 @@
     <Compile Include="SignalR\ConnectionMapping.cs" />
     <Compile Include="SignalR\Hubs\BaseHub.cs" />
     <Compile Include="SignalR\Hubs\EventsHub.cs" />
-    <Compile Include="WispCloudStartup.cs" />
+    <Compile Include="CloudStartup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

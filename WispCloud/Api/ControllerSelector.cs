@@ -5,9 +5,9 @@ using System.Web.Http.Dispatcher;
 
 namespace DeusCloud.Api
 {
-    public class DeusControllerSelector : DefaultHttpControllerSelector
+    public class ControllerSelector : DefaultHttpControllerSelector
     {
-        public DeusControllerSelector(HttpConfiguration configuration)
+        public ControllerSelector(HttpConfiguration configuration)
             : base(configuration)
         {
         }

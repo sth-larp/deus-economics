@@ -3,10 +3,9 @@ using DeusCloud.Data;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Logic.Accounts;
 using DeusCloud.Logic.Events;
+using DeusCloud.Logic.Rights;
 using DeusCloud.Logic.Transactions;
-using WispCloud.Data;
-using WispCloud.Logic;
-using WispCloud.SignalR;
+using DeusCloud.SignalR;
 
 namespace DeusCloud.Logic
 {

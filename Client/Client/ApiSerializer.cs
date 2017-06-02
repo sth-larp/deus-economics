@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.IO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RestSharp;
 using RestSharp.Deserializers;
 using RestSharp.Serializers;
-using System;
-using System.IO;
 
-namespace WispCloudClient
+namespace DeusClient.Client
 {
     public sealed class ApiSerializer : IDeserializer, ISerializer
     {

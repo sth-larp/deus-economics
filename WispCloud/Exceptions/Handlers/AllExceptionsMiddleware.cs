@@ -1,13 +1,13 @@
-﻿using Microsoft.Owin;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DeusCloud.Helpers;
 using DeusCloud.Serialization;
+using Microsoft.Owin;
 
-namespace WispCloud.Exceptions.Handlers
+namespace DeusCloud.Exceptions.Handlers
 {
     public class AllExceptionsMiddleware : OwinMiddleware
     {

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace WispCloudClient.ApiTypes
+namespace DeusClient.ApiCommands.Accounts.Client
 {
     public sealed class Account
     {

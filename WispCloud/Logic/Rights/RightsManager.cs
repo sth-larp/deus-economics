@@ -1,51 +1,44 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
-using DeusCloud.Logic;
+using DeusCloud.Identity;
 using DeusCloud.Logic.CommonBase;
 using DeusCloud.Logic.Rights.Client;
-using WispCloud.Data;
+using Microsoft.AspNet.Identity;
 
-namespace WispCloud.Logic
+namespace DeusCloud.Logic.Rights
 {
     public sealed class RightsManager : ContextHolder
     {
+        private UserManager _userManager;
         static string NotEnoughRightsMessageText { get; }
 
+        static string NotEnoughPrivilegeText { get; }
         static string UserBlockedMessageText { get; }
-        static string InstallationIsDisabledMessageText { get; }
 
         static RightsManager()
         {
+            NotEnoughPrivilegeText = "User did not allow this level of access;";
             NotEnoughRightsMessageText = "You are not allowed to perform this operation;";
             UserBlockedMessageText = "Your account is blocked;";
-            InstallationIsDisabledMessageText = "Cant find installation;";
         }
 
         public RightsManager(UserContext context)
             : base(context)
         {
+            _userManager = new UserManager(UserContext);
         }
 
-        public void CheckUser()
+        public void CheckCurrentUserActive()
         {
             Try.NotNull(UserContext.CurrentUser, NotEnoughRightsMessageText);
-            Try.Condition(UserContext.CurrentUser.Status == AccountStatus.Active, 
-                NotEnoughRightsMessageText);
-        }
-
-        public void CheckUserExistsAndActive(string user)
-        {
-            Try.NotNull(UserContext.CurrentUser, NotEnoughRightsMessageText);
-            Try.Condition(UserContext.CurrentUser.Status == AccountStatus.Active,
-                NotEnoughRightsMessageText);
+            Try.Condition(UserContext.CurrentUser.Status == AccountStatus.Active, UserBlockedMessageText);
         }
 
         public void CheckRole(AccountRole role)
         {
-            CheckUser();
+            CheckCurrentUserActive();
             Try.Condition((UserContext.CurrentUser.Role & role) > 0, NotEnoughRightsMessageText);
         }
 
@@ -54,60 +47,67 @@ namespace WispCloud.Logic
             return UserContext.Data.AccountAccesses.Find(slave, UserContext.CurrentUser.Login);
         }
 
-        public void CheckForOperation(string slave, AccountAccessRoles role)
+        public void CheckForAccessOverSlave(string slave, AccountAccessRoles roles)
         {
-            CheckUser();
-            var account = _userManager.FindById(slave);
-
-            //Master can do anything
-            if ((UserContext.CurrentUser.Role & AccountRole.Master) > 0)
+            CheckCurrentUserActive();
+            var slaveAccount = _userManager.FindById(slave);
+            Try.NotNull(slaveAccount, $"Cant find account with login: {slave}.");
+            
+            //Admin can do anything
+            if ((UserContext.CurrentUser.Role & AccountRole.Admin) > 0)
                 return;
 
-            var installationAccess = GetCurrentAccountAccess(slave);
-            Try.Condition(installationAccess != null && (installationAccess.Role & role) > 0, NotEnoughRightsMessageText);
+            //You have all access rights for yourself
+            if (UserContext.CurrentUser.Login == slave)
+                return;
+
+            var accessLevel = GetCurrentAccountAccess(slave);
+            Try.Condition(accessLevel != null && (accessLevel.Role & roles) > 0, NotEnoughPrivilegeText);
         }
 
 
-        public void SetProperties(AccPropertyClientData clientData)
+        public void SetAccountProperties(AccPropertyClientData clientData)
         {
             Try.Argument(clientData, nameof(clientData));
+            CheckRole(AccountRole.Admin);
+                
+            var roles = clientData.Roles?.Aggregate(AccountRole.None, (curr, r) => curr |= r);
 
-            AccountRole? role = null;
-            if (clientData.Roles != null)
-                role = clientData.Roles.Aggregate(AccountRole.None, (aggregatedRole, next) => aggregatedRole |= next);
+            var editAccount = UserContext.Accounts.Get(clientData.Login);
+            Try.NotNull(editAccount, $"Cant find account with login: {clientData.Login}.");
 
-            SetProperties(clientData.Login, role, clientData.Active);
+            if (roles != null)
+                editAccount.Role = roles.Value;
+
+            editAccount.Status = clientData.Status;
+
+            UserContext.Accounts.Update(editAccount);
         }
 
-        public void SetProperties(string login, AccountRole? roles, bool? active)
+        public void SetAccountAccess(string slave, string master, AccountAccessClientData accessData)
         {
-            CheckRole(AccountRole.SeviceEnginier);
+            CheckForAccessOverSlave(slave, AccountAccessRoles.Admin);
+            Try.Argument(accessData, nameof(accessData));
 
-            if (roles.HasValue) 
-                Try.Condition((roles.Value & AccountRole.Hub) == 0,
-                    "Cant assign Hub role, to create hubs use Hub api.");
+            var slaveAccount = _userManager.FindById(slave);
+            var masterAccount = _userManager.FindById(master);
+            Try.NotNull(masterAccount, $"Cant find account with login: {master}.");
 
-            var account = UserContext.Accounts.Get(login);
-            Try.NotNull(account, $"Cant find account with login: {login}.");
+            var newRole = accessData.Roles.Aggregate(AccountAccessRoles.None, (role, next) => role |= next);
 
-            if (roles.HasValue)
-            {
-                Try.Condition(account.Role != AccountRole.Hub, "Cant change role for hub.");
-                account.Role = roles.Value;
-            }
-            if (active.HasValue)
-                account.Active = active.Value;
-
-            UserContext.Accounts.Update(account);
+            var currentAccess = UserContext.Data.AccountAccesses.Find(slave, master);
+            if (currentAccess == null)
+                CreateAccountAccess(slaveAccount, masterAccount, newRole);
+            else
+                currentAccess.Role = newRole;
         }
 
-        public void SetAccountAccesses(long installationID, AccountAccessClientData clientData)
+        public AccountAccess CreateAccountAccess(Account slave, Account master, AccountAccessRoles roles)
         {
-            Try.Argument(clientData, nameof(clientData));
-            SetAccountAccesses(installationID, clientData.MasterLogin,
-                clientData.Roles.Aggregate(AccountAccessRoles.None, (role, next) => role |= next));
+            var access = new AccountAccess(slave, master, roles);
+            UserContext.Data.AccountAccesses.Add(access);
+            return access;
         }
-
     }
 
 }

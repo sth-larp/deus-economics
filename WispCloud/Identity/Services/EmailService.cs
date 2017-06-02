@@ -1,19 +1,19 @@
-﻿using Microsoft.AspNet.Identity;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using DeusCloud.Helpers;
+using Microsoft.AspNet.Identity;
 
-namespace WispCloud.Identity.Services
+namespace DeusCloud.Identity.Services
 {
-    public class WispEmailService : IIdentityMessageService
+    public class EmailService : IIdentityMessageService
     {
-        public static WispEmailService Instance { get; }
+        public static EmailService Instance { get; }
 
-        static WispEmailService()
+        static EmailService()
         {
-            Instance = new WispEmailService();
+            Instance = new EmailService();
         }
 
         SmtpClient _client;
@@ -21,7 +21,7 @@ namespace WispCloud.Identity.Services
 
         public bool IsEnabled { get; private set; }
 
-        private WispEmailService()
+        private EmailService()
         {
             IsEnabled = AppSettings.Is("mailEnabled");
             if (!IsEnabled)

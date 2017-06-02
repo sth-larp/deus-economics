@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.SignalR;
 
-namespace WispCloud.SignalR.Hubs
+namespace DeusCloud.SignalR.Hubs
 {
     public sealed class EventsHub : BaseHub
     {

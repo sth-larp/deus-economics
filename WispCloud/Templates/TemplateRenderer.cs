@@ -1,11 +1,11 @@
-﻿using Microsoft.Owin;
-using RazorEngine;
-using RazorEngine.Templating;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Reflection;
+using Microsoft.Owin;
+using RazorEngine;
+using RazorEngine.Templating;
 
-namespace WispCloud.Templates
+namespace DeusCloud.Templates
 {
     public static class TemplateRenderer
     {

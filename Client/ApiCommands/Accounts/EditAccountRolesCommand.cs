@@ -1,9 +1,11 @@
-﻿using RestSharp;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using WispCloudClient.ApiTypes;
+using DeusClient.ApiCommands.Accounts.Client;
+using DeusClient.ApiCommands.CommonBase;
+using DeusClient.Client;
+using RestSharp;
 
-namespace WispCloudClient.ApiCommands
+namespace DeusClient.ApiCommands.Accounts
 {
     public class EditAccountRolesCommand : InputCommand<RolesClientData>
     {

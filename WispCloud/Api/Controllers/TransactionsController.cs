@@ -19,8 +19,8 @@ namespace DeusCloud.Api.Controllers
         [Route("transfer")]
         public IHttpActionResult Transfer(string sender, string receiver, float amount)
         {
-            return Ok(UserContext.Transactions.Transfer(
-                UserContext.CurrentUser.Login, sender, receiver, amount));
+            UserContext.Transactions.Transfer(sender, receiver, amount);
+            return Ok();
         }
     }
 }

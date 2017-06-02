@@ -4,13 +4,13 @@ namespace DeusCloud.Helpers
 {
     public static class Constants
     {
-        public static class WispCloud
+        public static class StaticConstants
         {
             public const string DefaultConnectionStringName = "DeusMaster";
             public const string NotEnoughRightsMessageText = "You are not allowed to perform this operation;";
             public const string InstallationIsDisabledMessageText = "Cant find installation;";
             public const string MessageBusEmptyTopicsList = "List of subscribed topics cannot be null. For All topics subscription pass new string{\"\"} as argument";
-            public static AccountAccessRoles AccountAdminRole = AccountAccessRoles.Installer | AccountAccessRoles.Administrator;
+            public static AccountAccessRoles AccountAdminRoles = AccountAccessRoles.Admin;
             public const int MaxGroupsCount = 8;
             public const int MinimalHubHeartbeat = 1000;
             public const int MaximalHubHeartbeat = 60 * 1000;

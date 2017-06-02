@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNet.Identity;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic;
 using DeusCloud.Logic.CommonBase;
-using WispCloud.Data;
-using WispCloud.Logic;
+using Microsoft.AspNet.Identity;
 
-namespace WispCloud.Identity
+namespace DeusCloud.Identity
 {
     public sealed class UserStore : ContextHolder,
         IUserStore<Account>,

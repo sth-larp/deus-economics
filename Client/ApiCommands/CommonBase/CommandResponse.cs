@@ -1,9 +1,10 @@
-﻿using RestSharp;
-using System;
+﻿using System;
 using System.Net;
-using WispCloudClient.ApiTypes;
+using DeusClient.ApiCommands.CommonBase.Client;
+using DeusClient.Client;
+using RestSharp;
 
-namespace WispCloudClient.ApiCommands
+namespace DeusClient.ApiCommands.CommonBase
 {
     public class CommandResponse
     {

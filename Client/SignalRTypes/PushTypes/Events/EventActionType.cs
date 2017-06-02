@@ -1,4 +1,4 @@
-﻿namespace WispCloudClient.SignalRTypes
+﻿namespace DeusClient.SignalRTypes.PushTypes.Events
 {
     public enum EventActionType
     {

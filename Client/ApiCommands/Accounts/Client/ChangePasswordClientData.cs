@@ -1,4 +1,4 @@
-﻿namespace WispCloudClient.ApiTypes
+﻿namespace DeusClient.ApiCommands.Accounts.Client
 {
     public sealed class ChangePasswordClientData
     {

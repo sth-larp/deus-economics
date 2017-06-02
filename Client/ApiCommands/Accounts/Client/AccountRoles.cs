@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WispCloudClient.ApiTypes
+namespace DeusClient.ApiCommands.Accounts.Client
 {
     [Flags]
     public enum AccountRoles
