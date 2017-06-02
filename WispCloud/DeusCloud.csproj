@@ -175,6 +175,8 @@
     <Compile Include="Data\Entities\Accounts\AccountStatus.cs" />
     <Compile Include="Data\Entities\Accounts\UserAccountSettings.cs" />
     <Compile Include="Data\Entities\Access\AccountAccessRoles.cs" />
+    <Compile Include="Data\Entities\Transactions\Transaction.cs" />
+    <Compile Include="Data\Entities\Transactions\TransactionType.cs" />
     <Compile Include="Data\EntityFrameworkHelper.cs" />
     <Compile Include="Data\EnumsExtensions.cs" />
     <Compile Include="Exceptions\ExceptionPath.cs" />

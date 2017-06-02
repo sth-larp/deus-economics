@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DeusCloud.Data.Entities.Access;
 using DeusCloud.Serialization;
 using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
@@ -69,7 +68,5 @@ namespace DeusCloud.Data.Entities.Accounts
             Login = login;
             Role = role;
         }
-
     }
-
 }

@@ -1,4 +1,8 @@
-﻿using DeusCloud.Data.Entities;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DeusCloud.Data.Entities;
+using DeusCloud.Data.Entities.Access;
+using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
 using DeusCloud.Logic.CommonBase;
@@ -29,7 +33,7 @@ namespace DeusCloud.Logic.Transactions
             var senderAcc = _userManager.FindById(sender);
             Try.NotNull(senderAcc, $"Cant find account with login: {sender}.");
 
-            using (var transaction = UserContext.Data.Database.BeginTransaction())
+            using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
                 UserContext.Data.BeginFastSave();
 
@@ -44,9 +48,21 @@ namespace DeusCloud.Logic.Transactions
                 UserContext.Accounts.Update(senderAcc);
                 UserContext.Accounts.Update(receiverAcc);
 
+                var transaction = new Transaction(senderAcc, receiverAcc, amount);
+                transaction.Type = TransactionType.Normal;
+                UserContext.Data.Transactions.Add(transaction);
+
                 UserContext.Data.SaveChanges();
-                transaction.Commit();
+                dbTransact.Commit();
             }
+        }
+
+        public List<Transaction> GetHistory(string login)
+        {
+            _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            var ret = UserContext.Data.Transactions.Where(
+                x => x.Receiver == login || x.Sender == login);
+            return ret.ToList();
         }
     }
 }

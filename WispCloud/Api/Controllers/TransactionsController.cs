@@ -1,4 +1,8 @@
-﻿using System.Web.Http;
+﻿using System.Collections.Generic;
+using System.Web.Http;
+using System.Web.Http.Description;
+using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.Transactions;
 
 namespace DeusCloud.Api.Controllers
 {
@@ -21,6 +25,21 @@ namespace DeusCloud.Api.Controllers
         {
             UserContext.Transactions.Transfer(sender, receiver, amount);
             return Ok();
+        }
+
+        /// <summary>Obtain transaction history</summary>
+        /// <param name="login">Transaction account</param>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Internal Server Error</response>
+        [DeusAuthorize]
+        [HttpPost]
+        [Route("history")]
+        [ResponseType(typeof(List<Transaction>))]
+        public IHttpActionResult GetTransactionHistory(string login)
+        {
+            return Ok(UserContext.Transactions.GetHistory(login));
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic;
 
@@ -23,6 +24,7 @@ namespace DeusCloud.Data
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<AccountAccess> AccountAccesses { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
         public DeusData() : this(null) { }
         public DeusData(string dbNameOrConnectionString)
             : base(string.IsNullOrEmpty(dbNameOrConnectionString) ? 

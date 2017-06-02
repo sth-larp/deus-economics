@@ -1,4 +1,5 @@
 ﻿using DeusCloud.Data.Entities;
+using DeusCloud.Data.Entities.Access;
 
 namespace DeusCloud.Helpers
 {

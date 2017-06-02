@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace DeusCloud.Data.Entities
+namespace DeusCloud.Data.Entities.Access
 {
     [DataContract]
     [Flags]

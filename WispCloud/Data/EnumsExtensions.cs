@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities;
+using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.Transactions;
 
 namespace DeusCloud.Data
 {
@@ -20,6 +22,13 @@ namespace DeusCloud.Data
             return Enum.GetValues(typeof(AccountAccessRoles))
                 .Cast<AccountAccessRoles>()
                 .Where(x => (roles & x) > 0);
+        }
+
+        public static IEnumerable<TransactionType> GetFlags(this TransactionType types)
+        {
+            return Enum.GetValues(typeof(TransactionType))
+                .Cast<TransactionType>()
+                .Where(x => (types & x) > 0);
         }
 
     }
