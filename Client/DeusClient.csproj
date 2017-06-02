@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DeusClient</RootNamespace>
+    <AssemblyName>DeusClient</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Microsoft.AspNet.SignalR.Client.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApiCommands\Accounts\AddAccountToInstallationCommand.cs" />
+    <Compile Include="ApiCommands\Accounts\ChangePasswordCommand.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\Account.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\AccountRoles.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\Authorization.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\ChangePasswordClientData.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\InstallationAccessRoles.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\InstallationRolesClientData.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\RegistrationClientData.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\RolesClientData.cs" />
+    <Compile Include="ApiCommands\Accounts\Client\UserSettings.cs" />
+    <Compile Include="ApiCommands\Accounts\DeleteAccountFromInstallationCommand.cs" />
+    <Compile Include="ApiCommands\Accounts\EditAccountRolesCommand.cs" />
+    <Compile Include="ApiCommands\Accounts\EditInstallationRolesCommand.cs" />
+    <Compile Include="ApiCommands\Accounts\GetCurrentAccountCommand.cs" />
+    <Compile Include="ApiCommands\Accounts\LoginCommand.cs" />
+    <Compile Include="ApiCommands\Accounts\RegistrationCommand.cs" />
+    <Compile Include="ApiCommands\Accounts\RestorePasswordCommand.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\AddButtonWallSwitchToInstallationCommand.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\Client\ButtonWallSwitch.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\Client\ButtonWallSwitchSettings.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\Client\ButtonWallSwitchStatusClientData.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\Client\ButtonWallSwitchUserClientData.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\Client\ContainerToButtonWallSwitchClientData.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\CreateButtonWallSwitchCommand.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\EditButtonWallSwitchCommand.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\GetButtonWallSwitchesCommand.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\GetUnassignedButtonWallSwithcesCommand.cs" />
+    <Compile Include="ApiCommands\ButtonWallSwitches\UpdateButtonWallSwitchesCommand.cs" />
+    <Compile Include="ApiCommands\CommonBase\BaseCommand.cs" />
+    <Compile Include="ApiCommands\CommonBase\Client\NetworkStatus.cs" />
+    <Compile Include="ApiCommands\CommonBase\Client\ShortError.cs" />
+    <Compile Include="ApiCommands\CommonBase\CommandResponse.cs" />
+    <Compile Include="ApiCommands\CommonBase\CommandsManager.cs" />
+    <Compile Include="ApiCommands\CommonBase\GenericCommandResponse.cs" />
+    <Compile Include="ApiCommands\CommonBase\InputCommand.cs" />
+    <Compile Include="ApiCommands\CommonBase\InputOutputCommand.cs" />
+    <Compile Include="ApiCommands\CommonBase\OutputCommand.cs" />
+    <Compile Include="ApiCommands\De_bug\VoiceTurboModeOffCommand.cs" />
+    <Compile Include="ApiCommands\De_bug\VoiceTurboModeOnCommand.cs" />
+    <Compile Include="ApiCommands\De_bug\CreatePowerBarFromWindowCommand.cs" />
+    <Compile Include="ApiCommands\De_bug\MakeMeServiceEnginierCommand.cs" />
+    <Compile Include="ApiCommands\De_bug\VoiceSetBrightnessAndShadingCommand.cs" />
+    <Compile Include="ApiCommands\De_bug\NewHubPasswordCommand.cs" />
+    <Compile Include="ApiCommands\De_bug\VoiceSetBrightnessCommand.cs" />
+    <Compile Include="ApiCommands\EmptyCommand.cs" />
+    <Compile Include="ApiCommands\Hubs\AddHubToInstallationCommand.cs" />
+    <Compile Include="ApiCommands\Hubs\Client\Hub.cs" />
+    <Compile Include="ApiCommands\Hubs\Client\HubCreateClientData.cs" />
+    <Compile Include="ApiCommands\Hubs\Client\HubCredentials.cs" />
+    <Compile Include="ApiCommands\Hubs\Client\HubHardwareClientData.cs" />
+    <Compile Include="ApiCommands\Hubs\Client\HubSettingsClientData.cs" />
+    <Compile Include="ApiCommands\Hubs\CreateHubCommand.cs" />
+    <Compile Include="ApiCommands\Hubs\GetHubSettingsCommand.cs" />
+    <Compile Include="ApiCommands\Hubs\GetHubsCommand.cs" />
+    <Compile Include="ApiCommands\Hubs\GetUnassignedHubsCommand.cs" />
+    <Compile Include="ApiCommands\Hubs\UpdateHubSettingsCommand.cs" />
+    <Compile Include="ApiCommands\Installations\Client\InstallationClientData.cs" />
+    <Compile Include="ApiCommands\Installations\CreateInstallationCommand.cs" />
+    <Compile Include="ApiCommands\Installations\GetInstallationsCommand.cs" />
+    <Compile Include="ApiCommands\Modes\Client\DaysOfWeek.cs" />
+    <Compile Include="ApiCommands\Modes\Client\Mode.cs" />
+    <Compile Include="ApiCommands\Modes\Client\ModesClientData.cs" />
+    <Compile Include="ApiCommands\Modes\Client\Timer.cs" />
+    <Compile Include="ApiCommands\Modes\Client\TimerClientData.cs" />
+    <Compile Include="ApiCommands\Modes\CreateTimerCommand.cs" />
+    <Compile Include="ApiCommands\Modes\DeleteTimerCommand.cs" />
+    <Compile Include="ApiCommands\Modes\EditTimerCommand.cs" />
+    <Compile Include="ApiCommands\Modes\GetModesCommand.cs" />
+    <Compile Include="ApiCommands\Orders\Client\Order.cs" />
+    <Compile Include="ApiCommands\Orders\CreateOrderCommand.cs" />
+    <Compile Include="ApiCommands\Plan\Client\ContainerClientData.cs" />
+    <Compile Include="ApiCommands\Plan\Client\ContainerItem.cs" />
+    <Compile Include="ApiCommands\Plan\Client\ContainerItemStatus.cs" />
+    <Compile Include="ApiCommands\Plan\Client\FloorClientData.cs" />
+    <Compile Include="ApiCommands\Plan\Client\FloorItem.cs" />
+    <Compile Include="ApiCommands\Plan\Client\GroupClientData.cs" />
+    <Compile Include="ApiCommands\Plan\Client\GroupItem.cs" />
+    <Compile Include="ApiCommands\Plan\Client\GroupSettings.cs" />
+    <Compile Include="ApiCommands\Plan\Client\MainContainerClientData.cs" />
+    <Compile Include="ApiCommands\Plan\Client\MainContainerItem.cs" />
+    <Compile Include="ApiCommands\Plan\Client\PlanClientData.cs" />
+    <Compile Include="ApiCommands\Plan\Client\PlanView.cs" />
+    <Compile Include="ApiCommands\Plan\Client\RoomClientData.cs" />
+    <Compile Include="ApiCommands\Plan\Client\RoomItem.cs" />
+    <Compile Include="ApiCommands\Plan\Client\RoomSettings.cs" />
+    <Compile Include="ApiCommands\Plan\Client\WallClientData.cs" />
+    <Compile Include="ApiCommands\Plan\Client\WallItem.cs" />
+    <Compile Include="ApiCommands\Plan\Client\WallSettings.cs" />
+    <Compile Include="ApiCommands\Plan\Client\WindowClientData.cs" />
+    <Compile Include="ApiCommands\Plan\Client\WindowItem.cs" />
+    <Compile Include="ApiCommands\Plan\Client\WindowItemStatus.cs" />
+    <Compile Include="ApiCommands\Plan\EditPlanCommand.cs" />
+    <Compile Include="ApiCommands\Plan\GetPlanCommand.cs" />
+    <Compile Include="ApiCommands\PowerBars\AddPowerBarToInstallationCommand.cs" />
+    <Compile Include="ApiCommands\PowerBars\Client\BarLocation.cs" />
+    <Compile Include="ApiCommands\PowerBars\Client\PowerBar.cs" />
+    <Compile Include="ApiCommands\PowerBars\Client\PowerBarActionClientData.cs" />
+    <Compile Include="ApiCommands\PowerBars\Client\PowerBarActionParamsClientData.cs" />
+    <Compile Include="ApiCommands\PowerBars\Client\PowerBarAddToInstallationClientData.cs.cs" />
+    <Compile Include="ApiCommands\PowerBars\Client\PowerBarCreateClientData.cs" />
+    <Compile Include="ApiCommands\PowerBars\Client\PowerBarStatusClientData.cs" />
+    <Compile Include="ApiCommands\PowerBars\CreatePowerBarCommand.cs" />
+    <Compile Include="ApiCommands\PowerBars\DeletePowerBarCommand.cs" />
+    <Compile Include="ApiCommands\PowerBars\GetPowerBarsCommand.cs" />
+    <Compile Include="ApiCommands\PowerBars\GetUnassignedPowerBarsCommand.cs" />
+    <Compile Include="ApiCommands\PowerBars\PowerBarsActionCommand.cs" />
+    <Compile Include="ApiCommands\PowerBars\UpdatePowerBarsCommand.cs" />
+    <Compile Include="ApiCommands\Views\Client\ContainerPowerBarSNsClientData.cs" />
+    <Compile Include="ApiCommands\Views\Client\HubViewClientData.cs" />
+    <Compile Include="ApiCommands\Views\GetHubViewCommand.cs" />
+    <Compile Include="Client\ApiClient.cs" />
+    <Compile Include="Client\ApiSerializer.cs" />
+    <Compile Include="Client\Authenticator.cs" />
+    <Compile Include="Client\CloudClient.cs" />
+    <Compile Include="Client\IRestResponseExtensions.cs" />
+    <Compile Include="Client\SignalRClient.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SignalRTypes\PushTypes\Events\BaseEventArgs.cs" />
+    <Compile Include="SignalRTypes\PushTypes\Events\EventActionType.cs" />
+    <Compile Include="StaticRandom.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
