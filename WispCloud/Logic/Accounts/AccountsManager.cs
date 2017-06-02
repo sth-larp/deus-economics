@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
 using DeusCloud.Logic.Accounts.Client;
 using DeusCloud.Logic.CommonBase;
+using DeusCloud.Logic.Rights;
 using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Accounts
@@ -11,11 +13,13 @@ namespace DeusCloud.Logic.Accounts
     public sealed class AccountsManager : ContextHolder
     {
         UserManager _userManager;
+        private RightsManager _rightsManager;
 
         public AccountsManager(UserContext context)
             : base(context)
         {
             _userManager = new UserManager(UserContext);
+            _rightsManager = new RightsManager(UserContext);
         }
 
         public Account Registration(RegistrationClientData clientData)
@@ -72,6 +76,13 @@ namespace DeusCloud.Logic.Accounts
             var result = _userManager.Update(account);
             if (!result.Succeeded)
                 throw new DeusException(result.Errors.First());
+        }
+
+        public List<Account> GetAccountList()
+        {
+            _rightsManager.CheckRole(AccountRole.Admin);
+            var res = UserContext.Data.Accounts.ToList();
+            return res;
         }
     }
 }

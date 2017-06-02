@@ -70,5 +70,18 @@ namespace DeusCloud.Api.Controllers
         {
             return Ok(UserContext.Rights.SetAccountProperties(clientData));
         }
+
+        /// <summary>Get all accounts</summary>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="500">Internal Server Error</response>
+        [DeusAuthorize]
+        [HttpGet]
+        [Route("accounts/list")]
+        [ResponseType(typeof(List<Account>))]
+        public IHttpActionResult GetAccountList()
+        {
+            return Ok(UserContext.Accounts.GetAccountList());
+        }
     }
 }
