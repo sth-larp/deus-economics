@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DeusCloud.Data.Entities;
+using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
@@ -66,7 +68,7 @@ namespace DeusCloud.Logic.Rights
         }
 
 
-        public void SetAccountProperties(AccPropertyClientData clientData)
+        public Account SetAccountProperties(AccPropertyClientData clientData)
         {
             Try.Argument(clientData, nameof(clientData));
             CheckRole(AccountRole.Admin);
@@ -82,24 +84,31 @@ namespace DeusCloud.Logic.Rights
             editAccount.Status = clientData.Status;
 
             UserContext.Accounts.Update(editAccount);
+            return editAccount;
         }
 
-        public void SetAccountAccess(string slave, string master, AccountAccessClientData accessData)
+        public AccountAccess SetAccountAccess(AccountAccessClientData accessData)
         {
-            CheckForAccessOverSlave(slave, AccountAccessRoles.Admin);
+            CheckForAccessOverSlave(accessData.SlaveLogin, AccountAccessRoles.Admin);
             Try.Argument(accessData, nameof(accessData));
 
-            var slaveAccount = _userManager.FindById(slave);
-            var masterAccount = _userManager.FindById(master);
-            Try.NotNull(masterAccount, $"Cant find account with login: {master}.");
+            var slaveAccount = _userManager.FindById(accessData.SlaveLogin);
+            var masterAccount = _userManager.FindById(accessData.MasterLogin);
+            Try.NotNull(masterAccount, $"Cant find account with login: {accessData.MasterLogin}.");
 
             var newRole = accessData.Roles.Aggregate(AccountAccessRoles.None, (role, next) => role |= next);
 
-            var currentAccess = UserContext.Data.AccountAccesses.Find(slave, master);
+            var currentAccess = UserContext.Data.AccountAccesses.
+                Find(accessData.SlaveLogin, accessData.MasterLogin);
+
             if (currentAccess == null)
-                CreateAccountAccess(slaveAccount, masterAccount, newRole);
+                currentAccess = CreateAccountAccess(slaveAccount, masterAccount, newRole);
             else
                 currentAccess.Role = newRole;
+
+            UserContext.Data.SaveChanges();
+
+            return currentAccess;
         }
 
         public AccountAccess CreateAccountAccess(Account slave, Account master, AccountAccessRoles roles)
@@ -107,6 +116,20 @@ namespace DeusCloud.Logic.Rights
             var access = new AccountAccess(slave, master, roles);
             UserContext.Data.AccountAccesses.Add(access);
             return access;
+        }
+
+        public List<AccountAccess> GetAccessMasters(string slave)
+        {
+            CheckForAccessOverSlave(slave, AccountAccessRoles.Read);
+
+            return UserContext.Data.AccountAccesses.Where(x => x.Slave == slave).ToList();
+        }
+
+        public List<AccountAccess> GetAccessSlaves(string master)
+        {
+            CheckForAccessOverSlave(master, AccountAccessRoles.Read);
+
+            return UserContext.Data.AccountAccesses.Where(x => x.Master == master).ToList();
         }
     }
 

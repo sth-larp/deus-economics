@@ -4,11 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 using DeusCloud.Data.Entities.Accounts;
 using Newtonsoft.Json;
 
-namespace DeusCloud.Data.Entities
+namespace DeusCloud.Data.Entities.Access
 {
     public class AccountAccess
     {
         [Key, Column(Order = 0)]
+        [Index]
         public string Slave { get; protected set; }
 
         [JsonIgnore]
@@ -16,6 +17,7 @@ namespace DeusCloud.Data.Entities
         public virtual Account SlaveAccount { get; protected set; }
 
         [Key, Column(Order = 1)]
+        [Index]
         public string Master { get; protected set; }
 
         [JsonIgnore]
@@ -23,6 +25,7 @@ namespace DeusCloud.Data.Entities
         public virtual Account MasterAccount { get; protected set; }
 
         [Required]
+        [JsonIgnore]
         public AccountAccessRoles Role { get; set; }
 
         [NotMapped]
@@ -32,7 +35,7 @@ namespace DeusCloud.Data.Entities
         {
         }
 
-        public AccountAccess(Account master, Account slave, AccountAccessRoles roles)
+        public AccountAccess(Account slave, Account master, AccountAccessRoles roles)
         {
             MasterAccount = master;
             SlaveAccount = slave;

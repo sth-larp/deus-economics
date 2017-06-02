@@ -1,5 +1,8 @@
-﻿using System.Web.Http;
+﻿using System.Collections.Generic;
+using System.Web.Http;
 using System.Web.Http.Description;
+using DeusCloud.Data.Entities;
+using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Logic.Accounts.Client;
 using DeusCloud.Logic.Rights.Client;
@@ -33,7 +36,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
         [Route("accounts/register")]
-        [ResponseType(typeof(UserAccount))]
+        [ResponseType(typeof(Account))]
         public IHttpActionResult Registration(RegistrationClientData clientData)
         {
             return Ok(UserContext.Accounts.Registration(clientData));
@@ -54,7 +57,7 @@ namespace DeusCloud.Api.Controllers
         }
 
         
-        /// <summary>Set roles for account</summary>
+        /// <summary>Set properties for account</summary>
         /// <param name="clientData">Login and roles</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
@@ -62,26 +65,10 @@ namespace DeusCloud.Api.Controllers
         [DeusAuthorize]
         [HttpPost]
         [Route("accounts/properties")]
+        [ResponseType(typeof(Account))]
         public IHttpActionResult SetAccountProperties(AccPropertyClientData clientData)
         {
-            UserContext.Rights.SetAccountProperties(clientData);
-            return Ok();
-        }
-
-        /// <summary>Set roles for account in installation</summary>
-        /// <param name="slave">Account which will be accesses</param>
-        /// <param name="master">Account which will have access</param>
-        /// <param name="accessData">Access roles</param>
-        /// <response code="200">OK</response>
-        /// <response code="400">Bad request</response>
-        /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
-        [HttpPost]
-        [Route("accounts/access")]
-        public IHttpActionResult SetAccountAccesses(string slave, string master, AccountAccessClientData accessData)
-        {
-            UserContext.Rights.SetAccountAccess(slave, master, accessData);
-            return Ok();
+            return Ok(UserContext.Rights.SetAccountProperties(clientData));
         }
     }
 }

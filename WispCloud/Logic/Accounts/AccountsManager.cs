@@ -18,9 +18,9 @@ namespace DeusCloud.Logic.Accounts
             _userManager = new UserManager(UserContext);
         }
 
-        public UserAccount Registration(RegistrationClientData clientData)
+        public Account Registration(RegistrationClientData clientData)
         {
-            var newUser = new UserAccount(clientData.Email, AccountRole.Admin);
+            var newUser = new Account(clientData.Login, AccountRole.Admin);
                 //register all users as superusers for debug and tests
             newUser.Settings = clientData.Settings;
             newUser.Cash = 100000;

@@ -1,14 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DeusCloud.Data.Entities.Access;
+using DeusCloud.Serialization;
 using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 
 namespace DeusCloud.Data.Entities.Accounts
 {
-    public abstract class Account : IUser
+    public class Account : IUser
     {
+        [NotMapped]
+        public UserSettings Settings { get; set; }
+
+        [JsonIgnore]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string SettingsJson
+        {
+            get { return WispJsonSerializer.SerializeToJsonString(Settings); }
+            set { Settings = WispJsonSerializer.DeserializeJson<UserSettings>(value); }
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [StringLength(250)]
@@ -36,9 +51,6 @@ namespace DeusCloud.Data.Entities.Accounts
         [Required]
         public AccountStatus Status { get; set; }
 
-        [JsonIgnore]
-        public virtual List<AccountAccess> AccountAccesses { get; set; }
-
         string IUser<string>.Id { get { return Login; } }
 
         string IUser<string>.UserName
@@ -53,9 +65,9 @@ namespace DeusCloud.Data.Entities.Accounts
 
         public Account(string login, AccountRole role)
         {
-            this.Status = AccountStatus.Active;
-            this.Login = login;
-            this.Role = role;
+            Status = AccountStatus.Active;
+            Login = login;
+            Role = role;
         }
 
     }

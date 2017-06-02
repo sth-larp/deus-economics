@@ -41,6 +41,9 @@ namespace DeusCloud.Logic.Transactions
                 senderAcc.Cash -= amount;
                 receiverAcc.Cash += amount;
 
+                UserContext.Accounts.Update(senderAcc);
+                UserContext.Accounts.Update(receiverAcc);
+
                 UserContext.Data.SaveChanges();
                 transaction.Commit();
             }

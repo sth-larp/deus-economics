@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\CommonPrefixProvider .cs" />
+    <Compile Include="Api\Controllers\AccessController.cs" />
     <Compile Include="Api\Controllers\AccountsController.cs" />
     <Compile Include="Api\Controllers\ErrorController.cs" />
     <Compile Include="Api\Controllers\TransactionsController.cs" />
@@ -173,7 +174,7 @@
     <Compile Include="Data\Entities\Accounts\AccountRole.cs" />
     <Compile Include="Data\Entities\Accounts\AccountStatus.cs" />
     <Compile Include="Data\Entities\Accounts\UserAccountSettings.cs" />
-    <Compile Include="Data\Entities\AccountAccessRoles.cs" />
+    <Compile Include="Data\Entities\Access\AccountAccessRoles.cs" />
     <Compile Include="Data\EntityFrameworkHelper.cs" />
     <Compile Include="Data\EnumsExtensions.cs" />
     <Compile Include="Exceptions\ExceptionPath.cs" />
@@ -194,9 +195,9 @@
     <Compile Include="Logic\CommonBase\IContextHolder.cs" />
     <Compile Include="Logic\CommonBase\StaticRandom.cs" />
     <Compile Include="Logic\CommonBase\ContextHolder.cs" />
-    <Compile Include="Logic\Rights\Client\AccPropertyClientData.cs" />
-    <Compile Include="Logic\Rights\Client\AccountAccessClientData.cs" />
-    <Compile Include="Logic\Rights\RightsManager.cs" />
+    <Compile Include="Logic\Accesses\Client\AccPropertyClientData.cs" />
+    <Compile Include="Logic\Accesses\Client\AccountAccessClientData.cs" />
+    <Compile Include="Logic\Accesses\RightsManager.cs" />
     <Compile Include="Logic\Transactions\TransactionsManager.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />
@@ -208,8 +209,7 @@
     <Compile Include="Templates\Models\RestorePasswordModel.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Data\Entities\Accounts\Account.cs" />
-    <Compile Include="Data\Entities\Accounts\UserAccount.cs" />
-    <Compile Include="Data\Entities\AccountAccess.cs" />
+    <Compile Include="Data\Entities\Access\AccountAccess.cs" />
     <Compile Include="Data\DeusData.cs" />
     <Compile Include="Data\DeusDBInitializer.cs" />
     <Compile Include="Exceptions\Handlers\AllExceptionsMiddleware.cs" />

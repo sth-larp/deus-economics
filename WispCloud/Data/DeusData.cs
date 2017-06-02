@@ -6,6 +6,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DeusCloud.Data.Entities;
+using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic;
@@ -21,7 +22,6 @@ namespace DeusCloud.Data
         }
 
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<UserAccount> UserAccounts { get; set; }
         public DbSet<AccountAccess> AccountAccesses { get; set; }
         public DeusData() : this(null) { }
         public DeusData(string dbNameOrConnectionString)
@@ -30,7 +30,7 @@ namespace DeusCloud.Data
         {
             Database.SetInitializer(new DeusDBInitializer());
 #if DEBUG
-            this.Database.Log = (x => System.Diagnostics.Debug.WriteLine(x));
+            Database.Log = (x => System.Diagnostics.Debug.WriteLine(x));
 #endif
         }
 
