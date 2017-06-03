@@ -3,6 +3,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Transactions;
+using DeusCloud.Logic.Client;
 
 namespace DeusCloud.Api.Controllers
 {
@@ -35,7 +36,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [DeusAuthorize]
         [HttpPost]
-        [Route("history")]
+        [Route("transactions")]
         [ResponseType(typeof(List<Transaction>))]
         public IHttpActionResult GetTransactionHistory(string login)
         {

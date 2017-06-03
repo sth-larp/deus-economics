@@ -5,8 +5,8 @@ using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
+using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
-using DeusCloud.Logic.Rights.Client;
 using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Rights

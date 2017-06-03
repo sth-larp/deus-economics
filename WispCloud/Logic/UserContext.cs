@@ -1,10 +1,9 @@
 ﻿using System;
 using DeusCloud.Data;
 using DeusCloud.Data.Entities.Accounts;
-using DeusCloud.Logic.Accounts;
 using DeusCloud.Logic.Events;
+using DeusCloud.Logic.Managers;
 using DeusCloud.Logic.Rights;
-using DeusCloud.Logic.Transactions;
 using DeusCloud.SignalR;
 
 namespace DeusCloud.Logic
@@ -27,6 +26,7 @@ namespace DeusCloud.Logic
         RightsManager _rights;
         AccountsManager _accounts;
         TransactionsManager _transactions;
+        PaymentsManager _payments;
 
         EventsManager _events;
 
@@ -73,7 +73,18 @@ namespace DeusCloud.Logic
                 return _transactions;
             }
         }
-        
+
+        public PaymentsManager Payments
+        {
+            get
+            {
+                if (_payments == null)
+                    _payments = new PaymentsManager(this);
+
+                return _payments;
+            }
+        }
+
         public EventsManager Events
         {
             get

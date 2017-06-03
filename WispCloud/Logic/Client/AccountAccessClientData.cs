@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
 
-namespace DeusCloud.Logic.Rights.Client
+namespace DeusCloud.Logic.Client
 {
     public sealed class AccountAccessClientData : BaseModel
     {

@@ -4,8 +4,7 @@ using System.Web.Http.Description;
 using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
-using DeusCloud.Logic.Accounts.Client;
-using DeusCloud.Logic.Rights.Client;
+using DeusCloud.Logic.Client;
 
 namespace DeusCloud.Api.Controllers
 {

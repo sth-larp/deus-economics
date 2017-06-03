@@ -1,7 +1,7 @@
 ﻿using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
 
-namespace DeusCloud.Logic.Accounts.Client
+namespace DeusCloud.Logic.Client
 {
     public sealed class ChangePasswordClientData : BaseModel
     {

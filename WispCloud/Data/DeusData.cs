@@ -25,6 +25,7 @@ namespace DeusCloud.Data
         public DbSet<Account> Accounts { get; set; }
         public DbSet<AccountAccess> AccountAccesses { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Payment> Payments { get; set; }
         public DeusData() : this(null) { }
         public DeusData(string dbNameOrConnectionString)
             : base(string.IsNullOrEmpty(dbNameOrConnectionString) ? 

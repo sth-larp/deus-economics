@@ -1,9 +1,8 @@
-﻿using System.Net.Mail;
-using DeusCloud.Data.Entities.Accounts;
+﻿using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
 
-namespace DeusCloud.Logic.Accounts.Client
+namespace DeusCloud.Logic.Client
 {
     public sealed class RegistrationClientData : BaseModel
     {

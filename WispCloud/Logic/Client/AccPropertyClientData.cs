@@ -3,7 +3,7 @@ using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
 
-namespace DeusCloud.Logic.Rights.Client
+namespace DeusCloud.Logic.Client
 {
     public sealed class AccPropertyClientData : BaseModel
     {

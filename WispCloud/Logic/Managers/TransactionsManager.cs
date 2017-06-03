@@ -1,23 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
+using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
-using DeusCloud.Logic.Events.Client;
 using DeusCloud.Logic.Rights;
 using Microsoft.AspNet.Identity;
 
-namespace DeusCloud.Logic.Transactions
+namespace DeusCloud.Logic.Managers
 {
     public sealed class TransactionsManager : ContextHolder
     {
         private UserManager _userManager;
         private RightsManager _rightsManager;
 
-        public TransactionsManager(UserContext context): base(context)
+        public TransactionsManager(UserContext context) : base(context)
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
