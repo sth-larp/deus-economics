@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
@@ -9,7 +8,7 @@ using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
 using Microsoft.AspNet.Identity;
 
-namespace DeusCloud.Logic.Rights
+namespace DeusCloud.Logic.Managers
 {
     public sealed class RightsManager : ContextHolder
     {

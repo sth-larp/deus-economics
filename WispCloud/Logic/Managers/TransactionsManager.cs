@@ -6,7 +6,6 @@ using DeusCloud.Exceptions;
 using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
-using DeusCloud.Logic.Rights;
 using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers
@@ -49,7 +48,9 @@ namespace DeusCloud.Logic.Managers
 
                 var transaction = new Transaction(senderAcc, receiverAcc, amount);
                 transaction.Type = TransactionType.Normal;
-                UserContext.Data.Transactions.Add(transaction);
+
+                var taxedTransactions = TaxManager.TakeTax(transaction);
+                taxedTransactions.ForEach(x => UserContext.Data.Transactions.Add(x));
 
                 UserContext.Data.SaveChanges();
                 dbTransact.Commit();

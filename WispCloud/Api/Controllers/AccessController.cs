@@ -12,7 +12,7 @@ namespace DeusCloud.Api.Controllers
     [DeusTraceLogging]
     public sealed class AccessController : ApiController
     {
-        /// <summary>Set roles for account in installation</summary>
+        /// <summary>Set access roles for master-slave account pair</summary>
         /// <param name="accessData">Access roles</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
@@ -26,7 +26,7 @@ namespace DeusCloud.Api.Controllers
             return Ok(UserContext.Rights.SetAccountAccess(accessData));
         }
 
-        /// <summary>List of accounts having access to slave</summary>
+        /// <summary>List of accounts having access to slave account</summary>
         /// <param name="slave">Slave account</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
@@ -40,8 +40,8 @@ namespace DeusCloud.Api.Controllers
             return Ok(UserContext.Rights.GetAccessMasters(slave));
         }
 
-        /// <summary>List of accounts which master can access</summary>
-        /// <param name="slave">Master account</param>
+        /// <summary>List of accounts which master account can access</summary>
+        /// <param name="master">Master account</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>

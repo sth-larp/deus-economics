@@ -58,7 +58,6 @@ namespace DeusCloud.Api.Controllers
 
         /// <summary>Delete existing payment</summary>
         /// <param name="id">Payment id</param>
-        /// <param name="data">Payment data</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>

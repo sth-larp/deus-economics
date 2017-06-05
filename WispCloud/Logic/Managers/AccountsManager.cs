@@ -5,7 +5,6 @@ using DeusCloud.Exceptions;
 using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
-using DeusCloud.Logic.Rights;
 using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers

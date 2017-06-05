@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
 using DeusCloud.Data;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Logic.Events;
 using DeusCloud.Logic.Managers;
-using DeusCloud.Logic.Rights;
 using DeusCloud.SignalR;
 
 namespace DeusCloud.Logic
@@ -27,6 +27,7 @@ namespace DeusCloud.Logic
         AccountsManager _accounts;
         TransactionsManager _transactions;
         PaymentsManager _payments;
+        TaxManager _taxation;
 
         EventsManager _events;
 
@@ -53,6 +54,19 @@ namespace DeusCloud.Logic
                 return _rights;
             }
         }
+
+        public TaxManager Taxation
+        {
+            get
+            {
+                if (_taxation == null)
+                {
+                    _taxation = new TaxManager(this);
+                }
+
+                return _taxation;
+            }
+        }
         public AccountsManager Accounts
         {
             get
@@ -68,7 +82,10 @@ namespace DeusCloud.Logic
             get
             {
                 if (_transactions == null)
+                {
                     _transactions = new TransactionsManager(this);
+                    _taxation = new TaxManager(this);
+                }
 
                 return _transactions;
             }

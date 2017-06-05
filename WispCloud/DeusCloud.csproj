@@ -158,6 +158,9 @@
     <EmbeddedResource Include="Migrations\201706031252007_Payments-fix1.resx">
       <DependentUpon>201706031252007_Payments-fix1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706041051569_Taxes.resx">
+      <DependentUpon>201706041051569_Taxes.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\Files\OAuth2AuthorizationForm.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -170,6 +173,7 @@
     <Compile Include="Api\Controllers\AccountsController.cs" />
     <Compile Include="Api\Controllers\ErrorController.cs" />
     <Compile Include="Api\Controllers\PaymentsController.cs" />
+    <Compile Include="Api\Controllers\TaxController.cs" />
     <Compile Include="Api\Controllers\TransactionsController.cs" />
     <Compile Include="Api\OkJsonPatchResult.cs" />
     <Compile Include="Api\DeusActionSelector.cs" />
@@ -182,6 +186,8 @@
     <Compile Include="Data\Entities\Accounts\AccountStatus.cs" />
     <Compile Include="Data\Entities\Accounts\UserAccountSettings.cs" />
     <Compile Include="Data\Entities\Access\AccountAccessRoles.cs" />
+    <Compile Include="Data\Entities\Taxes\Tax.cs" />
+    <Compile Include="Data\Entities\Taxes\TaxType.cs" />
     <Compile Include="Data\Entities\Transactions\Payments.cs" />
     <Compile Include="Data\Entities\Transactions\Transaction.cs" />
     <Compile Include="Data\Entities\Transactions\TransactionType.cs" />
@@ -210,6 +216,7 @@
     <Compile Include="Logic\Client\AccountAccessClientData.cs" />
     <Compile Include="Logic\Managers\PaymentsManager.cs" />
     <Compile Include="Logic\Managers\RightsManager.cs" />
+    <Compile Include="Logic\Managers\TaxManager.cs" />
     <Compile Include="Logic\Managers\TransactionsManager.cs" />
     <Compile Include="Migrations\201706031244161_Payments.cs" />
     <Compile Include="Migrations\201706031244161_Payments.Designer.cs">
@@ -218,6 +225,10 @@
     <Compile Include="Migrations\201706031252007_Payments-fix1.cs" />
     <Compile Include="Migrations\201706031252007_Payments-fix1.Designer.cs">
       <DependentUpon>201706031252007_Payments-fix1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706041051569_Taxes.cs" />
+    <Compile Include="Migrations\201706041051569_Taxes.Designer.cs">
+      <DependentUpon>201706041051569_Taxes.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />
@@ -255,7 +266,9 @@
     <Compile Include="CloudStartup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Properties\PublishProfiles\Publish.pubxml" />
     <EmbeddedResource Include="Templates\Files\RegistrationEmail.html" />
     <EmbeddedResource Include="Templates\Files\RestorePasswordEmail.cshtml" />

@@ -55,7 +55,7 @@ namespace DeusCloud.Api.Controllers
             return Ok();
         }
 
-        
+
         /// <summary>Set properties for account</summary>
         /// <param name="clientData">Login and roles</param>
         /// <response code="200">OK</response>

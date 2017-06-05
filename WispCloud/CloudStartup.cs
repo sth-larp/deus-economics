@@ -119,7 +119,7 @@ namespace DeusCloud
                 {
                     x.CustomProvider(provider => new CachingSwaggerProvider(provider));
 
-                    x.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\bin\WispCloud.XML");
+                    x.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\bin\DeusCloud.XML");
                     x.MapType<decimal>(() => new Schema { type = "string", format = "\\d+" });
                     x.DescribeAllEnumsAsStrings();
                     x.DocumentFilter<AllPropertiesWritableFilter>();
