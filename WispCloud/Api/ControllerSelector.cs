@@ -2,6 +2,7 @@
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
+using DeusCloud.Exceptions;
 
 namespace DeusCloud.Api
 {

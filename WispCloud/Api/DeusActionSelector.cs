@@ -1,4 +1,5 @@
 ﻿using System.Web.Http.Controllers;
+using DeusCloud.Exceptions;
 
 namespace DeusCloud.Api
 {
