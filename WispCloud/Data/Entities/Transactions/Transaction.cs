@@ -35,6 +35,8 @@ namespace DeusCloud.Data.Entities.Transactions
         [Required]
         public float Amount { get; set; }
 
+        public string Comment { get; set; }
+
         [Required]
         [JsonIgnore]
         public TransactionType Type { get; set; }

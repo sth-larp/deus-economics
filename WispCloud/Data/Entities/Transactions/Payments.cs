@@ -15,11 +15,14 @@ namespace DeusCloud.Data.Entities.Transactions
 
         [Required]
         [Index]
-        public string Sender { get; set; }
+        public string Employer { get; set; }
+
+        [NotMapped]
+        public string EmployerName { get { return EmployerAccount.Settings.ToString(); } }
 
         [JsonIgnore]
-        [ForeignKey("Sender")]
-        public virtual Account SenderAccount { get; set; }
+        [ForeignKey("Employer")]
+        public virtual Account EmployerAccount { get; set; }
 
         [Required]
         [Index]
@@ -50,9 +53,9 @@ namespace DeusCloud.Data.Entities.Transactions
         {
         }
 
-        public Payment(Account sender, Account receiver, float amount)
+        public Payment(Account employer, Account receiver, float amount)
         {
-            SenderAccount = sender;
+            EmployerAccount = employer;
             ReceiverAccount = receiver;
             Amount = amount;
             Debt = 0;

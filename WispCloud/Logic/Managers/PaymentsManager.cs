@@ -27,13 +27,15 @@ namespace DeusCloud.Logic.Managers
         {
             _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
             var ret = UserContext.Data.Payments.Where(
-                x => x.Receiver == login || x.Sender == login);
+                x => x.Receiver == login || x.Employer == login);
             return ret.ToList();
         }
 
         public Payment NewPayment(PaymentClientData data)
         {
-            _rightsManager.CheckForAccessOverSlave(data.Sender, AccountAccessRoles.Withdraw);
+            _rightsManager.CheckRole(AccountRole.Admin);
+            //_rightsManager.CheckForAccessOverSlave(data.Sender, AccountAccessRoles.Withdraw);
+
             var senderAcc = _userManager.FindById(data.Sender);
             var receiverAcc = _userManager.FindById(data.Receiver);
 
@@ -41,12 +43,14 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.Payments.Add(payment);
             UserContext.Data.SaveChanges();
 
-                return payment;
-            }
+            return payment;
+        }
 
         public Payment EditPayment(int id, PaymentClientData data)
         {
-            _rightsManager.CheckForAccessOverSlave(data.Sender, AccountAccessRoles.Withdraw);
+            _rightsManager.CheckRole(AccountRole.Admin);
+            //_rightsManager.CheckForAccessOverSlave(data.Sender, AccountAccessRoles.Withdraw);
+
             Payment ret = null;
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
@@ -55,7 +59,7 @@ namespace DeusCloud.Logic.Managers
                 ret = UserContext.Data.Payments.Find(id);
                 Try.NotNull(ret, $"Can't find payment with id: {id}");
 
-                ret.Sender = data.Sender;
+                ret.Employer = data.Sender;
                 ret.Receiver = data.Receiver;
                 ret.Amount = data.Amount;
 
@@ -68,9 +72,11 @@ namespace DeusCloud.Logic.Managers
 
         public void DeletePayment(int id)
         {
+            _rightsManager.CheckRole(AccountRole.Admin);
+
             var payment = UserContext.Data.Payments.Find(id);
             Try.NotNull(payment, $"Can't find payment with id: {id}");
-            _rightsManager.CheckForAccessOverSlave(payment.Sender, AccountAccessRoles.Withdraw);
+            //_rightsManager.CheckForAccessOverSlave(payment.Employer, AccountAccessRoles.Withdraw);
 
             UserContext.Data.Payments.Remove(payment);
             UserContext.Data.SaveChanges();
@@ -94,21 +100,22 @@ namespace DeusCloud.Logic.Managers
 
         private void PerformPayment(Payment pay)
         {
-            if (pay.SenderAccount.Cash < pay.Amount)
+            if (pay.EmployerAccount.Cash < pay.Amount)
             {
                 pay.Debt += pay.Amount;
                 return;
             }
 
-            pay.SenderAccount.Cash -= pay.Amount;
+            //pay.EmployerAccount.Cash -= pay.Amount; //Payment from nowhere
             pay.ReceiverAccount.Cash += pay.Amount;
             pay.LastPaid = DateTime.Now;
 
-            UserContext.Accounts.Update(pay.SenderAccount);
+            //UserContext.Accounts.Update(pay.EmployerAccount);
             UserContext.Accounts.Update(pay.ReceiverAccount);
 
-            var transaction = new Transaction(pay.SenderAccount, pay.ReceiverAccount, pay.Amount);
+            var transaction = new Transaction(pay.EmployerAccount, pay.ReceiverAccount, pay.Amount);
             transaction.Type |= TransactionType.Payment;
+            transaction.Comment = String.Format("Regular payment from {0}", pay.EmployerName);
 
             var taxedTransactions = TaxManager.TakeTax(transaction);
             taxedTransactions.ForEach(x => UserContext.Data.Transactions.Add(x));

@@ -37,7 +37,7 @@ namespace DeusCloud.Logic.Managers
         {
             var ret = new List<Transaction>();
             //Take transaction tax
-            if (transaction.Receiver != "govt" && Taxes.ContainsKey(TaxType.Transaction))
+            if (transaction.Receiver != "govt" && Taxes != null && Taxes.ContainsKey(TaxType.Transaction))
             {
                 var sum = transaction.Amount * Taxes[TaxType.Transaction].PercentValue / 100;
                 var t = new Transaction(transaction.SenderAccount, _government, sum);
