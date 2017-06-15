@@ -13,6 +13,7 @@ namespace DeusCloud.Data.Entities.Accounts
         Admin = 4,
         Corp = 8,
         Govt = 16,
+        Tavern = 32,
     }
 
 }

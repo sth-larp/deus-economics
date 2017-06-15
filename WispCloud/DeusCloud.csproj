@@ -158,6 +158,12 @@
     <EmbeddedResource Include="Migrations\201706152052343_AdminPayments.resx">
       <DependentUpon>201706152052343_AdminPayments.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706152116284_TransactionDetails.resx">
+      <DependentUpon>201706152116284_TransactionDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706152204399_TransactionDetails2.resx">
+      <DependentUpon>201706152204399_TransactionDetails2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\Files\OAuth2AuthorizationForm.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -222,6 +228,14 @@
     <Compile Include="Migrations\201706152052343_AdminPayments.cs" />
     <Compile Include="Migrations\201706152052343_AdminPayments.Designer.cs">
       <DependentUpon>201706152052343_AdminPayments.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706152116284_TransactionDetails.cs" />
+    <Compile Include="Migrations\201706152116284_TransactionDetails.Designer.cs">
+      <DependentUpon>201706152116284_TransactionDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706152204399_TransactionDetails2.cs" />
+    <Compile Include="Migrations\201706152204399_TransactionDetails2.Designer.cs">
+      <DependentUpon>201706152204399_TransactionDetails2.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

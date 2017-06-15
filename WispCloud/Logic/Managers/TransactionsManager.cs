@@ -14,11 +14,13 @@ namespace DeusCloud.Logic.Managers
     {
         private UserManager _userManager;
         private RightsManager _rightsManager;
+        private TaxManager _taxManager;
 
         public TransactionsManager(UserContext context) : base(context)
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
+            _taxManager = new TaxManager(UserContext);
         }
 
         public void Transfer(string sender, string receiver, float amount)
@@ -40,19 +42,23 @@ namespace DeusCloud.Logic.Managers
                 Try.Condition(senderAcc.Cash >= amount, $"Not enought money");
                 Try.Condition(amount > 0, $"Can't transfer negative or zero funds");
 
-                senderAcc.Cash -= amount;
-                receiverAcc.Cash += amount;
-
-                UserContext.Accounts.Update(senderAcc);
-                UserContext.Accounts.Update(receiverAcc);
-
                 var transaction = new Transaction(senderAcc, receiverAcc, amount);
                 transaction.Type = TransactionType.Normal;
 
-                var taxedTransactions = TaxManager.TakeTax(transaction);
-                taxedTransactions.ForEach(x => UserContext.Data.Transactions.Add(x));
+                var taxedTransactions = _taxManager.TakeTax(transaction);
+                taxedTransactions.ForEach(x =>
+                {
+                    x.SenderAccount.Cash -= amount;
+                    x.ReceiverAccount.Cash += amount;
 
-                UserContext.Data.SaveChanges();
+                    UserContext.Accounts.Update(x.SenderAccount);
+                    UserContext.Accounts.Update(x.ReceiverAccount);
+
+                    UserContext.Data.Transactions.Add(x);
+
+                    UserContext.Data.SaveChanges();
+                });
+
                 dbTransact.Commit();
             }
         }

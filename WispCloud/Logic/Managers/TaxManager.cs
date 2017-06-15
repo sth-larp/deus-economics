@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Taxes;
@@ -15,8 +16,6 @@ namespace DeusCloud.Logic.Managers
         private UserManager _userManager;
         private RightsManager _rightsManager;
 
-        private static Account _government;
-
         public static Dictionary<TaxType, Tax> Taxes { get; protected set; }
 
         public TaxManager(UserContext context) : base(context)
@@ -24,26 +23,43 @@ namespace DeusCloud.Logic.Managers
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
 
-            if(_government == null)
-                _government = _userManager.FindById("govt");
-
             if (Taxes == null)
             {
                 Taxes = UserContext.Data.Taxes.ToList().ToDictionary(x => x.Type, x => x);
             }
         }
 
-        public static List<Transaction> TakeTax(Transaction transaction)
+        public List<Transaction> TakeTax(Transaction transaction)
         {
             var ret = new List<Transaction>();
-            //Take transaction tax
-            if (transaction.Receiver != "govt" && Taxes != null && Taxes.ContainsKey(TaxType.Transaction))
+
+            //Налог на все транзакции
+            var government = _userManager.FindById("govt");
+
+            if (transaction.ReceiverAccount.Login != "govt" && government != null
+                && Taxes != null && Taxes.ContainsKey(TaxType.Transaction)
+                )
             {
-                var sum = transaction.Amount * Taxes[TaxType.Transaction].PercentValue / 100;
-                var t = new Transaction(transaction.SenderAccount, _government, sum);
+                var taxValue = Taxes[TaxType.Transaction].PercentValue;
+                var sum = transaction.Amount * taxValue / 100;
+                var t = new Transaction(transaction.ReceiverAccount, government, sum);
                 t.Type = TransactionType.Tax;
+                t.Comment = String.Format("Налог c транзакций в размере {0}%", taxValue);
                 ret.Add(t);
-                transaction.Amount -= sum;
+            }
+
+            //Налог на прибыльные предприятия
+            var master = _userManager.FindById("master");
+            if ((transaction.ReceiverAccount.Role |= AccountRole.Tavern) > 0 
+                && Taxes != null && Taxes.ContainsKey(TaxType.Tavern)
+                && master != null)
+            {
+                var taxValue = Taxes[TaxType.Tavern].PercentValue;
+                var sum = transaction.Amount * taxValue / 100;
+                var t = new Transaction(transaction.ReceiverAccount, master, sum);
+                t.Type = TransactionType.Tax;
+                t.Comment = String.Format("Налог на прибыль в размере {0}%", taxValue);
+                ret.Add(t);
             }
 
             ret.Add(transaction);
