@@ -164,6 +164,9 @@
     <EmbeddedResource Include="Migrations\201706152204399_TransactionDetails2.resx">
       <DependentUpon>201706152204399_TransactionDetails2.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706172116091_Insurances-Loyalties.resx">
+      <DependentUpon>201706172116091_Insurances-Loyalties.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\Files\OAuth2AuthorizationForm.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -175,6 +178,7 @@
     <Compile Include="Api\Controllers\AccessController.cs" />
     <Compile Include="Api\Controllers\AccountsController.cs" />
     <Compile Include="Api\Controllers\ErrorController.cs" />
+    <Compile Include="Api\Controllers\LoyaltyController.cs" />
     <Compile Include="Api\Controllers\PaymentsController.cs" />
     <Compile Include="Api\Controllers\TaxController.cs" />
     <Compile Include="Api\Controllers\TransactionsController.cs" />
@@ -187,11 +191,13 @@
     <Compile Include="Api\DeusValidateModelAttribute .cs" />
     <Compile Include="Data\Entities\Accounts\AccountRole.cs" />
     <Compile Include="Data\Entities\Accounts\AccountStatus.cs" />
+    <Compile Include="Data\Entities\Accounts\InsuranceType.cs" />
     <Compile Include="Data\Entities\Accounts\UserAccountSettings.cs" />
     <Compile Include="Data\Entities\Access\AccountAccessRoles.cs" />
     <Compile Include="Data\Entities\Taxes\Tax.cs" />
     <Compile Include="Data\Entities\Taxes\TaxType.cs" />
-    <Compile Include="Data\Entities\Transactions\Payments.cs" />
+    <Compile Include="Data\Entities\Transactions\Loyalty.cs" />
+    <Compile Include="Data\Entities\Transactions\Payment.cs" />
     <Compile Include="Data\Entities\Transactions\Transaction.cs" />
     <Compile Include="Data\Entities\Transactions\TransactionType.cs" />
     <Compile Include="Data\EntityFrameworkHelper.cs" />
@@ -217,6 +223,7 @@
     <Compile Include="Logic\CommonBase\ContextHolder.cs" />
     <Compile Include="Logic\Client\AccPropertyClientData.cs" />
     <Compile Include="Logic\Client\AccountAccessClientData.cs" />
+    <Compile Include="Logic\Managers\LoyaltyManager.cs" />
     <Compile Include="Logic\Managers\PaymentsManager.cs" />
     <Compile Include="Logic\Managers\RightsManager.cs" />
     <Compile Include="Logic\Managers\TaxManager.cs" />
@@ -236,6 +243,10 @@
     <Compile Include="Migrations\201706152204399_TransactionDetails2.cs" />
     <Compile Include="Migrations\201706152204399_TransactionDetails2.Designer.cs">
       <DependentUpon>201706152204399_TransactionDetails2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706172116091_Insurances-Loyalties.cs" />
+    <Compile Include="Migrations\201706172116091_Insurances-Loyalties.Designer.cs">
+      <DependentUpon>201706172116091_Insurances-Loyalties.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

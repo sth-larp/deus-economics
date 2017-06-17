@@ -80,7 +80,11 @@ namespace DeusCloud.Logic.Managers
             if (roles != null)
                 editAccount.Role = roles.Value;
 
-            editAccount.Status = clientData.Status;
+            if(clientData.Status != null)
+                editAccount.Status = clientData.Status.Value;
+
+            if (clientData.Insurance != null)
+                editAccount.Insurance = clientData.Insurance.Value;
 
             UserContext.Accounts.Update(editAccount);
             return editAccount;

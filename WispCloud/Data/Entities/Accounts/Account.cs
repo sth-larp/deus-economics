@@ -41,6 +41,8 @@ namespace DeusCloud.Data.Entities.Accounts
         [JsonIgnore]
         public AccountRole Role { get; set; }
 
+        public InsuranceType Insurance { get; set; }
+
         [NotMapped]
         public IEnumerable<AccountRole> Roles { get { return Role.GetFlags(); } }
 
@@ -67,6 +69,7 @@ namespace DeusCloud.Data.Entities.Accounts
             Status = AccountStatus.Active;
             Login = login;
             Role = role;
+            Insurance = InsuranceType.None;
         }
     }
 }

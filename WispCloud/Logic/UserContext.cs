@@ -28,6 +28,7 @@ namespace DeusCloud.Logic
         TransactionsManager _transactions;
         PaymentsManager _payments;
         TaxManager _taxation;
+        LoyaltyManager _loyalties;
 
         EventsManager _events;
 
@@ -65,6 +66,19 @@ namespace DeusCloud.Logic
                 }
 
                 return _taxation;
+            }
+        }
+
+        public LoyaltyManager Loyalties
+        {
+            get
+            {
+                if (_loyalties == null)
+                {
+                    _loyalties = new LoyaltyManager(this);
+                }
+
+                return _loyalties;
             }
         }
         public AccountsManager Accounts
