@@ -44,6 +44,7 @@ namespace DeusCloud.Logic.Managers
 
                 var transaction = new Transaction(senderAcc, receiverAcc, amount);
                 transaction.Type = TransactionType.Normal;
+                transaction.Comment = "Простая транзакция";
 
                 var taxedTransactions = _taxManager.TakeTax(transaction);
                 taxedTransactions.ForEach(x =>

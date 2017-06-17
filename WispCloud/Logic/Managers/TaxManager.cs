@@ -15,6 +15,7 @@ namespace DeusCloud.Logic.Managers
     {
         private UserManager _userManager;
         private RightsManager _rightsManager;
+        private LoyaltyManager _loyaltyManager;
 
         public static Dictionary<TaxType, Tax> Taxes { get; protected set; }
 
@@ -22,6 +23,7 @@ namespace DeusCloud.Logic.Managers
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
+            _loyaltyManager = new LoyaltyManager(UserContext);
 
             if (Taxes == null)
             {
@@ -34,11 +36,10 @@ namespace DeusCloud.Logic.Managers
             var ret = new List<Transaction>();
 
             //Налог на все транзакции
-            var government = _userManager.FindById("govt");
+            /*var government = _userManager.FindById("govt");
 
             if (transaction.ReceiverAccount.Login != "govt" && government != null
-                && Taxes != null && Taxes.ContainsKey(TaxType.Transaction)
-                )
+                && Taxes != null && Taxes.ContainsKey(TaxType.Transaction))
             {
                 var taxValue = Taxes[TaxType.Transaction].PercentValue;
                 var sum = transaction.Amount * taxValue / 100;
@@ -46,20 +47,35 @@ namespace DeusCloud.Logic.Managers
                 t.Type = TransactionType.Tax;
                 t.Comment = String.Format("Налог c транзакций в размере {0}%", taxValue);
                 ret.Add(t);
-            }
+            }*/
 
             //Налог на прибыльные предприятия
             var master = _userManager.FindById("master");
-            if ((transaction.ReceiverAccount.Role |= AccountRole.Tavern) > 0 
+            if ((transaction.ReceiverAccount.Role & AccountRole.Tavern) > 0 
                 && Taxes != null && Taxes.ContainsKey(TaxType.Tavern)
                 && master != null)
             {
-                var taxValue = Taxes[TaxType.Tavern].PercentValue;
-                var sum = transaction.Amount * taxValue / 100;
-                var t = new Transaction(transaction.ReceiverAccount, master, sum);
-                t.Type = TransactionType.Tax;
-                t.Comment = String.Format("Налог на прибыль в размере {0}%", taxValue);
-                ret.Add(t);
+                var level = _loyaltyManager.CheckLoyaltyLevel(transaction.SenderAccount,
+                    transaction.ReceiverAccount);
+                var discount = GetDiscount(level);
+
+                var taxValue = Taxes[TaxType.Tavern].PercentValue / 100 - (float)discount;
+                if (taxValue > 0)
+                {
+                    var sum = transaction.Amount * taxValue;
+                    var t = new Transaction(transaction.ReceiverAccount, master, sum);
+                    t.Type = TransactionType.Tax;
+                    t.Comment = "Налог на прибыль";
+                    ret.Add(t);
+                }
+
+                if (level > 0)
+                {
+                    transaction.Comment += $" номинал {transaction.Amount} со скидкой {discount*100}% за счет страховки";
+                    transaction.Type |= TransactionType.Insurance;
+                }
+
+                transaction.Amount *= (1f - (float)discount);
             }
 
             ret.Add(transaction);
@@ -69,6 +85,14 @@ namespace DeusCloud.Logic.Managers
         public List<Tax> GetTaxes()
         {
             return Taxes.Values.ToList();
+        }
+
+        private decimal GetDiscount(int level)
+        {
+            if (level == 1) return (decimal) 0.25;
+            if (level == 2) return (decimal) 0.5;
+            if (level == 3) return (decimal) 0.75;
+            return 0;
         }
 
         public Tax NewTax(string text, TaxType type, float value)

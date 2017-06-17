@@ -60,6 +60,9 @@ namespace DeusCloud.Data.Entities.Accounts
             set { throw new NotImplementedException(); }
         }
 
+        [DefaultValue(1)]
+        public int InsuranceLevel { get; set; }
+
         public Account()
         {
         }

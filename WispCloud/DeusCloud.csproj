@@ -167,6 +167,9 @@
     <EmbeddedResource Include="Migrations\201706172116091_Insurances-Loyalties.resx">
       <DependentUpon>201706172116091_Insurances-Loyalties.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706172225137_Insurance level.resx">
+      <DependentUpon>201706172225137_Insurance level.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\Files\OAuth2AuthorizationForm.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -247,6 +250,10 @@
     <Compile Include="Migrations\201706172116091_Insurances-Loyalties.cs" />
     <Compile Include="Migrations\201706172116091_Insurances-Loyalties.Designer.cs">
       <DependentUpon>201706172116091_Insurances-Loyalties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706172225137_Insurance level.cs" />
+    <Compile Include="Migrations\201706172225137_Insurance level.Designer.cs">
+      <DependentUpon>201706172225137_Insurance level.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

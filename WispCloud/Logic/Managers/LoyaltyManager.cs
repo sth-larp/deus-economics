@@ -44,8 +44,8 @@ namespace DeusCloud.Logic.Managers
 
             var company = _userManager.FindById(data.LoyalName);
             Try.NotNull(company, $"Can't find account with id: {company}");
-            Try.Condition((company.Role | AccountRole.Tavern) > 0, 
-                $"Service account is not of required type: {company}");
+            Try.Condition((company.Role & AccountRole.Tavern) > 0, 
+                $"Service account is not of required type: {company.Role}");
 
             var check = UserContext.Data.Loyalties.Where(x =>
                 x.LoyalName == company.Login && x.Insurance == data.Insurance);
@@ -57,6 +57,15 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.SaveChanges();
 
             return loyalty;
+        }
+
+        public int CheckLoyaltyLevel(Account person, Account service)
+        {
+            var check = UserContext.Data.Loyalties.Where(x =>
+                x.LoyalName == service.Login && x.Insurance == person.Insurance);
+            if (check.Any())
+                return person.InsuranceLevel;
+            return 0;
         }
     }
 }

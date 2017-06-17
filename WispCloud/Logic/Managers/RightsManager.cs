@@ -75,7 +75,7 @@ namespace DeusCloud.Logic.Managers
             var roles = clientData.Roles?.Aggregate(AccountRole.None, (curr, r) => curr |= r);
 
             var editAccount = UserContext.Accounts.Get(clientData.Login);
-            Try.NotNull(editAccount, $"Cant find account with login: {clientData.Login}.");
+            Try.NotNull(editAccount, $"Can't find account with login: {clientData.Login}.");
 
             if (roles != null)
                 editAccount.Role = roles.Value;
@@ -84,10 +84,30 @@ namespace DeusCloud.Logic.Managers
                 editAccount.Status = clientData.Status.Value;
 
             if (clientData.Insurance != null)
+            {
+                Try.Condition((editAccount.Role & AccountRole.Person) > 0, 
+                    $"Cannot give insurance to non-person: {clientData.Login}.");
+                Try.Condition(clientData.InsuranceLevel != null, $"Please provide insurance level");
+
                 editAccount.Insurance = clientData.Insurance.Value;
+            }
+
+            if (clientData.InsuranceLevel != null)
+            {
+                Try.Condition((IsCorporate(editAccount.Insurance) && clientData.InsuranceLevel <= 3) 
+                    || (!IsCorporate(editAccount.Insurance) && clientData.InsuranceLevel == 1),
+                    $"Wrong level value. For corporations 1-3, for others 1 only: {clientData.InsuranceLevel}");
+            }
 
             UserContext.Accounts.Update(editAccount);
             return editAccount;
+        }
+
+        private bool IsCorporate(InsuranceType insurance)
+        {
+            return insurance == InsuranceType.Corp3
+                   || insurance == InsuranceType.JJ
+                   || insurance == InsuranceType.Serenity;
         }
 
         public AccountAccess SetAccountAccess(AccountAccessClientData accessData)

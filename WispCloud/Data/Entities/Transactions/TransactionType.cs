@@ -12,5 +12,6 @@ namespace DeusCloud.Data.Entities.Transactions
         Tax = 2,
         Hidden = 4,
         Payment = 8,
+        Insurance = 16,
     }
 }
