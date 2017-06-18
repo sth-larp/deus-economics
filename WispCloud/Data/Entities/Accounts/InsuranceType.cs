@@ -10,6 +10,6 @@ namespace DeusCloud.Data.Entities.Accounts
         SuperVip = 2,
         JJ = 3,
         Serenity = 4,
-        Corp3 = 5
+        Panam = 5
     }
 }

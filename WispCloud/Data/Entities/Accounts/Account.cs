@@ -33,7 +33,6 @@ namespace DeusCloud.Data.Entities.Accounts
         [JsonIgnore]
         public string PasswordHash { get; set; }
 
-        [Required]
         public string Fullname { get; set; }
 
         [Required]
@@ -43,6 +42,11 @@ namespace DeusCloud.Data.Entities.Accounts
         [Required]
         [JsonIgnore]
         public AccountRole Role { get; set; }
+
+        [Required]
+        public int Index { get; set; }
+
+        public int IndexSpent { get; set; }
 
         public InsuranceType Insurance { get; set; }
 

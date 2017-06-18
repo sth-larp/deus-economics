@@ -33,6 +33,12 @@ namespace DeusCloud.Logic.Managers
             return ret.ToList();
         }
 
+        public List<Payment> GetAllPayments()
+        {
+            _rightsManager.CheckRole(AccountRole.Admin);
+            return UserContext.Data.Payments.ToList();
+        }
+
         public Payment NewPayment(PaymentClientData data)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
@@ -84,7 +90,7 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.SaveChanges();
         }
 
-        public void Run()
+        public void SwitchCycle()
         {
             _rightsManager.CheckRole(AccountRole.Admin);
 

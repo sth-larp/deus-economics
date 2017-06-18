@@ -179,6 +179,15 @@
     <EmbeddedResource Include="Migrations\201706181346400_InsuranceLevelType2.resx">
       <DependentUpon>201706181346400_InsuranceLevelType2.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706181403342_Index.resx">
+      <DependentUpon>201706181403342_Index.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706181450208_Index2.resx">
+      <DependentUpon>201706181450208_Index2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706181543291_Fullname-Not-Required.resx">
+      <DependentUpon>201706181543291_Fullname-Not-Required.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\Files\OAuth2AuthorizationForm.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -189,6 +198,7 @@
     <Compile Include="Api\CommonPrefixProvider .cs" />
     <Compile Include="Api\Controllers\AccessController.cs" />
     <Compile Include="Api\Controllers\AccountsController.cs" />
+    <Compile Include="Api\Controllers\CycleController.cs" />
     <Compile Include="Api\Controllers\ErrorController.cs" />
     <Compile Include="Api\Controllers\LoyaltyController.cs" />
     <Compile Include="Api\Controllers\PaymentsController.cs" />
@@ -226,6 +236,8 @@
     <Compile Include="Identity\WispOAuthBearerAuthenticationProvider.cs" />
     <Compile Include="Identity\UserManager.cs" />
     <Compile Include="Identity\UserStore.cs" />
+    <Compile Include="Logic\Client\AccIndexClientData.cs" />
+    <Compile Include="Logic\Client\SwitchCycleClientData.cs" />
     <Compile Include="Logic\Server\InsuranceHolderServerData.cs" />
     <Compile Include="Logic\Client\ChangePasswordClientData.cs" />
     <Compile Include="Logic\Client\PaymentClientData.cs" />
@@ -276,6 +288,18 @@
     <Compile Include="Migrations\201706181346400_InsuranceLevelType2.cs" />
     <Compile Include="Migrations\201706181346400_InsuranceLevelType2.Designer.cs">
       <DependentUpon>201706181346400_InsuranceLevelType2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706181403342_Index.cs" />
+    <Compile Include="Migrations\201706181403342_Index.Designer.cs">
+      <DependentUpon>201706181403342_Index.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706181450208_Index2.cs" />
+    <Compile Include="Migrations\201706181450208_Index2.Designer.cs">
+      <DependentUpon>201706181450208_Index2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706181543291_Fullname-Not-Required.cs" />
+    <Compile Include="Migrations\201706181543291_Fullname-Not-Required.Designer.cs">
+      <DependentUpon>201706181543291_Fullname-Not-Required.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

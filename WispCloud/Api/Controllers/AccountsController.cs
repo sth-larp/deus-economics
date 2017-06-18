@@ -12,7 +12,8 @@ namespace DeusCloud.Api.Controllers
     [DeusTraceLogging]
     public sealed class AccountsController : ApiController
     {
-        /// <summary>Get current user profile</summary>
+        /// <summary>Получить профиль аккаунта</summary>
+        /// <param name="login">User login</param>
         /// <returns>Person profile</returns>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
@@ -22,12 +23,12 @@ namespace DeusCloud.Api.Controllers
         [HttpGet]
         [Route("accounts/current")]
         [ResponseType(typeof(Account))]
-        public IHttpActionResult Get()
+        public IHttpActionResult Get(string login)
         {
-            return Ok(UserContext.Accounts.Get(UserContext.CurrentUser.Login));
+            return Ok(UserContext.Accounts.GetAuthentified(login));
         }
 
-        /// <summary>Registers new user</summary>
+        /// <summary>Зарегистрировать аккаунт</summary>
         /// <param name="clientData">Registration data</param>
         /// <returns>New user profile</returns>
         /// <response code="200">OK</response>
@@ -41,7 +42,7 @@ namespace DeusCloud.Api.Controllers
             return Ok(UserContext.Accounts.Registration(clientData));
         }
 
-        /// <summary>Change password</summary>
+        /// <summary>Сменить пароль</summary>
         /// <param name="clientData">Change passsword data</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
@@ -56,7 +57,7 @@ namespace DeusCloud.Api.Controllers
         }
 
 
-        /// <summary>Set properties for account</summary>
+        /// <summary>Установить свойства аккаунта</summary>
         /// <param name="clientData">Login and roles</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
@@ -68,6 +69,20 @@ namespace DeusCloud.Api.Controllers
         public IHttpActionResult SetAccountProperties(AccPropertyClientData clientData)
         {
             return Ok(UserContext.Rights.SetAccountProperties(clientData));
+        }
+
+        /// <summary>Установить индекс аккаунта</summary>
+        /// <param name="data">Index data</param>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="500">Internal Server Error</response>
+        [DeusAuthorize]
+        [HttpPost]
+        [Route("accounts/setindex")]
+        [ResponseType(typeof(Account))]
+        public IHttpActionResult SetIndex(AccIndexClientData data)
+        {
+            return Ok(UserContext.Rights.SetAccountIndex(data));
         }
 
         /// <summary>Get all accounts</summary>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
@@ -59,6 +60,11 @@ namespace DeusCloud.Logic.Managers
 
             if (!result.Succeeded)
                 throw new DeusException(result.Errors.First());
+        }
+
+        public Account GetAuthentified(string login)
+        {
+            return _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
         }
 
         public Account Get(string login)

@@ -17,13 +17,17 @@ namespace DeusCloud.Logic.Managers
         private UserManager _userManager;
         private RightsManager _rightsManager;
 
+        private static string CorpName1 = "JJ";
+        private static string CorpName2 = "Serenity";
+        private static string CorpName3 = "Panam";
+
         private static Dictionary<string, InsuranceType> _associations = 
             new Dictionary<string, InsuranceType>
         {
             {"govt", InsuranceType.Govt },
-            {"JJ", InsuranceType.JJ},
-            {"Serenity", InsuranceType.Serenity},
-            {"Corp3", InsuranceType.Corp3},
+            {CorpName1, InsuranceType.JJ},
+            {CorpName2, InsuranceType.Serenity},
+            {CorpName3, InsuranceType.Panam},
             {"admin", InsuranceType.SuperVip}
         }; 
 
@@ -120,7 +124,54 @@ namespace DeusCloud.Logic.Managers
 
             Try.Condition(userAccount.Insurance == t, $"{user} не имеет нужной страховки");
             userAccount.Insurance = InsuranceType.None;
+            userAccount.InsuranceLevel = 1;
             UserContext.Accounts.Update(userAccount);
+        }
+
+        public void SwitchCycle(SwitchCycleClientData data)
+        {
+            _rightsManager.CheckRole(AccountRole.Admin);
+            ResetIndexValues(data);
+            SpendIndexForInsurance();
+        }
+
+        private void SpendIndexForInsurance()
+        {
+            foreach (var kv in _associations)
+            {
+                var corp = _userManager.FindById(kv.Key);
+                if (corp == null) continue; //Not found in DB
+
+                var holders = GetLoyaltyHolders(kv.Key).OrderByDescending(x => x.InsuranceLevel);
+                foreach (var holder in holders)
+                {
+                    if (corp.Index - corp.IndexSpent >= holder.InsuranceLevel)
+                        corp.IndexSpent += holder.InsuranceLevel;
+                    else
+                    {
+                        var userAccount = _userManager.FindById(holder.UserLogin);
+
+                        userAccount.Insurance = InsuranceType.None;
+                        userAccount.InsuranceLevel = 1;
+                        UserContext.Accounts.Update(userAccount);
+                    }
+                }
+                UserContext.Accounts.Update(corp);
+            }
+        }
+        private void ResetIndexValues(SwitchCycleClientData data)
+        {
+            foreach (var pair in _associations)
+            {
+                var corp = _userManager.FindById(pair.Key);
+                if (corp == null) continue; //Not found in DB
+
+                corp.IndexSpent = 0;
+                var cIndex = data.Indexes.ToList().FindIndex(x => x.Key == pair.Key);
+                if (cIndex >= 0)
+                    corp.Index = data.Indexes[cIndex].Value;
+                UserContext.Accounts.Update(corp);
+            }
         }
     }
 }

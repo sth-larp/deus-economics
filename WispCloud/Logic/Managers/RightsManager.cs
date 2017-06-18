@@ -48,7 +48,7 @@ namespace DeusCloud.Logic.Managers
             return UserContext.Data.AccountAccesses.Find(slave, UserContext.CurrentUser.Login);
         }
 
-        public void CheckForAccessOverSlave(string slave, AccountAccessRoles roles)
+        public Account CheckForAccessOverSlave(string slave, AccountAccessRoles roles)
         {
             CheckCurrentUserActive();
             var slaveAccount = _userManager.FindById(slave);
@@ -56,14 +56,15 @@ namespace DeusCloud.Logic.Managers
             
             //Admin can do anything
             if ((UserContext.CurrentUser.Role & AccountRole.Admin) > 0)
-                return;
+                return slaveAccount;
 
             //You have all access rights for yourself
             if (UserContext.CurrentUser.Login == slave)
-                return;
+                return slaveAccount;
 
             var accessLevel = GetCurrentAccountAccess(slave);
             Try.Condition(accessLevel != null && (accessLevel.Role & roles) > 0, NotEnoughPrivilegeText);
+            return slaveAccount;
         }
 
 
@@ -74,7 +75,7 @@ namespace DeusCloud.Logic.Managers
                 
             var roles = clientData.Roles?.Aggregate(AccountRole.None, (curr, r) => curr |= r);
 
-            var editAccount = UserContext.Accounts.Get(clientData.Login);
+            var editAccount = _userManager.FindById(clientData.Login);
             Try.NotNull(editAccount, $"Не найден логин: {clientData.Login}.");
 
             if (roles != null)
@@ -85,7 +86,7 @@ namespace DeusCloud.Logic.Managers
 
             if (clientData.Insurance != null)
             {
-                Try.Condition((editAccount.Role & AccountRole.Person) > 0, 
+                Try.Condition(clientData.Insurance == InsuranceType.None || (editAccount.Role & AccountRole.Person) > 0, 
                     $"Страховку можно дать только персоне: {clientData.Login}.");
                 Try.Condition(clientData.InsuranceLevel != null, $"Не задан уровень страховки");
 
@@ -105,9 +106,22 @@ namespace DeusCloud.Logic.Managers
             return editAccount;
         }
 
+        public Account SetAccountIndex(AccIndexClientData data)
+        {
+            CheckRole(AccountRole.Admin);
+
+            var editAccount = _userManager.FindById(data.Login);
+            Try.NotNull(editAccount, $"Не найден логин: {data.Login}.");
+
+            editAccount.Index = data.Index;
+            editAccount.IndexSpent = data.IndexSpent;
+            UserContext.Accounts.Update(editAccount);
+            return editAccount;
+        }
+
         private bool IsCorporate(InsuranceType insurance)
         {
-            return insurance == InsuranceType.Corp3
+            return insurance == InsuranceType.Panam
                    || insurance == InsuranceType.JJ
                    || insurance == InsuranceType.Serenity;
         }
