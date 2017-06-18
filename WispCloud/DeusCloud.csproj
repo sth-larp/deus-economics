@@ -170,6 +170,15 @@
     <EmbeddedResource Include="Migrations\201706172225137_Insurance level.resx">
       <DependentUpon>201706172225137_Insurance level.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706180813599_TaxesTpConstants.resx">
+      <DependentUpon>201706180813599_TaxesTpConstants.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706181326044_InsuranceLevels.resx">
+      <DependentUpon>201706181326044_InsuranceLevels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706181346400_InsuranceLevelType2.resx">
+      <DependentUpon>201706181346400_InsuranceLevelType2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\Files\OAuth2AuthorizationForm.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -183,7 +192,7 @@
     <Compile Include="Api\Controllers\ErrorController.cs" />
     <Compile Include="Api\Controllers\LoyaltyController.cs" />
     <Compile Include="Api\Controllers\PaymentsController.cs" />
-    <Compile Include="Api\Controllers\TaxController.cs" />
+    <Compile Include="Api\Controllers\ConstantsController.cs" />
     <Compile Include="Api\Controllers\TransactionsController.cs" />
     <Compile Include="Api\OkJsonPatchResult.cs" />
     <Compile Include="Api\DeusActionSelector.cs" />
@@ -197,8 +206,8 @@
     <Compile Include="Data\Entities\Accounts\InsuranceType.cs" />
     <Compile Include="Data\Entities\Accounts\UserAccountSettings.cs" />
     <Compile Include="Data\Entities\Access\AccountAccessRoles.cs" />
-    <Compile Include="Data\Entities\Taxes\Tax.cs" />
-    <Compile Include="Data\Entities\Taxes\TaxType.cs" />
+    <Compile Include="Data\Entities\Constants\Constant.cs" />
+    <Compile Include="Data\Entities\Constants\ConstantType.cs" />
     <Compile Include="Data\Entities\Transactions\Loyalty.cs" />
     <Compile Include="Data\Entities\Transactions\Payment.cs" />
     <Compile Include="Data\Entities\Transactions\Transaction.cs" />
@@ -217,6 +226,7 @@
     <Compile Include="Identity\WispOAuthBearerAuthenticationProvider.cs" />
     <Compile Include="Identity\UserManager.cs" />
     <Compile Include="Identity\UserStore.cs" />
+    <Compile Include="Logic\Server\InsuranceHolderServerData.cs" />
     <Compile Include="Logic\Client\ChangePasswordClientData.cs" />
     <Compile Include="Logic\Client\PaymentClientData.cs" />
     <Compile Include="Logic\CommonBase\BaseModel.cs" />
@@ -229,7 +239,7 @@
     <Compile Include="Logic\Managers\LoyaltyManager.cs" />
     <Compile Include="Logic\Managers\PaymentsManager.cs" />
     <Compile Include="Logic\Managers\RightsManager.cs" />
-    <Compile Include="Logic\Managers\TaxManager.cs" />
+    <Compile Include="Logic\Managers\ConstantManager.cs" />
     <Compile Include="Logic\Managers\TransactionsManager.cs" />
     <Compile Include="Migrations\201706151812158_First.cs" />
     <Compile Include="Migrations\201706151812158_First.Designer.cs">
@@ -254,6 +264,18 @@
     <Compile Include="Migrations\201706172225137_Insurance level.cs" />
     <Compile Include="Migrations\201706172225137_Insurance level.Designer.cs">
       <DependentUpon>201706172225137_Insurance level.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706180813599_TaxesTpConstants.cs" />
+    <Compile Include="Migrations\201706180813599_TaxesTpConstants.Designer.cs">
+      <DependentUpon>201706180813599_TaxesTpConstants.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706181326044_InsuranceLevels.cs" />
+    <Compile Include="Migrations\201706181326044_InsuranceLevels.Designer.cs">
+      <DependentUpon>201706181326044_InsuranceLevels.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706181346400_InsuranceLevelType2.cs" />
+    <Compile Include="Migrations\201706181346400_InsuranceLevelType2.Designer.cs">
+      <DependentUpon>201706181346400_InsuranceLevelType2.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

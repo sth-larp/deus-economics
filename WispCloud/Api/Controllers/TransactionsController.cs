@@ -35,7 +35,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
         [DeusAuthorize]
-        [HttpPost]
+        [HttpGet]
         [Route("transactions")]
         [ResponseType(typeof(List<Transaction>))]
         public IHttpActionResult GetTransactionHistory(string login)

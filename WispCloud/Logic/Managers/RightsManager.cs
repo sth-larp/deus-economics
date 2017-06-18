@@ -20,9 +20,9 @@ namespace DeusCloud.Logic.Managers
 
         static RightsManager()
         {
-            NotEnoughPrivilegeText = "User did not allow this level of access;";
-            NotEnoughRightsMessageText = "You are not allowed to perform this operation;";
-            UserBlockedMessageText = "Your account is blocked;";
+            NotEnoughPrivilegeText = "Недостаточно прав на аккаунт данного пользователя;";
+            NotEnoughRightsMessageText = "Недостаточно прав;";
+            UserBlockedMessageText = "Ваш аккаунт заблокирован;";
         }
 
         public RightsManager(UserContext context)
@@ -52,7 +52,7 @@ namespace DeusCloud.Logic.Managers
         {
             CheckCurrentUserActive();
             var slaveAccount = _userManager.FindById(slave);
-            Try.NotNull(slaveAccount, $"Cant find account with login: {slave}.");
+            Try.NotNull(slaveAccount, $"Не найден логин: {slave}.");
             
             //Admin can do anything
             if ((UserContext.CurrentUser.Role & AccountRole.Admin) > 0)
@@ -75,7 +75,7 @@ namespace DeusCloud.Logic.Managers
             var roles = clientData.Roles?.Aggregate(AccountRole.None, (curr, r) => curr |= r);
 
             var editAccount = UserContext.Accounts.Get(clientData.Login);
-            Try.NotNull(editAccount, $"Can't find account with login: {clientData.Login}.");
+            Try.NotNull(editAccount, $"Не найден логин: {clientData.Login}.");
 
             if (roles != null)
                 editAccount.Role = roles.Value;
@@ -86,8 +86,8 @@ namespace DeusCloud.Logic.Managers
             if (clientData.Insurance != null)
             {
                 Try.Condition((editAccount.Role & AccountRole.Person) > 0, 
-                    $"Cannot give insurance to non-person: {clientData.Login}.");
-                Try.Condition(clientData.InsuranceLevel != null, $"Please provide insurance level");
+                    $"Страховку можно дать только персоне: {clientData.Login}.");
+                Try.Condition(clientData.InsuranceLevel != null, $"Не задан уровень страховки");
 
                 editAccount.Insurance = clientData.Insurance.Value;
             }
@@ -95,8 +95,10 @@ namespace DeusCloud.Logic.Managers
             if (clientData.InsuranceLevel != null)
             {
                 Try.Condition((IsCorporate(editAccount.Insurance) && clientData.InsuranceLevel <= 3) 
-                    || (!IsCorporate(editAccount.Insurance) && clientData.InsuranceLevel == 1),
-                    $"Wrong level value. For corporations 1-3, for others 1 only: {clientData.InsuranceLevel}");
+                    || (editAccount.Insurance == InsuranceType.Govt && clientData.InsuranceLevel <= 2)
+                    || clientData.InsuranceLevel == 1,
+                    $"Неверное значение уровня. 1-3 для корпораций, 1-2 для правительства, 1 в прочих случаях: {clientData.InsuranceLevel}");
+                editAccount.InsuranceLevel = clientData.InsuranceLevel.Value;
             }
 
             UserContext.Accounts.Update(editAccount);
@@ -117,7 +119,7 @@ namespace DeusCloud.Logic.Managers
 
             var slaveAccount = _userManager.FindById(accessData.SlaveLogin);
             var masterAccount = _userManager.FindById(accessData.MasterLogin);
-            Try.NotNull(masterAccount, $"Cant find account with login: {accessData.MasterLogin}.");
+            Try.NotNull(masterAccount, $"Не найден логин: {accessData.MasterLogin}.");
 
             var newRole = accessData.Roles.Aggregate(AccountAccessRoles.None, (role, next) => role |= next);
 

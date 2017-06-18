@@ -1,5 +1,4 @@
-﻿using DeusCloud.Data.Entities.Accounts;
-using DeusCloud.Exceptions;
+﻿using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
 
 namespace DeusCloud.Logic.Client
@@ -8,7 +7,9 @@ namespace DeusCloud.Logic.Client
     {
         public string Login { get; set; }
         public string Password { get; set; }
-        public UserSettings Settings { get; set; }
+        public string Fullname { get; set; }
+
+        //public UserSettings Settings { get; set; }
 
         public override void Validate()
         {

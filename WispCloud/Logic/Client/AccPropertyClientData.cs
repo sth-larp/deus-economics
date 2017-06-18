@@ -11,7 +11,7 @@ namespace DeusCloud.Logic.Client
         public List<AccountRole> Roles { get; set; }
         public AccountStatus? Status { get; set; }
         public InsuranceType? Insurance { get; set; }
-        public uint? InsuranceLevel { get; set; }
+        public int? InsuranceLevel { get; set; }
 
         public override void Validate()
         {

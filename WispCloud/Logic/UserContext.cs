@@ -27,7 +27,7 @@ namespace DeusCloud.Logic
         AccountsManager _accounts;
         TransactionsManager _transactions;
         PaymentsManager _payments;
-        TaxManager _taxation;
+        ConstantManager _constants;
         LoyaltyManager _loyalties;
 
         EventsManager _events;
@@ -56,16 +56,16 @@ namespace DeusCloud.Logic
             }
         }
 
-        public TaxManager Taxation
+        public ConstantManager Constants
         {
             get
             {
-                if (_taxation == null)
+                if (_constants == null)
                 {
-                    _taxation = new TaxManager(this);
+                    _constants = new ConstantManager(this);
                 }
 
-                return _taxation;
+                return _constants;
             }
         }
 
@@ -98,7 +98,7 @@ namespace DeusCloud.Logic
                 if (_transactions == null)
                 {
                     _transactions = new TransactionsManager(this);
-                    _taxation = new TaxManager(this);
+                    _constants = new ConstantManager(this);
                 }
 
                 return _transactions;

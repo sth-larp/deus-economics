@@ -11,17 +11,17 @@ namespace DeusCloud.Data.Entities.Accounts
 {
     public class Account : IUser
     {
-        [NotMapped]
-        public UserSettings Settings { get; set; }
+        //[NotMapped]
+        //public UserSettings Settings { get; set; }
 
-        [JsonIgnore]
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string SettingsJson
-        {
-            get { return WispJsonSerializer.SerializeToJsonString(Settings); }
-            set { Settings = WispJsonSerializer.DeserializeJson<UserSettings>(value); }
-        }
+        //[JsonIgnore]
+        //[Browsable(false)]
+        //[EditorBrowsable(EditorBrowsableState.Never)]
+        //public string SettingsJson
+        //{
+        //    get { return WispJsonSerializer.SerializeToJsonString(Settings); }
+        //    set { Settings = WispJsonSerializer.DeserializeJson<UserSettings>(value); }
+        //}
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -32,6 +32,9 @@ namespace DeusCloud.Data.Entities.Accounts
         [Required]
         [JsonIgnore]
         public string PasswordHash { get; set; }
+
+        [Required]
+        public string Fullname { get; set; }
 
         [Required]
         [JsonIgnore]

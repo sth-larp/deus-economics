@@ -6,11 +6,10 @@ namespace DeusCloud.Data.Entities.Accounts
     public enum InsuranceType
     {
         None = 0,
-        Govt1 = 1,
-        Govt2 = 2,
-        SuperVip = 3,
-        JJ = 4,
-        Serenity = 5,
-        Corp3 = 6
+        Govt = 1,
+        SuperVip = 2,
+        JJ = 3,
+        Serenity = 4,
+        Corp3 = 5
     }
 }

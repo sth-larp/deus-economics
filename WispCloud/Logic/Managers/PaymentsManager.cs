@@ -16,13 +16,13 @@ namespace DeusCloud.Logic.Managers
     {
         private UserManager _userManager;
         private RightsManager _rightsManager;
-        private TaxManager _taxManager;
+        private ConstantManager _constantManager;
 
         public PaymentsManager(UserContext context) : base(context)
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
-            _taxManager = new TaxManager(UserContext);
+            _constantManager = new ConstantManager(UserContext);
         }
 
         public List<Payment> GetPayments(string login)
@@ -119,7 +119,7 @@ namespace DeusCloud.Logic.Managers
             transaction.Type |= TransactionType.Payment;
             transaction.Comment = String.Format("Regular payment from {0}", pay.EmployerName);
 
-            var taxedTransactions = _taxManager.TakeTax(transaction);
+            var taxedTransactions = _constantManager.TakeTax(transaction);
             taxedTransactions.ForEach(x => UserContext.Data.Transactions.Add(x));
 
             //UserContext.Data.Transactions.Add(transaction);

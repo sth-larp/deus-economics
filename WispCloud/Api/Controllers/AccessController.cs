@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Description;
-using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Access;
-using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Logic.Client;
 
 namespace DeusCloud.Api.Controllers

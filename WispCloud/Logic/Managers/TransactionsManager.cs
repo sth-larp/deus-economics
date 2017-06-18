@@ -14,13 +14,13 @@ namespace DeusCloud.Logic.Managers
     {
         private UserManager _userManager;
         private RightsManager _rightsManager;
-        private TaxManager _taxManager;
+        private ConstantManager _constantManager;
 
         public TransactionsManager(UserContext context) : base(context)
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
-            _taxManager = new TaxManager(UserContext);
+            _constantManager = new ConstantManager(UserContext);
         }
 
         public void Transfer(string sender, string receiver, float amount)
@@ -46,7 +46,7 @@ namespace DeusCloud.Logic.Managers
                 transaction.Type = TransactionType.Normal;
                 transaction.Comment = "Простая транзакция";
 
-                var taxedTransactions = _taxManager.TakeTax(transaction);
+                var taxedTransactions = _constantManager.TakeTax(transaction);
                 taxedTransactions.ForEach(x =>
                 {
                     x.SenderAccount.Cash -= amount;

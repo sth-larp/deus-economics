@@ -18,7 +18,7 @@ namespace DeusCloud.Data.Entities.Transactions
         public string Employer { get; set; }
 
         [NotMapped]
-        public string EmployerName { get { return EmployerAccount.Settings.ToString(); } }
+        public string EmployerName { get { return EmployerAccount.Fullname; } }
 
         [JsonIgnore]
         [ForeignKey("Employer")]

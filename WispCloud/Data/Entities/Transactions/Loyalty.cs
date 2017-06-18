@@ -15,6 +15,10 @@ namespace DeusCloud.Data.Entities.Transactions
         [Index]
         public InsuranceType Insurance { get; set; }
 
+        //Default 1 = see Migrations
+        [Required]
+        public int MinLevel { get; set; }
+
         [Required]
         [Index]
         public string LoyalName { get; set; }
@@ -25,12 +29,14 @@ namespace DeusCloud.Data.Entities.Transactions
 
         public Loyalty()
         {
+            MinLevel = 1;
         }
 
         public Loyalty(Account service, InsuranceType type)
         {
             LoyalService = service;
             Insurance = type;
+            MinLevel = 1;
         }
     }
 }

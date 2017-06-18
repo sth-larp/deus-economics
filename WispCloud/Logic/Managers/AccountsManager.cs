@@ -25,7 +25,8 @@ namespace DeusCloud.Logic.Managers
         {
             var newUser = new Account(clientData.Login, AccountRole.Admin);
                 //register all users as superusers for debug and tests
-            newUser.Settings = clientData.Settings;
+            
+            newUser.Fullname = clientData.Fullname??"";
             newUser.Cash = 100000;
 
             var result = _userManager.Create(newUser, clientData.Password);

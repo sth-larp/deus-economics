@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DeusCloud.Data.Entities.Taxes
+namespace DeusCloud.Data.Entities.Constants
 {
-    public class Tax
+    public class Constant
     {
         [Required]
         public float PercentValue { get; set; }
 
         [Key]
-        public TaxType Type { get; set; }
+        public ConstantType Type { get; set; }
 
         [StringLength(250)]
         public string Description { get; set; }

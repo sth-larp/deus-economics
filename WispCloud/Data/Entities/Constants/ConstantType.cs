@@ -1,12 +1,12 @@
 ﻿using System.Runtime.Serialization;
 
-namespace DeusCloud.Data.Entities.Taxes
+namespace DeusCloud.Data.Entities.Constants
 {
     [DataContract]
-    public enum TaxType
+    public enum ConstantType
     {
         Transaction = 1,
         Corporate = 2,
-        Tavern = 3
+        TavernTax = 3
     }
 }

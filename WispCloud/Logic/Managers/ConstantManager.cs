@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Accounts;
-using DeusCloud.Data.Entities.Taxes;
+using DeusCloud.Data.Entities.Constants;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
@@ -11,23 +11,23 @@ using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers
 {
-    public class TaxManager : ContextHolder
+    public class ConstantManager : ContextHolder
     {
         private UserManager _userManager;
         private RightsManager _rightsManager;
         private LoyaltyManager _loyaltyManager;
 
-        public static Dictionary<TaxType, Tax> Taxes { get; protected set; }
+        public static Dictionary<ConstantType, Constant> Constants { get; protected set; }
 
-        public TaxManager(UserContext context) : base(context)
+        public ConstantManager(UserContext context) : base(context)
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
             _loyaltyManager = new LoyaltyManager(UserContext);
 
-            if (Taxes == null)
+            if (Constants == null)
             {
-                Taxes = UserContext.Data.Taxes.ToList().ToDictionary(x => x.Type, x => x);
+                Constants = UserContext.Data.Constants.ToList().ToDictionary(x => x.Type, x => x);
             }
         }
 
@@ -39,9 +39,9 @@ namespace DeusCloud.Logic.Managers
             /*var government = _userManager.FindById("govt");
 
             if (transaction.ReceiverAccount.Login != "govt" && government != null
-                && Taxes != null && Taxes.ContainsKey(TaxType.Transaction))
+                && Constants != null && Constants.ContainsKey(ConstantType.Transaction))
             {
-                var taxValue = Taxes[TaxType.Transaction].PercentValue;
+                var taxValue = Constants[ConstantType.Transaction].PercentValue;
                 var sum = transaction.Amount * taxValue / 100;
                 var t = new Transaction(transaction.ReceiverAccount, government, sum);
                 t.Type = TransactionType.Tax;
@@ -52,20 +52,20 @@ namespace DeusCloud.Logic.Managers
             //Налог на прибыльные предприятия
             var master = _userManager.FindById("master");
             if ((transaction.ReceiverAccount.Role & AccountRole.Tavern) > 0 
-                && Taxes != null && Taxes.ContainsKey(TaxType.Tavern)
+                && Constants != null && Constants.ContainsKey(ConstantType.TavernTax)
                 && master != null)
             {
                 var level = _loyaltyManager.CheckLoyaltyLevel(transaction.SenderAccount,
                     transaction.ReceiverAccount);
                 var discount = GetDiscount(level);
 
-                var taxValue = Taxes[TaxType.Tavern].PercentValue / 100 - (float)discount;
-                if (taxValue > 0)
+                var constValue = Constants[ConstantType.TavernTax].PercentValue / 100 - (float)discount;
+                if (constValue > 0)
                 {
-                    var sum = transaction.Amount * taxValue;
+                    var sum = transaction.Amount * constValue;
                     var t = new Transaction(transaction.ReceiverAccount, master, sum);
                     t.Type = TransactionType.Tax;
-                    t.Comment = "Налог на прибыль";
+                    t.Comment = "Налог на прибыльные заведения";
                     ret.Add(t);
                 }
 
@@ -82,9 +82,9 @@ namespace DeusCloud.Logic.Managers
             return ret;
         }
 
-        public List<Tax> GetTaxes()
+        public List<Constant> GetConstants()
         {
-            return Taxes.Values.ToList();
+            return Constants.Values.ToList();
         }
 
         private decimal GetDiscount(int level)
@@ -95,47 +95,47 @@ namespace DeusCloud.Logic.Managers
             return 0;
         }
 
-        public Tax NewTax(string text, TaxType type, float value)
+        public Constant NewConstant(string text, ConstantType type, float value)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
-            Try.Condition(!Taxes.ContainsKey(type), $"This tax already exests: {type}.");
-            var tax = new Tax
+            Try.Condition(!Constants.ContainsKey(type), $"This constant already exists: {type}.");
+            var c = new Constant
             {
                 Description = text,
                 PercentValue = value,
                 Type = type
             };
-            Taxes.Add(type, tax);
-            UserContext.Data.Taxes.Add(tax);
+            Constants.Add(type, c);
+            UserContext.Data.Constants.Add(c);
             UserContext.Data.SaveChanges();
-            return tax;
+            return c;
         }
 
-        public Tax EditTax(string text, TaxType type, float value)
+        public Constant EditConstant(string text, ConstantType type, float value)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
 
-            Try.Condition(Taxes.ContainsKey(type), $"Cant find tax with type: {type}.");
-            var tax = Taxes[type];
-            tax.Description = text;
-            tax.PercentValue = value;
+            Try.Condition(Constants.ContainsKey(type), $"Cant find constant with type: {type}.");
+            var c = Constants[type];
+            c.Description = text;
+            c.PercentValue = value;
 
-            var dbtax = UserContext.Data.Taxes.Find(type);
-            dbtax.Description = text;
-            dbtax.PercentValue = value;
+            var dbconst = UserContext.Data.Constants.Find(type);
+            dbconst.Description = text;
+            dbconst.PercentValue = value;
             UserContext.Data.SaveChanges();
-            return tax;
+            return c;
         }
 
-        public void DeleteTax(TaxType type)
+        public void DeleteConstant(ConstantType type)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
 
-            Try.Condition(Taxes.ContainsKey(type), $"Cant find tax with type: {type}.");
-            Taxes.Remove(type);
+            Try.Condition(Constants.ContainsKey(type), $"Cant find constant with type: {type}.");
+            Constants.Remove(type);
 
-            var tax = UserContext.Data.Taxes.First(c => c.Type == type);
-            UserContext.Data.Taxes.Remove(tax);
+            var c = UserContext.Data.Constants.First(x => x.Type == type);
+            UserContext.Data.Constants.Remove(c);
             UserContext.Data.SaveChanges();
         }
     }
