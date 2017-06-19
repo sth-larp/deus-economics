@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Description;
+using DeusCloud.BasicAuth;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Logic.Client;
 
@@ -8,6 +9,7 @@ namespace DeusCloud.Api.Controllers
 {
     [DeusValidateModel]
     [DeusTraceLogging]
+    [BasicAuth]
     public sealed class AccessController : ApiController
     {
         /// <summary>Set access roles for master-slave account pair</summary>
@@ -15,7 +17,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpPost]
         [Route("accounts/access/set")]
         [ResponseType(typeof(AccountAccess))]
@@ -29,7 +30,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpGet]
         [Route("accounts/access/masters")]
         [ResponseType(typeof(List<AccountAccess>))]
@@ -43,7 +43,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpGet]
         [Route("accounts/access/slaves")]
         [ResponseType(typeof(List<AccountAccess>))]

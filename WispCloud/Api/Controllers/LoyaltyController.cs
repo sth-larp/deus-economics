@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Description;
+using DeusCloud.BasicAuth;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.Server;
@@ -9,6 +10,7 @@ namespace DeusCloud.Api.Controllers
 {
     [DeusValidateModel]
     [DeusTraceLogging]
+    [BasicAuth]
     public sealed class LoyaltyController : ApiController
     {
         /// <summary>Список всех компаний, работающих по страховкам</summary>
@@ -16,7 +18,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpGet]
         [Route("insurance/all")]
         [ResponseType(typeof(List<Loyalty>))]
@@ -31,7 +32,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpGet]
         [Route("insurance/list")]
         [ResponseType(typeof(List<Loyalty>))]
@@ -46,7 +46,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpGet]
         [Route("insurance/holders")]
         [ResponseType(typeof(List<InsuranceHolderServerData>))]
@@ -62,7 +61,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpPost]
         [Route("insurance/removeholder")]
         public IHttpActionResult RemoveLoyaltyHolder(string company, string user)
@@ -77,7 +75,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpPost]
         [Route("insurance/newrelation")]
         [ResponseType(typeof(Loyalty))]
@@ -92,7 +89,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpDelete]
         [Route("insurance/deleterelation")]
         public IHttpActionResult DeleteLoyalty(int id)

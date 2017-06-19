@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Description;
+using DeusCloud.BasicAuth;
 using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
@@ -19,7 +20,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
+        [BasicAuth]
         [HttpGet]
         [Route("accounts/current")]
         [ResponseType(typeof(Account))]
@@ -47,7 +48,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
+        [BasicAuth]
         [HttpPost]
         [Route("accounts/changepassword")]
         public IHttpActionResult ChangePassword(ChangePasswordClientData clientData)
@@ -62,7 +63,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
+        [BasicAuth]
         [HttpPost]
         [Route("accounts/properties")]
         [ResponseType(typeof(Account))]
@@ -76,7 +77,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
+        [BasicAuth]
         [HttpPost]
         [Route("accounts/setindex")]
         [ResponseType(typeof(Account))]
@@ -89,7 +90,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
+        [BasicAuth]
         [HttpGet]
         [Route("accounts/list")]
         [ResponseType(typeof(List<Account>))]

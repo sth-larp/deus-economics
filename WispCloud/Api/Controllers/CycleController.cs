@@ -1,8 +1,10 @@
 ﻿using System.Web.Http;
+using DeusCloud.BasicAuth;
 using DeusCloud.Logic.Client;
 
 namespace DeusCloud.Api.Controllers
 {
+    [BasicAuth]
     [DeusValidateModel]
     [DeusTraceLogging]
     public sealed class CycleController : ApiController
@@ -12,7 +14,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpPost]
         [Route("cycle/new")]
         public IHttpActionResult NewCycle(SwitchCycleClientData data)

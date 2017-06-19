@@ -188,7 +188,6 @@
     <EmbeddedResource Include="Migrations\201706181543291_Fullname-Not-Required.resx">
       <DependentUpon>201706181543291_Fullname-Not-Required.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Files\OAuth2AuthorizationForm.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -207,10 +206,13 @@
     <Compile Include="Api\OkJsonPatchResult.cs" />
     <Compile Include="Api\DeusActionSelector.cs" />
     <Compile Include="Api\ApiController.cs" />
-    <Compile Include="Api\DeusAuthorizeAttribute.cs" />
     <Compile Include="Api\ControllerSelector.cs" />
     <Compile Include="Api\DeusTraceLoggingAttribute.cs" />
     <Compile Include="Api\DeusValidateModelAttribute .cs" />
+    <Compile Include="BasicAuth\AuthenticationFailureResult.cs" />
+    <Compile Include="BasicAuth\BasicAuthAttribute.cs" />
+    <Compile Include="BasicAuth\BasicAuthenticationFilterAttribute.cs" />
+    <Compile Include="BasicAuth\HttpActionContextExtensions.cs" />
     <Compile Include="Data\Entities\Accounts\AccountRole.cs" />
     <Compile Include="Data\Entities\Accounts\AccountStatus.cs" />
     <Compile Include="Data\Entities\Accounts\InsuranceType.cs" />
@@ -232,8 +234,6 @@
     <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Identity\AuthorizationExtensions.cs" />
     <Compile Include="Identity\Services\EmailService.cs" />
-    <Compile Include="Identity\WispOAuthAuthorizationProvider.cs" />
-    <Compile Include="Identity\WispOAuthBearerAuthenticationProvider.cs" />
     <Compile Include="Identity\UserManager.cs" />
     <Compile Include="Identity\UserStore.cs" />
     <Compile Include="Logic\Client\AccIndexClientData.cs" />
@@ -306,6 +306,7 @@
     <Compile Include="Serialization\WispJsonNullableDecimalConverter.cs" />
     <Compile Include="Swashbuckle\AllPropertiesWritableFilter.cs" />
     <Compile Include="Swashbuckle\AuthenticationFilter.cs" />
+    <Compile Include="Swashbuckle\MarkSecuredMethodsFilter.cs" />
     <Compile Include="Swashbuckle\CachingSwaggerProvider.cs" />
     <Compile Include="Templates\MimeTypes.cs" />
     <Compile Include="Templates\Models\RestorePasswordModel.cs" />
@@ -344,8 +345,6 @@
     <None Include="Properties\PublishProfiles\deus2017economy - Web Deploy %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\deus2017economy - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\Publish.pubxml" />
-    <EmbeddedResource Include="Templates\Files\RegistrationEmail.html" />
-    <EmbeddedResource Include="Templates\Files\RestorePasswordEmail.cshtml" />
     <None Include="Properties\PublishProfiles\TestWispCloud_Publish.pubxml" />
   </ItemGroup>
   <ItemGroup>

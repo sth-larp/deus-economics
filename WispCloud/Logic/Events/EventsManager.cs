@@ -20,7 +20,7 @@ namespace DeusCloud.Logic.Events
         public void InstallationChange(long installationID, EventActionType action)
         {
             var connectionIDs = UserContext.SignalRConnectionMapping
-                .GetConnectionIDsForLoginExceptAuthorization(UserContext.CurrentUser.Login, UserContext.CurrentAuthorization);
+                .GetConnectionIDsForLoginExceptAuthorization(UserContext.CurrentUser.Login, null); //UserContext.CurrentAuthorization);
 
             _hubContext.Clients.Clients(connectionIDs).InstallationChange(
                 new InstallationEventArgs()

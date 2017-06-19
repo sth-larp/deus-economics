@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Description;
+using DeusCloud.BasicAuth;
 using DeusCloud.Data.Entities.Constants;
 
 namespace DeusCloud.Api.Controllers
 {
     [DeusValidateModel]
     [DeusTraceLogging]
+    [BasicAuth]
     public sealed class ConstantsController : ApiController
     {
         /// <summary>Obtain constant list</summary>
@@ -30,7 +32,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpPost]
         [Route("constant/new")]
         [ResponseType(typeof(Constant))]
@@ -47,7 +48,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpPost]
         [Route("constant/edit")]
         [ResponseType(typeof(Constant))]
@@ -62,7 +62,6 @@ namespace DeusCloud.Api.Controllers
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
-        [DeusAuthorize]
         [HttpPost]
         [Route("constant/delete")]
         public IHttpActionResult DeleteConstant(ConstantType type)

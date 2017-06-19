@@ -4,7 +4,7 @@ using Microsoft.Owin.Security.Provider;
 
 namespace DeusCloud.Logic.CommonBase
 {
-    public static class GetWispContextExtensions
+    /*public static class GetWispContextExtensions
     {
         public static UserContext GetContext(this HttpRequestMessage request)
         {
@@ -29,7 +29,6 @@ namespace DeusCloud.Logic.CommonBase
 
             return wispContext;
         }
-
-    }
+    }*/
 
 }

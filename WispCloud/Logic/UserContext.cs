@@ -115,19 +115,7 @@ namespace DeusCloud.Logic
                 return _payments;
             }
         }
-
-        public EventsManager Events
-        {
-            get
-            {
-                if (_events == null)
-                    _events = new EventsManager(this);
-
-                return _events;
-            }
-        }
-        
-       
+      
         public UserContext(string dbNameOrConnectionString = null)
         {
             this._dbNameOrConnectionString = string.IsNullOrEmpty(dbNameOrConnectionString)
@@ -149,10 +137,9 @@ namespace DeusCloud.Logic
             _data?.Dispose();
         }
 
-        public void SetCurrentUser(Account user, string authorization)
+        public void SetCurrentUser(Account user)
         {
             CurrentUser = user;
-            CurrentAuthorization = authorization; //Previously was 'null' - bug?
         }
 
     }
