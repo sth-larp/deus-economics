@@ -238,6 +238,7 @@
     <Compile Include="Identity\UserStore.cs" />
     <Compile Include="Logic\Client\AccIndexClientData.cs" />
     <Compile Include="Logic\Client\SwitchCycleClientData.cs" />
+    <Compile Include="Logic\Client\TransferClientData.cs" />
     <Compile Include="Logic\Server\InsuranceHolderServerData.cs" />
     <Compile Include="Logic\Client\ChangePasswordClientData.cs" />
     <Compile Include="Logic\Client\PaymentClientData.cs" />

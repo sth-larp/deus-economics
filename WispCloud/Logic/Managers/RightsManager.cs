@@ -31,15 +31,14 @@ namespace DeusCloud.Logic.Managers
             _userManager = new UserManager(UserContext);
         }
 
-        public void CheckCurrentUserActive()
-        {
-            Try.NotNull(UserContext.CurrentUser, NotEnoughRightsMessageText);
-            Try.Condition(UserContext.CurrentUser.Status == AccountStatus.Active, UserBlockedMessageText);
-        }
+        //public void CheckCurrentUserActive()
+        //{
+        //    Try.NotNull(UserContext.CurrentUser, NotEnoughRightsMessageText);
+        //    Try.Condition(UserContext.CurrentUser.Status == AccountStatus.Active, UserBlockedMessageText);
+        //}
 
         public void CheckRole(AccountRole role)
         {
-            CheckCurrentUserActive();
             Try.Condition((UserContext.CurrentUser.Role & role) > 0, NotEnoughRightsMessageText);
         }
 
@@ -50,23 +49,27 @@ namespace DeusCloud.Logic.Managers
 
         public Account CheckForAccessOverSlave(string slave, AccountAccessRoles roles)
         {
-            CheckCurrentUserActive();
             var slaveAccount = _userManager.FindById(slave);
             Try.NotNull(slaveAccount, $"Не найден логин: {slave}.");
             
+            //Admin can do anything
+            return CheckForAccessOverSlave(slaveAccount, roles);
+        }
+
+        public Account CheckForAccessOverSlave(Account slaveAccount, AccountAccessRoles roles)
+        {
             //Admin can do anything
             if ((UserContext.CurrentUser.Role & AccountRole.Admin) > 0)
                 return slaveAccount;
 
             //You have all access rights for yourself
-            if (UserContext.CurrentUser.Login == slave)
+            if (UserContext.CurrentUser.Login == slaveAccount.Login)
                 return slaveAccount;
 
-            var accessLevel = GetCurrentAccountAccess(slave);
+            var accessLevel = GetCurrentAccountAccess(slaveAccount.Login);
             Try.Condition(accessLevel != null && (accessLevel.Role & roles) > 0, NotEnoughPrivilegeText);
             return slaveAccount;
         }
-
 
         public Account SetAccountProperties(AccPropertyClientData clientData)
         {
@@ -128,10 +131,11 @@ namespace DeusCloud.Logic.Managers
 
         public AccountAccess SetAccountAccess(AccountAccessClientData accessData)
         {
-            CheckForAccessOverSlave(accessData.SlaveLogin, AccountAccessRoles.Admin);
             Try.Argument(accessData, nameof(accessData));
 
             var slaveAccount = _userManager.FindById(accessData.SlaveLogin);
+            CheckForAccessOverSlave(slaveAccount, AccountAccessRoles.Admin);
+
             var masterAccount = _userManager.FindById(accessData.MasterLogin);
             Try.NotNull(masterAccount, $"Не найден логин: {accessData.MasterLogin}.");
 

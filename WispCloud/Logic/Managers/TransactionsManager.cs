@@ -23,34 +23,32 @@ namespace DeusCloud.Logic.Managers
             _constantManager = new ConstantManager(UserContext);
         }
 
-        public void Transfer(string sender, string receiver, float amount)
+        public void Transfer(TransferClientData data)
         {
-            _rightsManager.CheckCurrentUserActive();
+            var receiverAcc = _userManager.FindById(data.Receiver);
+            Try.NotNull(receiverAcc, $"Cant find account with login: {data.Receiver}.");
 
-            var receiverAcc = _userManager.FindById(receiver);
-            Try.NotNull(receiverAcc, $"Cant find account with login: {receiver}.");
-
-            var senderAcc = _userManager.FindById(sender);
-            Try.NotNull(senderAcc, $"Cant find account with login: {sender}.");
+            var senderAcc = _userManager.FindById(data.Sender);
+            Try.NotNull(senderAcc, $"Cant find account with login: {data.Sender}.");
 
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
                 UserContext.Data.BeginFastSave();
 
-                _rightsManager.CheckForAccessOverSlave(sender, AccountAccessRoles.Withdraw);
+                _rightsManager.CheckForAccessOverSlave(senderAcc, AccountAccessRoles.Withdraw);
 
-                Try.Condition(senderAcc.Cash >= amount, $"Not enought money");
-                Try.Condition(amount > 0, $"Can't transfer negative or zero funds");
+                Try.Condition(senderAcc.Cash >= data.Amount, $"Not enought money");
+                Try.Condition(data.Amount > 0, $"Can't transfer negative or zero funds");
 
-                var transaction = new Transaction(senderAcc, receiverAcc, amount);
+                var transaction = new Transaction(senderAcc, receiverAcc, data.Amount);
                 transaction.Type = TransactionType.Normal;
-                transaction.Comment = "Простая транзакция";
+                transaction.Comment = data.Description ?? "";
 
                 var taxedTransactions = _constantManager.TakeTax(transaction);
                 taxedTransactions.ForEach(x =>
                 {
-                    x.SenderAccount.Cash -= amount;
-                    x.ReceiverAccount.Cash += amount;
+                    x.SenderAccount.Cash -= data.Amount;
+                    x.ReceiverAccount.Cash += data.Amount;
 
                     UserContext.Accounts.Update(x.SenderAccount);
                     UserContext.Accounts.Update(x.ReceiverAccount);
@@ -64,11 +62,18 @@ namespace DeusCloud.Logic.Managers
             }
         }
 
-        public List<Transaction> GetHistory(string login)
+        public List<Transaction> GetHistory(string login, int take, int skip)
         {
+            Try.NotEmpty(login, $"Поле {nameof(login)} не должно быть пустым");
+            Try.Condition(skip >= 0, $"Поле {nameof(skip)} не должно быть отрицательным");
+            Try.Condition(take >= 0, $"Поле {nameof(take)} не должно быть отрицательным");
+
             _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
-            var ret = UserContext.Data.Transactions.Where(
-                x => x.Receiver == login || x.Sender == login);
+
+            var ret = UserContext.Data.Transactions
+                .Where(x => x.Receiver == login || x.Sender == login)
+                .OrderByDescending(x => x.Time)
+                .Skip(skip).Take(take);
             return ret.ToList();
         }
     }

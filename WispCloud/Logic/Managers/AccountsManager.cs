@@ -62,7 +62,7 @@ namespace DeusCloud.Logic.Managers
                 throw new DeusException(result.Errors.First());
         }
 
-        public Account GetAuthentified(string login)
+        public Account GetProfile(string login)
         {
             return _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
         }

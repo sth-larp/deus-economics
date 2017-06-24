@@ -26,7 +26,7 @@ namespace DeusCloud.Api.Controllers
         [ResponseType(typeof(Account))]
         public IHttpActionResult Get(string login)
         {
-            return Ok(UserContext.Accounts.GetAuthentified(login));
+            return Ok(UserContext.Accounts.GetProfile(login));
         }
 
         /// <summary>Зарегистрировать аккаунт</summary>
