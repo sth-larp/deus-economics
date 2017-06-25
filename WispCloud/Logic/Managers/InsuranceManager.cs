@@ -110,7 +110,7 @@ namespace DeusCloud.Logic.Managers
             return UserContext.Data.Loyalties.Where(x => x.LoyalService.Login == login).ToList();
         }
 
-        public List<InsuranceHolderServerData> GetLoyaltyHolders(string login)
+        public List<InsuranceHolderServerData> GetInsuranceHolders(string login)
         {
             var ret = new List<InsuranceHolderServerData>();
             _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
@@ -169,19 +169,28 @@ namespace DeusCloud.Logic.Managers
                 $"{data.Company} не выпускает страховки");
 
             var t = _associations[data.Company];
-            Try.Condition(CheckInsuranceLevel(level, t), 
-                $"Неверный уровень страховки {level}");
+            Try.Condition(CheckInsuranceLevel(level, t), $"Неверный уровень страховки {level}");
 
-            SetInsuranceHolder_Checked(userAccount, level, t);
+            SetInsuranceHolder_Checked(userAccount, level, t, true);
         }
 
-        private void SetInsuranceHolder_Checked(Account userAccount, int level, InsuranceType t)
+        private void SetInsuranceHolder_Checked(Account userAccount, int level, InsuranceType t, bool countIndex = false)
         {
             Try.Condition((userAccount.Role & AccountRole.Person) > 0,
                 $"Только персоны могут быть держателями страховки");
 
             var oldIssuer = GetIssuerFromType(userAccount.Insurance);
             var newIssuer = GetIssuerFromType(t);
+
+            if (countIndex)
+            {
+                Try.Condition(newIssuer.InsurancePoints >= level, $"Не хватает очков страховки");
+                newIssuer.InsurancePoints -= level;
+                UserContext.Accounts.Update(newIssuer);
+
+                UserContext.AddGameEvent(newIssuer.Login, GameEventType.Index,
+                    $"Потрачено {level} очков на выдачу страховки {userAccount.Login}", true);
+            }
 
             if (oldIssuer != null && userAccount.Insurance != t)
             {
@@ -211,6 +220,9 @@ namespace DeusCloud.Logic.Managers
 
             var loserAccount = _userManager.FindById(data.Loser);
             Try.NotNull(loserAccount, $"Не найден пользователь {data.Loser}");
+
+            Try.Condition(loserAccount.Insurance != InsuranceType.None, 
+                $"У пользователя {data.Loser} нет страховки");
 
             var receiverAccount = _userManager.FindById(data.Receiver);
             Try.NotNull(receiverAccount, $"Не найден пользователь {data.Receiver}");
@@ -245,21 +257,28 @@ namespace DeusCloud.Logic.Managers
         {
             _rightsManager.CheckRole(AccountRole.Admin);
             ResetIndexValues(data);
-            SpendIndexForInsurance();
+            ProlongInsurance();
         }
 
-        private void SpendIndexForInsurance()
+        private void ProlongInsurance()
         {
             foreach (var kv in _associations)
             {
                 var corp = _userManager.FindById(kv.Key);
                 if (corp == null) continue; //Not found in DB
 
-                var holders = GetLoyaltyHolders(kv.Key).OrderByDescending(x => x.InsuranceLevel);
+                var holders = GetInsuranceHolders(kv.Key).OrderByDescending(x => x.InsuranceLevel);
                 foreach (var holder in holders)
                 {
-                    if (corp.Index - corp.IndexSpent >= holder.InsuranceLevel)
-                        corp.IndexSpent += holder.InsuranceLevel;
+                    if (corp.InsurancePoints >= holder.InsuranceLevel)
+                    {
+                        corp.InsurancePoints -= holder.InsuranceLevel;
+                        UserContext.AddGameEvent(corp.Login, GameEventType.Index, 
+                            $"Продлена страховка пользователя {holder.UserLogin}," +
+                            $" потрачено {holder.InsuranceLevel} очков", true);
+                        UserContext.AddGameEvent(holder.UserLogin, GameEventType.Index,
+                            $"{corp.Login} продлила вашу страховку", true);
+                    }
                     else
                     {
                         var userAccount = _userManager.FindById(holder.UserLogin);
@@ -277,15 +296,14 @@ namespace DeusCloud.Logic.Managers
                 var corp = _userManager.FindById(pair.Key);
                 if (corp == null) continue; //Not found in DB
 
-                corp.IndexSpent = 0;
                 var cIndex = data.Indexes.ToList().FindIndex(x => x.Key == pair.Key);
                 if (cIndex >= 0)
                     corp.Index = data.Indexes[cIndex].Value;
+                corp.InsurancePoints = corp.Index;
                 UserContext.Accounts.Update(corp);
 
                 UserContext.AddGameEvent(corp.Login, GameEventType.Index,
-                    $"выставлен индекс {corp.Index}, " +
-                    $"потраченные на страховки очки индекса выставлены в 0");
+                    $"Выставлен индекс и очки страховки {corp.Index}");
             }
         }       
     }

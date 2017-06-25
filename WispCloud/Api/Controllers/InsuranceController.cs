@@ -51,7 +51,7 @@ namespace DeusCloud.Api.Controllers
         [ResponseType(typeof(List<InsuranceHolderServerData>))]
         public IHttpActionResult GetLoyaltyHolders(string company)
         {
-            return Ok(UserContext.Insurances.GetLoyaltyHolders(company));
+            return Ok(UserContext.Insurances.GetInsuranceHolders(company));
         }
 
         /// <summary>Отменить страховку у персоны</summary>

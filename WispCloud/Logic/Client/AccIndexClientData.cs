@@ -9,13 +9,13 @@ namespace DeusCloud.Logic.Client
     {
         public string Login { get; set; }
         public int Index { get; set; }
-        public int IndexSpent { get; set; }
+        public int InsurancePoints { get; set; }
 
         public override void Validate()
         {
             Try.NotEmpty(Login, $"{nameof(Login)} cant be empty.");
             Try.Condition(Index >= 0, $"Index should be positive");
-            Try.Condition(IndexSpent >= 0, $"Spent Index should be positive");
+            Try.Condition(InsurancePoints >= 0, $"InsurancePoints should be positive");
         }
 
     }

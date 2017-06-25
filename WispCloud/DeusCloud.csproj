@@ -195,6 +195,9 @@
     <EmbeddedResource Include="Migrations\201706250941370_GameEvents.resx">
       <DependentUpon>201706250941370_GameEvents.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706251617097_FieldRename.resx">
+      <DependentUpon>201706251617097_FieldRename.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\CommonPrefixProvider .cs" />
@@ -313,6 +316,10 @@
     <Compile Include="Migrations\201706250941370_GameEvents.cs" />
     <Compile Include="Migrations\201706250941370_GameEvents.Designer.cs">
       <DependentUpon>201706250941370_GameEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706251617097_FieldRename.cs" />
+    <Compile Include="Migrations\201706251617097_FieldRename.Designer.cs">
+      <DependentUpon>201706251617097_FieldRename.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

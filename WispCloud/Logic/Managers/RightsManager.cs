@@ -119,7 +119,7 @@ namespace DeusCloud.Logic.Managers
             Try.NotNull(editAccount, $"Не найден логин: {data.Login}.");
 
             editAccount.Index = data.Index;
-            editAccount.IndexSpent = data.IndexSpent;
+            editAccount.InsurancePoints = data.InsurancePoints;
             UserContext.Accounts.Update(editAccount);
 
             UserContext.AddGameEvent(editAccount.Login, GameEventType.Index, $"Задан новый индекс {data.Index}");

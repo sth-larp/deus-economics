@@ -46,7 +46,7 @@ namespace DeusCloud.Data.Entities.Accounts
         [Required]
         public int Index { get; set; }
 
-        public int IndexSpent { get; set; }
+        public int InsurancePoints { get; set; }
 
         public InsuranceType Insurance { get; set; }
 
