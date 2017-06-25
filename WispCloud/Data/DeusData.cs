@@ -9,6 +9,7 @@ using DeusCloud.Data.Entities;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Constants;
+using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic;
@@ -29,6 +30,7 @@ namespace DeusCloud.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Constant> Constants { get; set; }
         public DbSet<Loyalty> Loyalties { get; set; }
+        public DbSet<GameEvent> GameEvents { get; set; }
         public DeusData() : this(null) { }
         public DeusData(string dbNameOrConnectionString)
             : base(string.IsNullOrEmpty(dbNameOrConnectionString) ? 

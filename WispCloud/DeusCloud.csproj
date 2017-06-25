@@ -192,6 +192,9 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Migrations\201706250941370_GameEvents.resx">
+      <DependentUpon>201706250941370_GameEvents.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\CommonPrefixProvider .cs" />
@@ -199,7 +202,7 @@
     <Compile Include="Api\Controllers\AccountsController.cs" />
     <Compile Include="Api\Controllers\CycleController.cs" />
     <Compile Include="Api\Controllers\ErrorController.cs" />
-    <Compile Include="Api\Controllers\LoyaltyController.cs" />
+    <Compile Include="Api\Controllers\InsuranceController.cs" />
     <Compile Include="Api\Controllers\PaymentsController.cs" />
     <Compile Include="Api\Controllers\ConstantsController.cs" />
     <Compile Include="Api\Controllers\TransactionsController.cs" />
@@ -220,6 +223,8 @@
     <Compile Include="Data\Entities\Access\AccountAccessRoles.cs" />
     <Compile Include="Data\Entities\Constants\Constant.cs" />
     <Compile Include="Data\Entities\Constants\ConstantType.cs" />
+    <Compile Include="Data\Entities\GameEvents\GameEvent.cs" />
+    <Compile Include="Data\Entities\GameEvents\GameEventType.cs" />
     <Compile Include="Data\Entities\Transactions\Loyalty.cs" />
     <Compile Include="Data\Entities\Transactions\Payment.cs" />
     <Compile Include="Data\Entities\Transactions\Transaction.cs" />
@@ -237,8 +242,11 @@
     <Compile Include="Identity\UserManager.cs" />
     <Compile Include="Identity\UserStore.cs" />
     <Compile Include="Logic\Client\AccIndexClientData.cs" />
+    <Compile Include="Logic\Client\SetInsuranceClientData.cs" />
+    <Compile Include="Logic\Client\StealInsuranceClientData.cs" />
     <Compile Include="Logic\Client\SwitchCycleClientData.cs" />
     <Compile Include="Logic\Client\TransferClientData.cs" />
+    <Compile Include="Logic\Server\FullAccountServerData.cs" />
     <Compile Include="Logic\Server\InsuranceHolderServerData.cs" />
     <Compile Include="Logic\Client\ChangePasswordClientData.cs" />
     <Compile Include="Logic\Client\PaymentClientData.cs" />
@@ -249,7 +257,7 @@
     <Compile Include="Logic\CommonBase\ContextHolder.cs" />
     <Compile Include="Logic\Client\AccPropertyClientData.cs" />
     <Compile Include="Logic\Client\AccountAccessClientData.cs" />
-    <Compile Include="Logic\Managers\LoyaltyManager.cs" />
+    <Compile Include="Logic\Managers\InsuranceManager.cs" />
     <Compile Include="Logic\Managers\PaymentsManager.cs" />
     <Compile Include="Logic\Managers\RightsManager.cs" />
     <Compile Include="Logic\Managers\ConstantManager.cs" />
@@ -301,6 +309,10 @@
     <Compile Include="Migrations\201706181543291_Fullname-Not-Required.cs" />
     <Compile Include="Migrations\201706181543291_Fullname-Not-Required.Designer.cs">
       <DependentUpon>201706181543291_Fullname-Not-Required.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706250941370_GameEvents.cs" />
+    <Compile Include="Migrations\201706250941370_GameEvents.Designer.cs">
+      <DependentUpon>201706250941370_GameEvents.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

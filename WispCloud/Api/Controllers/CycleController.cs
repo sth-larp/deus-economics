@@ -18,7 +18,7 @@ namespace DeusCloud.Api.Controllers
         [Route("cycle/new")]
         public IHttpActionResult NewCycle(SwitchCycleClientData data)
         {
-            UserContext.Loyalties.SwitchCycle(data);
+            UserContext.Insurances.SwitchCycle(data);
             UserContext.Payments.SwitchCycle();
             return Ok();
         }

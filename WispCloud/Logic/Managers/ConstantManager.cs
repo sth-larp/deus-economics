@@ -15,7 +15,7 @@ namespace DeusCloud.Logic.Managers
     {
         private UserManager _userManager;
         private RightsManager _rightsManager;
-        private LoyaltyManager _loyaltyManager;
+        private InsuranceManager _insuranceManager;
 
         public static Dictionary<ConstantType, Constant> Constants { get; protected set; }
 
@@ -23,7 +23,7 @@ namespace DeusCloud.Logic.Managers
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
-            _loyaltyManager = new LoyaltyManager(UserContext);
+            _insuranceManager = new InsuranceManager(UserContext);
 
             if (Constants == null)
             {
@@ -55,7 +55,7 @@ namespace DeusCloud.Logic.Managers
                 && Constants != null && Constants.ContainsKey(ConstantType.TavernTax)
                 && master != null)
             {
-                var level = _loyaltyManager.CheckLoyaltyLevel(transaction.SenderAccount,
+                var level = _insuranceManager.CheckLoyaltyLevel(transaction.SenderAccount,
                     transaction.ReceiverAccount);
                 var discount = GetDiscount(level);
 

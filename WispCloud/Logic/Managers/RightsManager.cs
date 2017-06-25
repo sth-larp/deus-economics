@@ -2,6 +2,7 @@
 using System.Linq;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
@@ -67,7 +68,7 @@ namespace DeusCloud.Logic.Managers
                 return slaveAccount;
 
             var accessLevel = GetCurrentAccountAccess(slaveAccount.Login);
-            Try.Condition(accessLevel != null && (accessLevel.Role & roles) > 0, NotEnoughPrivilegeText);
+            Try.Condition(accessLevel != null && (accessLevel.Role - roles) >= 0, NotEnoughPrivilegeText);
             return slaveAccount;
         }
 
@@ -87,25 +88,26 @@ namespace DeusCloud.Logic.Managers
             if(clientData.Status != null)
                 editAccount.Status = clientData.Status.Value;
 
-            if (clientData.Insurance != null)
-            {
-                Try.Condition(clientData.Insurance == InsuranceType.None || (editAccount.Role & AccountRole.Person) > 0, 
-                    $"Страховку можно дать только персоне: {clientData.Login}.");
-                Try.Condition(clientData.InsuranceLevel != null, $"Не задан уровень страховки");
+            //if (clientData.Insurance != null)
+            //{
+            //    Try.Condition(clientData.Insurance == InsuranceType.None || (editAccount.Role & AccountRole.Person) > 0, 
+            //        $"Страховку можно дать только персоне: {clientData.Login}.");
+            //    Try.Condition(clientData.InsuranceLevel != null, $"Не задан уровень страховки");
+            //
+            //    editAccount.Insurance = clientData.Insurance.Value;
+            //}
 
-                editAccount.Insurance = clientData.Insurance.Value;
-            }
-
-            if (clientData.InsuranceLevel != null)
-            {
-                Try.Condition((IsCorporate(editAccount.Insurance) && clientData.InsuranceLevel <= 3) 
-                    || (editAccount.Insurance == InsuranceType.Govt && clientData.InsuranceLevel <= 2)
-                    || clientData.InsuranceLevel == 1,
-                    $"Неверное значение уровня. 1-3 для корпораций, 1-2 для правительства, 1 в прочих случаях: {clientData.InsuranceLevel}");
-                editAccount.InsuranceLevel = clientData.InsuranceLevel.Value;
-            }
+            //if (clientData.InsuranceLevel != null)
+            //{
+            //    Try.Condition((IsCorporate(editAccount.Insurance) && clientData.InsuranceLevel <= 3) 
+            //        || (editAccount.Insurance == InsuranceType.Govt && clientData.InsuranceLevel <= 2)
+            //        || clientData.InsuranceLevel == 1,
+            //        $"Неверное значение уровня. 1-3 для корпораций, 1-2 для правительства, 1 в прочих случаях: {clientData.InsuranceLevel}");
+            //    editAccount.InsuranceLevel = clientData.InsuranceLevel.Value;
+            //}
 
             UserContext.Accounts.Update(editAccount);
+            UserContext.AddGameEvent(editAccount.Login, GameEventType.Rights, $"Изменены свойства аккаунта");
             return editAccount;
         }
 
@@ -119,14 +121,10 @@ namespace DeusCloud.Logic.Managers
             editAccount.Index = data.Index;
             editAccount.IndexSpent = data.IndexSpent;
             UserContext.Accounts.Update(editAccount);
-            return editAccount;
-        }
 
-        private bool IsCorporate(InsuranceType insurance)
-        {
-            return insurance == InsuranceType.Panam
-                   || insurance == InsuranceType.JJ
-                   || insurance == InsuranceType.Serenity;
+            UserContext.AddGameEvent(editAccount.Login, GameEventType.Index, $"Задан новый индекс {data.Index}");
+
+            return editAccount;
         }
 
         public AccountAccess SetAccountAccess(AccountAccessClientData accessData)
@@ -150,7 +148,7 @@ namespace DeusCloud.Logic.Managers
                 currentAccess.Role = newRole;
 
             UserContext.Data.SaveChanges();
-
+            SetAccessChangeGameEvents(slaveAccount, masterAccount);
             return currentAccess;
         }
 
@@ -158,7 +156,18 @@ namespace DeusCloud.Logic.Managers
         {
             var access = new AccountAccess(slave, master, roles);
             UserContext.Data.AccountAccesses.Add(access);
+            SetAccessChangeGameEvents(slave, master);
             return access;
+        }
+
+        private void SetAccessChangeGameEvents(Account slave, Account master)
+        {
+            UserContext.AddGameEvent(slave.Login, GameEventType.Rights,
+                $"Изменен доступ для пользователя {master.Login}");
+
+
+            UserContext.AddGameEvent(master.Login, GameEventType.Rights,
+                $"Изменен доступ над пользователем {slave.Login}");
         }
 
         public List<AccountAccess> GetAccessMasters(string slave)

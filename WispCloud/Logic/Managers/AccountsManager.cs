@@ -2,10 +2,12 @@
 using System.Linq;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
+using DeusCloud.Logic.Server;
 using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers
@@ -34,9 +36,7 @@ namespace DeusCloud.Logic.Managers
             if (!result.Succeeded)
                 throw new DeusException(result.Errors.First());
 
-            //var mailBody = TemplateRenderer.GetEmbeddedResource("StaticConstants.Templates.Files.RegistrationEmail.html");
-            //var sendTask = _userManager.SendEmailAsync(newUser.Login, "Welcome to Wisp", mailBody);
-
+            UserContext.AddGameEvent(clientData.Login, GameEventType.None, $"Аккаунт создан");
             return newUser;
         }
 
@@ -60,6 +60,8 @@ namespace DeusCloud.Logic.Managers
 
             if (!result.Succeeded)
                 throw new DeusException(result.Errors.First());
+
+            UserContext.AddGameEvent(account.Login, GameEventType.None, $"Изменен пароль");
         }
 
         public Account GetProfile(string login)
@@ -89,6 +91,14 @@ namespace DeusCloud.Logic.Managers
             _rightsManager.CheckRole(AccountRole.Admin);
             var res = UserContext.Data.Accounts.ToList();
             return res;
+        }
+
+        public FullAccountServerData GetFullProfile(string login)
+        {
+            var user = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            var data = new FullAccountServerData(user);
+            data.History = UserContext.Data.GameEvents.Where(x => x.User == user.Login).ToList();
+            return data;
         }
     }
 }

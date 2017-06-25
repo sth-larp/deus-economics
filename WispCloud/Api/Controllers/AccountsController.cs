@@ -2,10 +2,9 @@
 using System.Web.Http;
 using System.Web.Http.Description;
 using DeusCloud.BasicAuth;
-using DeusCloud.Data.Entities;
-using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Logic.Client;
+using DeusCloud.Logic.Server;
 
 namespace DeusCloud.Api.Controllers
 {
@@ -22,11 +21,27 @@ namespace DeusCloud.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [BasicAuth]
         [HttpGet]
-        [Route("accounts/current")]
+        [Route("accounts/profile")]
         [ResponseType(typeof(Account))]
         public IHttpActionResult Get(string login)
         {
             return Ok(UserContext.Accounts.GetProfile(login));
+        }
+
+        /// <summary>Получить профиль аккаунта с историей событий</summary>
+        /// <param name="login">User login</param>
+        /// <returns>Person profile with history</returns>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Internal Server Error</response>
+        [BasicAuth]
+        [HttpGet]
+        [Route("accounts/fullprofile")]
+        [ResponseType(typeof(FullAccountServerData))]
+        public IHttpActionResult GetFull(string login)
+        {
+            return Ok(UserContext.Accounts.GetFullProfile(login));
         }
 
         /// <summary>Зарегистрировать аккаунт</summary>

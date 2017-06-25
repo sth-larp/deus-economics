@@ -2,6 +2,7 @@
 using System.Linq;
 using DeusCloud.Data;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Logic.Events;
 using DeusCloud.Logic.Managers;
 using DeusCloud.SignalR;
@@ -28,7 +29,7 @@ namespace DeusCloud.Logic
         TransactionsManager _transactions;
         PaymentsManager _payments;
         ConstantManager _constants;
-        LoyaltyManager _loyalties;
+        InsuranceManager _insurances;
 
         EventsManager _events;
 
@@ -69,16 +70,16 @@ namespace DeusCloud.Logic
             }
         }
 
-        public LoyaltyManager Loyalties
+        public InsuranceManager Insurances
         {
             get
             {
-                if (_loyalties == null)
+                if (_insurances == null)
                 {
-                    _loyalties = new LoyaltyManager(this);
+                    _insurances = new InsuranceManager(this);
                 }
 
-                return _loyalties;
+                return _insurances;
             }
         }
         public AccountsManager Accounts
@@ -120,6 +121,16 @@ namespace DeusCloud.Logic
         {
             this._dbNameOrConnectionString = string.IsNullOrEmpty(dbNameOrConnectionString)
                 ? DefaultConnectionStringName : dbNameOrConnectionString;
+        }
+
+        public void AddGameEvent(string user, GameEventType t, string comment, bool isAnonym = false)
+        {
+            if (!isAnonym)
+                comment += $" пользователем {CurrentUser.Login}";
+            var e = new GameEvent(t, user);
+            e.Description = comment;
+            Data.GameEvents.Add(e);
+            Data.SaveChanges();
         }
 
         ~UserContext()

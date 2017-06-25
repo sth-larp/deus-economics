@@ -11,33 +11,33 @@ namespace DeusCloud.Api.Controllers
     [DeusValidateModel]
     [DeusTraceLogging]
     [BasicAuth]
-    public sealed class LoyaltyController : ApiController
+    public sealed class InsuranceController : ApiController
     {
-        /// <summary>Список всех компаний, работающих по страховкам</summary>
+        /// <summary>Список всех компаний, обслуживающих страховки</summary>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
         [HttpGet]
-        [Route("insurance/all")]
+        [Route("insurance/loyals")]
         [ResponseType(typeof(List<Loyalty>))]
         public IHttpActionResult GetLoyalties()
         {
-            return Ok(UserContext.Loyalties.GetLoyalties());
+            return Ok(UserContext.Insurances.GetLoyalties());
         }
 
-        /// <summary>Список страховок, которые обслуживает компания</summary>
+        /// <summary>Список обслуживаемых компанией страховок</summary>
         /// <param name="login">Company's ID</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
         [HttpGet]
-        [Route("insurance/list")]
+        [Route("insurance/loyalties")]
         [ResponseType(typeof(List<Loyalty>))]
         public IHttpActionResult GetCompanyLoyalties(string login)
         {
-            return Ok(UserContext.Loyalties.GetCompanyLoyalties(login));
+            return Ok(UserContext.Insurances.GetCompanyLoyalties(login));
         }
 
         /// <summary>Список персон, имеющих страховку</summary>
@@ -51,11 +51,10 @@ namespace DeusCloud.Api.Controllers
         [ResponseType(typeof(List<InsuranceHolderServerData>))]
         public IHttpActionResult GetLoyaltyHolders(string company)
         {
-            return Ok(UserContext.Loyalties.GetLoyaltyHolders(company));
+            return Ok(UserContext.Insurances.GetLoyaltyHolders(company));
         }
 
         /// <summary>Отменить страховку у персоны</summary>
-        /// <param name="company">Issuing company's ID</param>
         /// <param name="user">User with Insurance</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
@@ -63,9 +62,37 @@ namespace DeusCloud.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
         [Route("insurance/removeholder")]
-        public IHttpActionResult RemoveLoyaltyHolder(string company, string user)
+        public IHttpActionResult RemoveInsuranceHolder(string user)
         {
-            UserContext.Loyalties.RemoveLoyaltyHolder(company, user);
+            UserContext.Insurances.RemoveInsuranceHolder(user);
+            return Ok();
+        }
+
+        /// <summary>Украсть страховку</summary>
+        /// <param name="data">Steal insurance data</param>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Internal Server Error</response>
+        [HttpPost]
+        [Route("insurance/steal")]
+        public IHttpActionResult RemoveInsuranceHolder(StealInsuranceClientData data)
+        {
+            UserContext.Insurances.StealInsurance(data);
+            return Ok();
+        }
+
+        /// <summary>Сменить/добавить страховку персоне</summary>
+        /// <param name="data">Insurance data</param>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Internal Server Error</response>
+        [HttpPost]
+        [Route("insurance/changeholder")]
+        public IHttpActionResult ChangeInsuranceHolder(SetInsuranceClientData data)
+        {
+            UserContext.Insurances.SetInsuranceHolder(data);
             return Ok();
         }
 
@@ -76,11 +103,11 @@ namespace DeusCloud.Api.Controllers
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
-        [Route("insurance/newrelation")]
+        [Route("insurance/newloyalty")]
         [ResponseType(typeof(Loyalty))]
         public IHttpActionResult AddNewLoyalty(Loyalty data)
         {
-            return Ok(UserContext.Loyalties.NewLoyalty(data));
+            return Ok(UserContext.Insurances.NewLoyalty(data));
         }
 
         /// <summary>Удалить обслуживание страховки</summary>
@@ -90,10 +117,10 @@ namespace DeusCloud.Api.Controllers
         /// <response code="401">Unauthorized</response>
         /// <response code="500">Internal Server Error</response>
         [HttpDelete]
-        [Route("insurance/deleterelation")]
+        [Route("insurance/deleteloyalty")]
         public IHttpActionResult DeleteLoyalty(int id)
         {
-            UserContext.Loyalties.DeleteLoyalty(id);
+            UserContext.Insurances.DeleteLoyalty(id);
             return Ok();
         }
     }
