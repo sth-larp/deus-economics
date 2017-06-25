@@ -51,6 +51,18 @@ namespace DeusCloud.Data.Entities.Accounts
         public InsuranceType Insurance { get; set; }
 
         [NotMapped]
+        [JsonIgnore]
+        public int EffectiveLevel 
+        {
+            get
+            {
+                if (Insurance == InsuranceType.None) return 0;
+                if (Insurance == InsuranceType.SuperVip) return 3;
+                return InsuranceLevel;
+            }
+        }
+
+        [NotMapped]
         public IEnumerable<AccountRole> Roles { get { return Role.GetFlags(); } }
 
         [Required]

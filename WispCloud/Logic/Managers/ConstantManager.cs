@@ -31,55 +31,10 @@ namespace DeusCloud.Logic.Managers
             }
         }
 
-        public List<Transaction> TakeTax(Transaction transaction)
+        public float GetDiscountValue(Account sender, Account receiver)
         {
-            var ret = new List<Transaction>();
-
-            //Налог на все транзакции
-            /*var government = _userManager.FindById("govt");
-
-            if (transaction.ReceiverAccount.Login != "govt" && government != null
-                && Constants != null && Constants.ContainsKey(ConstantType.Transaction))
-            {
-                var taxValue = Constants[ConstantType.Transaction].PercentValue;
-                var sum = transaction.Amount * taxValue / 100;
-                var t = new Transaction(transaction.ReceiverAccount, government, sum);
-                t.Type = TransactionType.Tax;
-                t.Comment = String.Format("Налог c транзакций в размере {0}%", taxValue);
-                ret.Add(t);
-            }*/
-
-            //Налог на прибыльные предприятия
-            var master = _userManager.FindById("master");
-            if ((transaction.ReceiverAccount.Role & AccountRole.Tavern) > 0 
-                && Constants != null && Constants.ContainsKey(ConstantType.TavernTax)
-                && master != null)
-            {
-                var level = _insuranceManager.CheckLoyaltyLevel(transaction.SenderAccount,
-                    transaction.ReceiverAccount);
-                var discount = GetDiscount(level);
-
-                var constValue = Constants[ConstantType.TavernTax].PercentValue / 100 - (float)discount;
-                if (constValue > 0)
-                {
-                    var sum = transaction.Amount * constValue;
-                    var t = new Transaction(transaction.ReceiverAccount, master, sum);
-                    t.Type = TransactionType.Tax;
-                    t.Comment = "Налог на прибыльные заведения";
-                    ret.Add(t);
-                }
-
-                if (level > 0)
-                {
-                    transaction.Comment += $" номинал {transaction.Amount} со скидкой {discount*100}% за счет страховки";
-                    transaction.Type |= TransactionType.Insurance;
-                }
-
-                transaction.Amount *= (1f - (float)discount);
-            }
-
-            ret.Add(transaction);
-            return ret;
+            var level = _insuranceManager.CheckLoyaltyLevel(sender, receiver);
+            return GetDiscount(level);
         }
 
         public List<Constant> GetConstants()
@@ -87,11 +42,11 @@ namespace DeusCloud.Logic.Managers
             return Constants.Values.ToList();
         }
 
-        private decimal GetDiscount(int level)
+        private float GetDiscount(int level)
         {
-            if (level == 1) return (decimal) 0.25;
-            if (level == 2) return (decimal) 0.5;
-            if (level == 3) return (decimal) 0.75;
+            if (level == 1) return 0.25f;
+            if (level == 2) return 0.5f;
+            if (level == 3) return 0.75f;
             return 0;
         }
 

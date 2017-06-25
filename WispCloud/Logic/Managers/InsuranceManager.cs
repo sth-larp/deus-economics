@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
@@ -99,7 +100,7 @@ namespace DeusCloud.Logic.Managers
             var check = UserContext.Data.Loyalties.Where(x =>
                 x.LoyalName == service.Login && x.Insurance == person.Insurance);
             if (check.Any())
-                return person.InsuranceLevel;
+                return person.EffectiveLevel;
             return 0;
         }
 
@@ -184,14 +185,20 @@ namespace DeusCloud.Logic.Managers
 
             if (countIndex)
             {
-                Try.Condition(newIssuer.InsurancePoints >= level, $"Не хватает очков страховки");
-                newIssuer.InsurancePoints -= level;
+                var price = level;
+                if (userAccount.Insurance == t)
+                    price = Math.Max(0, level - userAccount.InsuranceLevel);
+
+                Try.Condition(newIssuer.InsurancePoints >= price, $"Не хватает очков страховки");
+                newIssuer.InsurancePoints -= price;
                 UserContext.Accounts.Update(newIssuer);
 
+                var txtverb = userAccount.Insurance == t ? "изменение" : "выдачу";
                 UserContext.AddGameEvent(newIssuer.Login, GameEventType.Index,
-                    $"Потрачено {level} очков на выдачу страховки {userAccount.Login}", true);
+                    $"Потрачено {price} очков на {txtverb} страховки {userAccount.Login}", true);
             }
 
+            //Отменить старую страховку, если была
             if (oldIssuer != null && userAccount.Insurance != t)
             {
                 UserContext.AddGameEvent(oldIssuer.Login, GameEventType.Insurance,

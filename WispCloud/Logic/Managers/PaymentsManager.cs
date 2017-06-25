@@ -123,12 +123,8 @@ namespace DeusCloud.Logic.Managers
 
             var transaction = new Transaction(pay.EmployerAccount, pay.ReceiverAccount, pay.Amount);
             transaction.Type |= TransactionType.Payment;
-            transaction.Comment = String.Format("Regular payment from {0}", pay.EmployerName);
-
-            var taxedTransactions = _constantManager.TakeTax(transaction);
-            taxedTransactions.ForEach(x => UserContext.Data.Transactions.Add(x));
-
-            //UserContext.Data.Transactions.Add(transaction);
+            transaction.Comment = $"регулярные выплаты от {pay.EmployerName}";
+            UserContext.Data.Transactions.Add(transaction);
         }
     }
 }

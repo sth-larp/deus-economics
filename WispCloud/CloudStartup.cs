@@ -106,18 +106,6 @@ namespace DeusCloud
                     x.BasicAuth("auth").Description("Basic Authentication");
                     x.OperationFilter<MarkSecuredMethodsFilter>();
                     
-                    //x.OperationFilter(() => new AuthenticationFilter(_oauth2DefaultScope));
-
-                    //x.OAuth2("oauth2")
-                    //    .Description("OAuth2 Implicit Grant")
-                    //    .Flow("implicit")
-                    //    .Scopes(scopes =>
-                    //     {
-                    //         scopes.Add(_oauth2DefaultScope, "Get acces to user data");
-                    //     })
-                    //    .AuthorizationUrl($"{_rootUrl}{_oauth2AuthorizeEndpoint}")
-                    //    .TokenUrl($"{_rootUrl}{_oauth2TokenEndpoint}");
-
                     x.SingleApiVersion("v1", "DeusEx Economy API").Description("DeusEx Economy API");
                 });
 

@@ -3,9 +3,11 @@ using System.Linq;
 using DeusCloud.Data;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.GameEvents;
+using DeusCloud.Identity;
 using DeusCloud.Logic.Events;
 using DeusCloud.Logic.Managers;
 using DeusCloud.SignalR;
+using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic
 {
@@ -13,6 +15,18 @@ namespace DeusCloud.Logic
     {
         public static string DefaultConnectionStringName { get; }
         public static ConnectionMapping SignalRConnectionMapping { get; private set; }
+
+        private static Account _masterAcc;
+
+        public Account MasterAcc
+        {
+            get
+            {
+                if (_masterAcc == null)
+                    _masterAcc = new UserManager(this).FindById("master");
+                return _masterAcc;
+            }
+        }
 
         static UserContext()
         {

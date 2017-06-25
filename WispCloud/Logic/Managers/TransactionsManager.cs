@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Access;
+using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
@@ -26,26 +28,31 @@ namespace DeusCloud.Logic.Managers
         public void Transfer(TransferClientData data)
         {
             var receiverAcc = _userManager.FindById(data.Receiver);
-            Try.NotNull(receiverAcc, $"Cant find account with login: {data.Receiver}.");
+            Try.NotNull(receiverAcc, $"Не найден пользователь {data.Receiver}.");
 
             var senderAcc = _userManager.FindById(data.Sender);
-            Try.NotNull(senderAcc, $"Cant find account with login: {data.Sender}.");
+            Try.NotNull(senderAcc, $"Не найден пользователь {data.Sender}.");
+            Try.Condition(data.Amount > 0, $"Неверная сумма перевода");
+
+            _rightsManager.CheckForAccessOverSlave(senderAcc, AccountAccessRoles.Withdraw);
+            data.Description = data.Description ?? "";
+
+            var trList = new List<Transaction>();
+                
+            if ((receiverAcc.Role & AccountRole.Person) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
+                trList = C2CTransfer(senderAcc, receiverAcc, data);
+            else if((receiverAcc.Role & AccountRole.Tavern) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
+                trList = C2BTransfer(senderAcc, receiverAcc, data);
+            else if ((receiverAcc.Role & AccountRole.Corp) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
+                trList = C2BTransfer(senderAcc, receiverAcc, data);
+            else
+                trList = B2BTransfer(senderAcc, receiverAcc, data);
 
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
                 UserContext.Data.BeginFastSave();
 
-                _rightsManager.CheckForAccessOverSlave(senderAcc, AccountAccessRoles.Withdraw);
-
-                Try.Condition(senderAcc.Cash >= data.Amount, $"Not enought money");
-                Try.Condition(data.Amount > 0, $"Can't transfer negative or zero funds");
-
-                var transaction = new Transaction(senderAcc, receiverAcc, data.Amount);
-                transaction.Type = TransactionType.Normal;
-                transaction.Comment = data.Description ?? "";
-
-                var taxedTransactions = _constantManager.TakeTax(transaction);
-                taxedTransactions.ForEach(x =>
+                trList.ForEach(x =>
                 {
                     x.SenderAccount.Cash -= data.Amount;
                     x.ReceiverAccount.Cash += data.Amount;
@@ -54,12 +61,65 @@ namespace DeusCloud.Logic.Managers
                     UserContext.Accounts.Update(x.ReceiverAccount);
 
                     UserContext.Data.Transactions.Add(x);
-
                     UserContext.Data.SaveChanges();
                 });
 
                 dbTransact.Commit();
             }
+        }
+
+        //Транзакции между физлицами
+        //Налог платит отправитель в зависимости от разницы страховок
+        private List<Transaction> C2CTransfer(Account sender, Account receiver, TransferClientData data)
+        {
+            Try.Condition(sender.Cash >= data.Amount, $"Недостаточно средств");
+            var ret = new List<Transaction>();
+            var diff = Math.Max(0, receiver.EffectiveLevel - sender.EffectiveLevel);
+            var discount = diff*0.25f;
+            if (diff > 0)
+            {
+                var master = _userManager.FindById("master");
+                var t = new Transaction(sender, master, data.Amount * discount);
+                t.Comment = $"Налог на транзакции физлиц в размере {discount*100}%";
+                t.Type = TransactionType.Tax;
+                ret.Add(t);
+            }
+            var transaction = new Transaction(sender, receiver, data.Amount * (1 - discount));
+            transaction.Comment = data.Description;
+            ret.Add(transaction);
+            return ret;
+        }
+
+        //Транзакции юрлицам, налог платит получатель
+        //Работают страховки
+        private List<Transaction> C2BTransfer(Account sender, Account receiver, TransferClientData data)
+        {
+            var ret = new List<Transaction>();
+            var discount = _constantManager.GetDiscountValue(sender, receiver);
+            Try.Condition(sender.Cash >= data.Amount * (1 - discount), $"Недостаточно средств");
+
+            if (discount == 0)
+            {
+                var master = _userManager.FindById("master"); //UserContext.MasterAcc
+                var t = new Transaction(receiver, master, data.Amount * 0.5f);
+                t.Comment = $"Налог на доходные предприятия в размере 50%";
+                t.Type = TransactionType.Tax;
+                ret.Add(t);
+            }
+            var transaction = new Transaction(sender, receiver, data.Amount * (1 - discount));
+            transaction.Comment = data.Description + $" номинал {data.Amount} скидка {discount * 100}%";
+            ret.Add(transaction);
+            return ret;
+        }
+
+        //Транзакции между юолицами и прочие, особых правил нет
+        private List<Transaction> B2BTransfer(Account sender, Account receiver, TransferClientData data)
+        {
+            Try.Condition(sender.Cash >= data.Amount, $"Недостаточно средств");
+            var transaction = new Transaction(sender, receiver, data.Amount);
+            transaction.Comment = data.Description;
+            var ret = new List<Transaction> {transaction};
+            return ret;
         }
 
         public List<Transaction> GetHistory(string login, int take, int skip)
