@@ -12,7 +12,11 @@ namespace DeusCloud.BasicAuth
     {
         public override void OnAuthorization(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
-            if (actionContext.Request.Headers.Authorization == null)
+            if (actionContext.Request.Method.Method.Equals("OPTIONS"))
+            {
+                base.OnAuthorization(actionContext);
+            }
+            else if (actionContext.Request.Headers.Authorization == null)
             {
                 actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized);
             }

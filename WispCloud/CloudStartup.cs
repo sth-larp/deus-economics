@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.Cors;
 using System.Web.Http.Dispatcher;
 using System.Web.Http.ExceptionHandling;
 using DeusCloud;
@@ -65,10 +66,14 @@ namespace DeusCloud
         {
             var config = new HttpConfiguration();
 
+            var cors = new EnableCorsAttribute("*", "*", "*");
+            config.EnableCors(cors);
+            //config.MessageHandlers.Add(new CorsRequestsHandler());
+
             config.SuppressDefaultHostAuthentication();
 
             config.Filters.Add(new BasicAuthAttribute());
-            config.Filters.Add(new BasicAuthenticationFilterAttribute());
+            //config.Filters.Add(new BasicAuthenticationFilterAttribute());
             
             config.Formatters.Clear();
             config.Formatters.Add(new WispJsonMediaTypeFormatter());

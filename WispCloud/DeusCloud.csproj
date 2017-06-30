@@ -125,9 +125,17 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.3\lib\net45\System.Web.Cors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Cors.5.2.3\lib\net45\System.Web.Http.Cors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.Http.Owin, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Owin.5.2.3\lib\net45\System.Web.Http.Owin.dll</HintPath>
       <Private>True</Private>
@@ -218,6 +226,7 @@
     <Compile Include="BasicAuth\AuthenticationFailureResult.cs" />
     <Compile Include="BasicAuth\BasicAuthAttribute.cs" />
     <Compile Include="BasicAuth\BasicAuthenticationFilterAttribute.cs" />
+    <Compile Include="BasicAuth\CorsRequestHandler.cs" />
     <Compile Include="BasicAuth\HttpActionContextExtensions.cs" />
     <Compile Include="Data\Entities\Accounts\AccountRole.cs" />
     <Compile Include="Data\Entities\Accounts\AccountStatus.cs" />
@@ -265,6 +274,7 @@
     <Compile Include="Logic\Managers\RightsManager.cs" />
     <Compile Include="Logic\Managers\ConstantManager.cs" />
     <Compile Include="Logic\Managers\TransactionsManager.cs" />
+    <Compile Include="Logic\Server\TransactionTaxServerData.cs" />
     <Compile Include="Migrations\201706151812158_First.cs" />
     <Compile Include="Migrations\201706151812158_First.Designer.cs">
       <DependentUpon>201706151812158_First.cs</DependentUpon>
