@@ -13,7 +13,7 @@ namespace DeusCloud.BasicAuth
             {
                 var response = new HttpResponseMessage { StatusCode = HttpStatusCode.OK };
                 // Define and add values to variables: origins, headers, methods (can be global)               
-                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                response.Headers.Add("Access-Control-Allow-Origin", "handler");
                 response.Headers.Add("Access-Control-Allow-Headers", "*");
                 response.Headers.Add("Access-Control-Allow-Methods", "*");
                 var tsc = new TaskCompletionSource<HttpResponseMessage>();

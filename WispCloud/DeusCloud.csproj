@@ -225,7 +225,6 @@
     <Compile Include="Api\DeusValidateModelAttribute .cs" />
     <Compile Include="BasicAuth\AuthenticationFailureResult.cs" />
     <Compile Include="BasicAuth\BasicAuthAttribute.cs" />
-    <Compile Include="BasicAuth\BasicAuthenticationFilterAttribute.cs" />
     <Compile Include="BasicAuth\CorsRequestHandler.cs" />
     <Compile Include="BasicAuth\HttpActionContextExtensions.cs" />
     <Compile Include="Data\Entities\Accounts\AccountRole.cs" />
@@ -274,7 +273,6 @@
     <Compile Include="Logic\Managers\RightsManager.cs" />
     <Compile Include="Logic\Managers\ConstantManager.cs" />
     <Compile Include="Logic\Managers\TransactionsManager.cs" />
-    <Compile Include="Logic\Server\TransactionTaxServerData.cs" />
     <Compile Include="Migrations\201706151812158_First.cs" />
     <Compile Include="Migrations\201706151812158_First.Designer.cs">
       <DependentUpon>201706151812158_First.cs</DependentUpon>

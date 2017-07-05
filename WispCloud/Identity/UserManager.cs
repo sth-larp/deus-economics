@@ -16,7 +16,7 @@ namespace DeusCloud.Identity
         {
             _passwordValidator = new PasswordValidator()
             {
-                RequiredLength = 6,
+                RequiredLength = 1 //6,
             };
         }
 
@@ -36,6 +36,7 @@ namespace DeusCloud.Identity
             if (passwordStore == null)
                 return IdentityResult.Failed("Current UserStore doesn't implement IUserPasswordStore");
 
+            
             var passwordValidateResult = await PasswordValidator.ValidateAsync(newPassword);
             if (!passwordValidateResult.Succeeded)
                 return passwordValidateResult;

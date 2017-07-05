@@ -140,7 +140,7 @@ namespace DeusCloud.Logic
         public void AddGameEvent(string user, GameEventType t, string comment, bool isAnonym = false)
         {
             if (!isAnonym)
-                comment += $" пользователем {CurrentUser.Login}";
+                comment += $" пользователем {CurrentUser?.Login??"N/A"}";
             var e = new GameEvent(t, user);
             e.Description = comment;
             Data.GameEvents.Add(e);

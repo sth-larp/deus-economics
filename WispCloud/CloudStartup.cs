@@ -42,7 +42,7 @@ namespace DeusCloud
             LogManager.GetLogger("").Info("Server started");
             app.Use<AllExceptionsMiddleware>();
             //ConfigureOAuth(app);
-            ConfigureSignalR(app);
+            //ConfigureSignalR(app);
             ConfigureApi(app);
             LogManager.GetLogger("").Info("Server configured");
         }
@@ -66,13 +66,13 @@ namespace DeusCloud
         {
             var config = new HttpConfiguration();
 
-            var cors = new EnableCorsAttribute("*", "*", "*");
-            config.EnableCors(cors);
+            //var cors = new EnableCorsAttribute("cors", "*", "*");
+            //config.EnableCors(cors);
             //config.MessageHandlers.Add(new CorsRequestsHandler());
 
             config.SuppressDefaultHostAuthentication();
 
-            config.Filters.Add(new BasicAuthAttribute());
+            //config.Filters.Add(new BasicAuthAttribute());
             //config.Filters.Add(new BasicAuthenticationFilterAttribute());
             
             config.Formatters.Clear();
