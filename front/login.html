@@ -1,0 +1,24 @@
+<html>
+	<head>
+		<title>DeusEx Economical Trash Login</title>
+	</head>
+	<script>
+		var url = "http://localhost:54294"; //change to web	
+		function setLogin()
+		{
+			var cookieName = 'local_arm_id';
+			var cookieValue = 'Basic ' + btoa(document.getElementsByName("username").value + ':' + document.getElementsByName("pwd").value);
+			var myDate = new Date();
+			myDate.setMonth(myDate.getMonth() + 12);
+			document.cookie = cookieName +"=" + cookieValue + ";expires=" + myDate;
+			window.location.href = url + "/deus_economics.html";
+		}
+	</script>
+	<body>
+		<form action=""  onsubmit="setLogin()">
+			<span>LOGIN:</span><input type="text" name="username" value=""/>
+			<span>PASSWORD:</span><input type="password" name="pass" value=""/>
+			<input type="submit" name="login" value="SIGN IN"/>
+		</form>
+	</body>
+</html>

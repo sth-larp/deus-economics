@@ -1,0 +1,106 @@
+<html>
+	<head>
+		<title>DeusEx Economical Trash</title>
+		<script type="text/javascript">
+			var url = "http://localhost:54294"; //change to web
+			function make_base_auth(user, password) 
+			{
+				var tok = user + ':' + password;
+				var hash = btoa(tok);
+				return "Basic " + hash;
+			}
+			function get_auth_tok()
+			{
+				var tok = "";
+				//tok = document.cookie.replace(/(?:(?:^|.*;\s*)local_arm_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+				tok = make_base_auth("admin","12345"); //delete before use
+				return tok;
+			}
+			function sendAPIRequest(func_url, type)
+			{
+				var result = [];
+				var xhttp = new XMLHttpRequest();
+				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
+				xhttp.onreadystatechange = function() 
+				{
+					if (this.readyState == 4 && this.status == 200) 
+						result = xhttp.responseText;
+				};
+				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
+				xhttp.open(type, func_url, true);
+				xhttp.send();		
+				return JSON.parse(result);				
+			}			
+			function insertDocumentToWrapper(wrapper_id, document_href, rq_type)
+			{
+				var xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() 
+				{
+					if (this.readyState == 4 && this.status == 200) document.getElementById(wrapper_id).innerHTML = xhttp.responseText;
+				};
+				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
+				xhttp.open(rq_type, document_href, true);
+				xhttp.send();				
+			}
+			function load_profile(p_name)
+			{
+				insertDocumentToWrapper("content_wrapper", url + "/","GET");
+				var prof = sendAPIRequest(url + "/getProfile","GET");
+				//---------------
+				document.getElementById("full_name").innerHTML = prof.name;
+				document.getElementById("live_status").innerHTML = prof.name;
+				if (prof.isCorp)
+				{
+					document.getElementById("current_index").innerHTML = prof.name;
+					document.getElementById("spent_index").innerHTML = prof.name;			
+					document.getElementById("index_label").style.display = "inline";
+				}
+				document.getElementById("current_account_value").innerHTML = prof.name;
+			}
+			function load_transactions()
+			{
+			}
+			function load_admin()
+			{
+			}
+		</script>
+	</head>
+	<body>
+		<div id="wrapper" style="height: 100%; width: 100%">
+			<div id="top_menu" style="height: 8%; width: 100%; border-style:solid;">			
+				<div id="current_account" style="border-style: solid; width: 20%; height: 80%; float: left;">ACCOUNT NAME</div>
+				<div id="profile_menu" style="border-style: solid; width: 10%; height: 80%; float: left;">
+					<a href="">
+						<div style="height: 100%; width: 100%; text-align: center;" onclick="insertDocumentToWrapper('content_wrapper', url + '/profile_page.html','GET');">Профиль аккаунта</div>
+					</a>
+				</div>
+				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
+					<a href="">
+						<div id="corp_menu" style=" height: 100%; width: 100%; text-align: center;" onclick="insertDocumentToWrapper('content_wrapper', url + '/corp_admin.html','GET');">Администрирование</div>
+					</a>
+				</div>
+				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
+					<a href="">
+						<div id="transactions_menu" style="height: 100%; width: 100%; text-align: center;" onclick="insertDocumentToWrapper('content_wrapper', url + '/transactions.html','GET');">Транзакции</div>
+					</a>
+				</div>				
+				<div id="profile_menu" style="border-style: solid; width: 10%; height: 80%; float: right;">LOGOUT</div>
+			</div>
+			<div id="left_menu" style="height: 90%; width: 20%; border-style:solid; float: left;">
+				Left Menu
+				<div id="slave_list" style="height: 45%; border-style: solid;">
+				Slaves
+				</div>
+				<br/>
+				<div id="master_list" style="height: 45%; border-style: solid;">
+				Profile
+				</div>
+			</div>
+			<div id="content_wrapper" style="border-style: solid; width: 79%; height: 90%; float: right">
+			Content wrapper
+			</div>
+			<script>
+			</script>
+		</div>
+	</body>
+</html>
