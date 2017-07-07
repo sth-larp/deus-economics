@@ -2,7 +2,8 @@
 	<head>
 		<title>DeusEx Economical Trash</title>
 		<script type="text/javascript">
-			var url = "http://localhost:54294"; //change to web
+			//var url = "http://localhost:54294"; //change to web
+			var url = "http://deus2017economy.azurewebsites.net";
 			function make_base_auth(user, password) 
 			{
 				var tok = user + ':' + password;
@@ -16,20 +17,17 @@
 				tok = make_base_auth("admin","12345"); //delete before use
 				return tok;
 			}
-			function sendAPIRequest(func_url, type)
+			function sendAPIRequest(func_url, type, callback)
 			{
-				var result = [];
 				var xhttp = new XMLHttpRequest();
-				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
 				xhttp.onreadystatechange = function() 
 				{
 					if (this.readyState == 4 && this.status == 200) 
-						result = xhttp.responseText;
+						callback(this.responseText);
 				};
-				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
 				xhttp.open(type, func_url, true);
-				xhttp.send();		
-				return JSON.parse(result);				
+				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
+				xhttp.send();
 			}			
 			function insertDocumentToWrapper(wrapper_id, document_href, rq_type)
 			{
@@ -38,24 +36,32 @@
 				{
 					if (this.readyState == 4 && this.status == 200) document.getElementById(wrapper_id).innerHTML = xhttp.responseText;
 				};
-				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
 				xhttp.open(rq_type, document_href, true);
+				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
 				xhttp.send();				
 			}
 			function load_profile(p_name)
 			{
-				insertDocumentToWrapper("content_wrapper", url + "/","GET");
-				var prof = sendAPIRequest(url + "/getProfile","GET");
+				//insertDocumentToWrapper("content_wrapper", url + "/","GET");
+				document.getElementById("content_wrapper").innerHTML = '<div id="profile_page" style="width:100%; height:100%"><span>Полное имя:</span><span id="full_name">#NAME</span><span> Статус: </span><span id="live_status">#ISALIVE?</span><p/><span id="index_label" style="display: none;"><span>Индекс: </span><span id="current_index">#CURRENT INDEX </span><span>Потраченный индекс: </span><span id="spent_index">#SPENT INDEX </span><p/></span><span>Деньги: </span><span id="current_account_value">#CASH!</span><p/><div id="slave_list"></div><div id="masters_list"></div><div id="history"></div><div id="insurances_supported"></div></div>';
+				var prof = {};
+				sendAPIRequest(url + "/api/accounts/profile?login=" + p_name, "GET", function(param)
+					{
+						if(param.length > 0)
+							alert(1);
+							prof = JSON.parse(param);
+							document.getElementById("full_name").innerHTML = prof.fullname;
+							document.getElementById("live_status").innerHTML = prof.status;
+							if (prof.isCorp)
+							{
+								document.getElementById("current_index").innerHTML = prof.index;
+								document.getElementById("spent_index").innerHTML = prof.index;			
+								document.getElementById("index_label").style.display = "inline";
+							}
+							document.getElementById("current_account_value").innerHTML = prof.cash;	
+					}
+				);
 				//---------------
-				document.getElementById("full_name").innerHTML = prof.name;
-				document.getElementById("live_status").innerHTML = prof.name;
-				if (prof.isCorp)
-				{
-					document.getElementById("current_index").innerHTML = prof.name;
-					document.getElementById("spent_index").innerHTML = prof.name;			
-					document.getElementById("index_label").style.display = "inline";
-				}
-				document.getElementById("current_account_value").innerHTML = prof.name;
 			}
 			function load_transactions()
 			{
@@ -70,18 +76,16 @@
 			<div id="top_menu" style="height: 8%; width: 100%; border-style:solid;">			
 				<div id="current_account" style="border-style: solid; width: 20%; height: 80%; float: left;">ACCOUNT NAME</div>
 				<div id="profile_menu" style="border-style: solid; width: 10%; height: 80%; float: left;">
+					<div style="height: 100%; width: 100%; text-align: center;" onclick="load_profile();">Профиль аккаунта</div>
+				</div>
+				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
 					<a href="">
-						<div style="height: 100%; width: 100%; text-align: center;" onclick="insertDocumentToWrapper('content_wrapper', url + '/profile_page.html','GET');">Профиль аккаунта</div>
+						<div id="corp_menu" style=" height: 100%; width: 100%; text-align: center;">Администрирование</div>
 					</a>
 				</div>
 				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
 					<a href="">
-						<div id="corp_menu" style=" height: 100%; width: 100%; text-align: center;" onclick="insertDocumentToWrapper('content_wrapper', url + '/corp_admin.html','GET');">Администрирование</div>
-					</a>
-				</div>
-				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
-					<a href="">
-						<div id="transactions_menu" style="height: 100%; width: 100%; text-align: center;" onclick="insertDocumentToWrapper('content_wrapper', url + '/transactions.html','GET');">Транзакции</div>
+						<div id="transactions_menu" style="height: 100%; width: 100%; text-align: center;">Транзакции</div>
 					</a>
 				</div>				
 				<div id="profile_menu" style="border-style: solid; width: 10%; height: 80%; float: right;">LOGOUT</div>
@@ -96,9 +100,7 @@
 				Profile
 				</div>
 			</div>
-			<div id="content_wrapper" style="border-style: solid; width: 79%; height: 90%; float: right">
-			Content wrapper
-			</div>
+			<div id="content_wrapper" style="border-style: solid; width: 79%; height: 90%; float: right"></div>
 			<script>
 			</script>
 		</div>
