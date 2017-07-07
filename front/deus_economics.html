@@ -1,36 +1,60 @@
-<html>
+﻿<html>
 	<head>
 		<title>DeusEx Economical Trash</title>
 		<script type="text/javascript">
-			//var url = "http://localhost:54294"; //change to web
+			//Basic web resources location
+			//var url = "http://localhost:54294";
 			var url = "http://deus2017economy.azurewebsites.net";
-			function make_base_auth(user, password) 
-			{
+			var main_account = 'admin';
+			var selected_account = 'admin';
+
+//mok profile page for local testing			
+			var p_page = '<div id="profile_page" style="width:100%; height:100%"> \
+	<div><span>Логин:</span><span id="login_name"></span></div> \
+	<div><span> Полное имя:</span><span id="full_name"></span></div> \
+	<div><span> Статус: </span><span id="live_status"></span></div> \
+	<span id="index_label" style="display: none;"> \
+		<div><span> Индекс: </span><span id="current_index"></span> \
+		<span> Потраченный индекс: </span><span id="spent_index"></span></div> \
+	</span> \
+	<div><span> Деньги: </span><span id="current_account_value"></span></div> \
+	<span> Страховка: </span><span id="insurance"></span> \
+	<span> Уровень страховки: </span><span id="insurance_level"></span> \
+	<span> Очки страховки: </span><span id="insurance_points"></span> \
+	<p/> \
+<div> \
+<table id="slave_list"></table></div><div id="masters_list"></div><div><div>История операций</div><table id="history"></table> \
+</div><div id="insurances_supported" style="display: none;"></div></div>'
+			
+			//check if login is not set, return to login page
+			
+			function make_base_auth(user, password){
+				//make basic auth tocken from scratch
 				var tok = user + ':' + password;
 				var hash = btoa(tok);
 				return "Basic " + hash;
 			}
-			function get_auth_tok()
-			{
+			function get_auth_tok(){
+				//get basic auth token from cookies
 				var tok = "";
 				//tok = document.cookie.replace(/(?:(?:^|.*;\s*)local_arm_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-				tok = make_base_auth("admin","12345"); //delete before use
+				//test login, replace^ before deploy
+				tok = make_base_auth("admin","123456"); //delete before use
 				return tok;
 			}
-			function sendAPIRequest(func_url, type, callback)
-			{
+			function logout(){
+				
+			}
+			function sendAPIRequest(func_url, type, callback){
 				var xhttp = new XMLHttpRequest();
-				xhttp.onreadystatechange = function() 
-				{
-					if (this.readyState == 4 && this.status == 200) 
-						callback(this.responseText);
+				xhttp.onreadystatechange = function(){
+					if (this.readyState == 4 && this.status == 200) callback(this.responseText);
 				};
 				xhttp.open(type, func_url, true);
 				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
 				xhttp.send();
 			}			
-			function insertDocumentToWrapper(wrapper_id, document_href, rq_type)
-			{
+			function insertDocumentToWrapper(wrapper_id, document_href, rq_type){
 				var xhttp = new XMLHttpRequest();
 				xhttp.onreadystatechange = function() 
 				{
@@ -40,55 +64,85 @@
 				xhttp.setRequestHeader("Authorization", get_auth_tok()); 
 				xhttp.send();				
 			}
-			function load_profile(p_name)
-			{
-				//insertDocumentToWrapper("content_wrapper", url + "/","GET");
-				document.getElementById("content_wrapper").innerHTML = '<div id="profile_page" style="width:100%; height:100%"><span>Полное имя:</span><span id="full_name">#NAME</span><span> Статус: </span><span id="live_status">#ISALIVE?</span><p/><span id="index_label" style="display: none;"><span>Индекс: </span><span id="current_index">#CURRENT INDEX </span><span>Потраченный индекс: </span><span id="spent_index">#SPENT INDEX </span><p/></span><span>Деньги: </span><span id="current_account_value">#CASH!</span><p/><div id="slave_list"></div><div id="masters_list"></div><div id="history"></div><div id="insurances_supported"></div></div>';
+			function load_profile(p_name){
 				var prof = {};
-				sendAPIRequest(url + "/api/accounts/profile?login=" + p_name, "GET", function(param)
-					{
+				sendAPIRequest(url + "/api/accounts/fullprofile?login=" + p_name, "GET", function(param){
+						//insertDocumentToWrapper("content_wrapper", url + "/profile_page.html","GET");
+						//mok html for localtesting, replace^ before deploy
+						document.getElementById("content_wrapper").innerHTML = p_page;
 						if(param.length > 0)
-							alert(1);
 							prof = JSON.parse(param);
-							document.getElementById("full_name").innerHTML = prof.fullname;
-							document.getElementById("live_status").innerHTML = prof.status;
+							//result mapping to visual elements							
+							document.getElementById("login_name").innerHTML = prof.User.Login + " ";
+							document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
+							document.getElementById("live_status").innerHTML = prof.User.Status + " ";
+							prof.isCorp = prof.User.Roles.includes("Corp");
 							if (prof.isCorp)
 							{
-								document.getElementById("current_index").innerHTML = prof.index;
-								document.getElementById("spent_index").innerHTML = prof.index;			
+								document.getElementById("current_index").innerHTML = prof.User.Index;
+								document.getElementById("spent_index").innerHTML = prof.User.Index;			
 								document.getElementById("index_label").style.display = "inline";
 							}
-							document.getElementById("current_account_value").innerHTML = prof.cash;	
+							document.getElementById("current_account_value").innerHTML = prof.User.Cash;
+							document.getElementById("insurance").innerHTML = prof.User.Insurance;
+							document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
+							document.getElementById("insurance_points").innerHTML = prof.User.InsurancePoints;
+							var history_html = "<tr><th>Id</th><th>User</th><th>Time</th><th>Type</th><th>Description</th></tr>";
+							for(i = 0; i < prof.History.length; i++)
+							{
+								history_html = history_html + "<tr><td>" + prof.History[i].Id + "</td>";
+								history_html = history_html + "<td>" + prof.History[i].User + "</td>";
+								history_html = history_html + "<td>" + prof.History[i].Time + "</td>";
+								history_html = history_html + "<td>" + prof.History[i].Type + "</td>";
+								history_html = history_html + "<td>" + prof.History[i].Description + "</td>";
+								history_html = history_html + "</tr>";
+							}
+							document.getElementById("history").innerHTML = history_html;
 					}
 				);
-				//---------------
 			}
-			function load_transactions()
-			{
+			function load_slaves(p_name){
 			}
-			function load_admin()
-			{
+			function load_transactions(p_name){
+			}
+			function load_corp_admin(p_name){
+			}
+			function createHandlerOnButton(obj){
+				return function(){
+					obj.style.backgroundColor = '#99FF00';
+					obj.style.cursor = 'pointer';
+				}
+			}
+			function createHandlerOutButton(obj){
+				return function(){
+					obj.style.backgroundColor = '#FFFFFF';
+				}
+			}
+			function initUI(){
+				//init all active UI elements on page, set event handlers
+				//onmouseover="onButton(this);" onmouseout="this.style.backgroundColor = 'white';"
+				var buttons = ['profile_menu','corp_menu','transactions_menu','logout_menu'];
+				for(i = 0; i < buttons.length; i++){
+					document.getElementById(buttons[i]).onmouseover = createHandlerOnButton(document.getElementById(buttons[i]));
+					document.getElementById(buttons[i]).onmouseout = createHandlerOutButton(document.getElementById(buttons[i]));
+				}
 			}
 		</script>
 	</head>
-	<body>
+	<body onload="initUI();">
 		<div id="wrapper" style="height: 100%; width: 100%">
 			<div id="top_menu" style="height: 8%; width: 100%; border-style:solid;">			
 				<div id="current_account" style="border-style: solid; width: 20%; height: 80%; float: left;">ACCOUNT NAME</div>
-				<div id="profile_menu" style="border-style: solid; width: 10%; height: 80%; float: left;">
-					<div style="height: 100%; width: 100%; text-align: center;" onclick="load_profile();">Профиль аккаунта</div>
+				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
+					<div id="profile_menu" style="height: 100%; width: 100%; text-align: center;" onclick="load_profile(selected_account);">Профиль аккаунта</div>
 				</div>
 				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
-					<a href="">
-						<div id="corp_menu" style=" height: 100%; width: 100%; text-align: center;">Администрирование</div>
-					</a>
+					<div id="corp_menu" style=" height: 100%; width: 100%; text-align: center;">Администрирование</div>
 				</div>
 				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
-					<a href="">
-						<div id="transactions_menu" style="height: 100%; width: 100%; text-align: center;">Транзакции</div>
-					</a>
+					<div id="transactions_menu" style="height: 100%; width: 100%; text-align: center;">Транзакции</div>
 				</div>				
-				<div id="profile_menu" style="border-style: solid; width: 10%; height: 80%; float: right;">LOGOUT</div>
+				<div id="logout_menu" style="border-style: solid; width: 10%; height: 80%; float: right;">LOGOUT</div>
 			</div>
 			<div id="left_menu" style="height: 90%; width: 20%; border-style:solid; float: left;">
 				Left Menu
