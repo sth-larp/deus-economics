@@ -7,7 +7,9 @@
 			var url = "http://deus2017economy.azurewebsites.net";
 			var main_account = 'admin';
 			var selected_account = 'admin';
-
+			var main_profile = {}
+			sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param){main_profile = JSON.parse(param);}); //get logged in profile as global var
+			
 //mok profile page for local testing			
 			var p_page = '<div id="profile_page" style="width:100%; height:100%"> \
 	<div><span>Логин:</span><span id="login_name"></span></div> \
@@ -29,7 +31,7 @@
 			//check if login is not set, return to login page
 			
 			function make_base_auth(user, password){
-				//make basic auth tocken from scratch
+				//make basic auth token from scratch
 				var tok = user + ':' + password;
 				var hash = btoa(tok);
 				return "Basic " + hash;
@@ -42,7 +44,7 @@
 				tok = make_base_auth("admin","123456"); //delete before use
 				return tok;
 			}
-			function logout(){
+			function logout(p_name){
 				
 			}
 			function sendAPIRequest(func_url, type, callback){
@@ -107,25 +109,29 @@
 			}
 			function load_corp_admin(p_name){
 			}
-			function createHandlerOnButton(obj){
-				return function(){
-					obj.style.backgroundColor = '#99FF00';
-					obj.style.cursor = 'pointer';
-				}
+			function createHandler(obj, handler){
+				return function(){handler(obj);}
 			}
-			function createHandlerOutButton(obj){
-				return function(){
-					obj.style.backgroundColor = '#FFFFFF';
-				}
+			function onButton(obj){
+				obj.style.backgroundColor = '#99FF00';
+				obj.style.cursor = 'pointer';
+			}			
+			function outButton(obj){
+				obj.style.backgroundColor = '#FFFFFF';
 			}
 			function initUI(){
 				//init all active UI elements on page, set event handlers
 				//onmouseover="onButton(this);" onmouseout="this.style.backgroundColor = 'white';"
 				var buttons = ['profile_menu','corp_menu','transactions_menu','logout_menu'];
 				for(i = 0; i < buttons.length; i++){
-					document.getElementById(buttons[i]).onmouseover = createHandlerOnButton(document.getElementById(buttons[i]));
-					document.getElementById(buttons[i]).onmouseout = createHandlerOutButton(document.getElementById(buttons[i]));
+					document.getElementById(buttons[i]).onmouseover = createHandler(document.getElementById(buttons[i]), onButton);
+					document.getElementById(buttons[i]).onmouseout = createHandler(document.getElementById(buttons[i]), outButton);
 				}
+				//init onclick actions
+				document.getElementById("profile_menu").onclick = createHandler(selected_account, load_profile);
+				document.getElementById("corp_menu").onclick = createHandler(selected_account, load_corp_admin);
+				document.getElementById("transactions_menu").onclick = createHandler(selected_account, load_transactions);
+				document.getElementById("logout_menu").onclick = createHandler(selected_account, logout);
 			}
 		</script>
 	</head>
@@ -134,7 +140,7 @@
 			<div id="top_menu" style="height: 8%; width: 100%; border-style:solid;">			
 				<div id="current_account" style="border-style: solid; width: 20%; height: 80%; float: left;">ACCOUNT NAME</div>
 				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
-					<div id="profile_menu" style="height: 100%; width: 100%; text-align: center;" onclick="load_profile(selected_account);">Профиль аккаунта</div>
+					<div id="profile_menu" style="height: 100%; width: 100%; text-align: center;">Профиль аккаунта</div>
 				</div>
 				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
 					<div id="corp_menu" style=" height: 100%; width: 100%; text-align: center;">Администрирование</div>
