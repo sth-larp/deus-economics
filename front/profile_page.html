@@ -1,17 +1,29 @@
 <div id="profile_page" style="width:100%; height:100%">
-	<span>Полное имя:</span><span id="full_name">#NAME</span>
-	<span> Статус: </span><span id="live_status">#ISALIVE?</span><p/>
+	<div><span> Логин:</span><span id="login_name"></span></div>
+	<div><span> Полное имя:</span><span id="full_name"></span></div>
+	<div><span> Статус: </span><span id="live_status"></span></div>
 	<span id="index_label" style="display: none;">
-		<span>Индекс: </span><span id="current_index">#CURRENT INDEX </span>
-		<span>Потраченный индекс: </span><span id="spent_index">#SPENT INDEX </span><p/>
+	<div><span> Индекс: </span><span id="current_index"></span>
+		<span> Потраченный индекс: </span><span id="spent_index"></span></div>
 	</span>
-	<span>Деньги: </span><span id="current_account_value">#CASH!</span><p/>
-<div id="slave_list">
-</div>
-<div id="masters_list">
-</div>
-<div id="history">
-</div>
-<div id="insurances_supported">
-</div>
+	<div><span> Деньги: </span><span id="current_account_value"></span></div>
+	<div><span> Страховка: </span><span id="insurance"></span>
+	<span> Уровень страховки: </span><span id="insurance_level"></span>
+	<span> Очки страховки страховки: </span><span id="insurance_points"></span></div>
+	<div>
+		<table id="slave_list">
+		</table>
+	</div>
+	<div>
+		<table id="masters_list">
+		</table>	
+	</div>
+	<div>
+		<table id="history">
+		</table>
+	</div>
+	<div id="insurances_supported" style="display: none;">
+		<table id="insurance_supported_list">
+		</table>
+	</div>
 </div>
