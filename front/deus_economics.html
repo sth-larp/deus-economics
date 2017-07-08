@@ -8,10 +8,13 @@
 			var main_account = 'admin';
 			var selected_account = 'admin';
 			var main_profile = {}
+			var lines_on_tab = 30;
 			sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param){main_profile = JSON.parse(param);}); //get logged in profile as global var
-			
-//mok profile page for local testing			
-			var p_page = '<div id="profile_page" style="width:100%; height:100%"> \
+//---------------------------------------------------------------------------------------------------------------------------------------------------			
+//mok pages for local testing			
+
+//profile page mok
+var p_page = '<div id="profile_page" style="width:100%; height:100%"> \
 	<div><span> Логин:</span><span id="login_name"></span></div>\
 	<div><span> Полное имя:</span><span id="full_name"></span></div>\
 	<div><span> Статус: </span><span id="live_status"></span></div>\
@@ -40,7 +43,44 @@
 		</table>\
 	</div>\
 </div>'
-			
+
+//corp admin page mok
+var ca_page = '';
+
+//transactions page mok
+var t_page = '<div id="transactions" style="width:100%; height:100%">\
+	<div id="trans_menu_holder">\
+		<div>Выполнить платеж</div>\
+		<form id="new_transaction" action="">\
+			<table>\
+				<tr><th>Кому</th><th>Сумма</th><th>Комментарий</th><th></th></tr>\
+				<tr>\
+					<td><input type="text" id="user_name_id" name="user_name" value="NAME"/></td>\
+					<td><input type="text" id="transaction_value_id" name="transaction_value" value="0"/></td>\
+					<td><input type="text" id="transaction_comment_id" name="transaction_comment" value="COMMENT"/></td>\
+					<td><input type="button" id="send_transaction" name="send" value="SEND"/></td>\
+				</tr>\
+			</table>\
+		</form>\
+	</div>\
+	<div>\
+		<div><span>История операций</span><br/><span>Количество строк на странице</span>\
+			<select>\
+				<option>5</option>\
+				<option>10</option>\
+				<option>20</option>\
+				<option>30</option>\
+				<option>50</option>\
+				<option>100</option>\
+			</select>\
+		</div>\
+		<table id="transactions_list">\
+		</table>\
+		<div><span><<Назад<<  </span><span>  >>Вперед>></span></div>\
+	</div>\
+</div>';
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
 			//check if login is not set, return to login page
 			
 			function make_base_auth(user, password){
@@ -59,6 +99,7 @@
 			}
 			function logout(p_name){
 				
+				window.location.href = url + "/login.html";				
 			}
 			function sendAPIRequest(func_url, type, callback){
 				var xhttp = new XMLHttpRequest();
@@ -80,20 +121,20 @@
 				xhttp.send();				
 			}
 			function load_profile(p_name){
-				var prof = {};
+				//insertDocumentToWrapper("content_wrapper", url + "/profile_page.html","GET");
+				//mok html for localtesting, replace^ before deploy
+				document.getElementById("content_wrapper").innerHTML = p_page;
+				//get general profile info
 				sendAPIRequest(url + "/api/accounts/fullprofile?login=" + p_name, "GET", function(param){
-						//insertDocumentToWrapper("content_wrapper", url + "/profile_page.html","GET");
-						//mok html for localtesting, replace^ before deploy
-						document.getElementById("content_wrapper").innerHTML = p_page;
-						if(param.length > 0)
+						var prof = {};				
+						if(param.length > 0){
 							prof = JSON.parse(param);
 							//result mapping to visual elements							
 							document.getElementById("login_name").innerHTML = prof.User.Login + " ";
 							document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
 							document.getElementById("live_status").innerHTML = prof.User.Status + " ";
 							prof.isCorp = prof.User.Roles.includes("Corp");
-							if (prof.isCorp)
-							{
+							if (prof.isCorp){
 								document.getElementById("current_index").innerHTML = prof.User.Index;
 								document.getElementById("spent_index").innerHTML = prof.User.Index;			
 								document.getElementById("index_label").style.display = "inline";
@@ -105,8 +146,7 @@
 							document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
 							document.getElementById("insurance_points").innerHTML = prof.User.InsurancePoints;
 							var history_html = "<tr><th>Id</th><th>User</th><th>Time</th><th>Type</th><th>Description</th></tr>";
-							for(i = 0; i < prof.History.length; i++)
-							{
+							for(i = 0; i < prof.History.length; i++){
 								history_html = history_html + "<tr><td>" + prof.History[i].Id + "</td>";
 								history_html = history_html + "<td>" + prof.History[i].User + "</td>";
 								history_html = history_html + "<td>" + prof.History[i].Time + "</td>";
@@ -115,12 +155,34 @@
 								history_html = history_html + "</tr>";
 							}
 							document.getElementById("history").innerHTML = history_html;
+						}
 					}
 				);
-			}
-			function load_slaves(p_name){
+				//get slaves
+				sendAPIRequest(url + "/api/accounts/access/slaves?master=" + p_name, "GET", function(param){
+				});
+				//get masters
+				sendAPIRequest(url + "/api/accounts/access/masters?slave=" + p_name, "GET", function(param){
+				});
+				//get supported insurances (for corps only)
+				
 			}
 			function load_transactions(p_name){
+				//insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
+				//mok html for localtesting, replace^ before deploy
+				document.getElementById("content_wrapper").innerHTML = t_page;
+				sendAPIRequest(url + "/api/transactions?login=" + p_name, "GET", function(param){
+					var t_list = JSON.parse(param);
+					var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
+					var page_str = head_str;
+					var t_str = [];
+					for(i = 0; i < t_list.length; i++){
+						t_str[i] = "<tr><td>" + t_list[i].Id + "</td><td>" + t_list[i].Sender + "</td><td>" + t_list[i].Receiver + "</td><td>" + t_list[i].Time + "</td>";
+						t_str[i] = t_str[i] + "<td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
+						page_str = page_str + t_str[i];
+					}
+					document.getElementById("transactions_list").innerHTML = page_str;
+				});
 			}
 			function load_corp_admin(p_name){
 			}
