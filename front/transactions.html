@@ -15,17 +15,17 @@
 	</div>
 	<div>
 		<div><span>История операций</span><span>    Количество строк на странице</span>
-			<select>
-				<option>5</option>
-				<option>10</option>
-				<option>20</option>
-				<option>30</option>
-				<option>50</option>
-				<option>100</option>
+			<select id="lines_on_tab" onload="this.value=lines_on_tab;">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="20">20</option>
+				<option value="30">30</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
 			</select>
 		</div>
-		<table id="transactions_list">
-		</table>
-		<div><span><<Назад<<  </span><span>  >>Вперед>></span></div>
+		<div id="transactions_list">
+		</div>
+		<div><span id="back_link"><<Назад  </span><span id="fw_link">  Вперед>></span></div>
 	</div>
 </div>

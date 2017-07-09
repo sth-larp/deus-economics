@@ -1,6 +1,7 @@
 ﻿<html>
 	<head>
 		<title>DeusEx Economical Trash</title>
+		<meta charset="utf-8"/>
 		<script type="text/javascript">
 			//Basic web resources location
 			//var url = "http://localhost:54294";
@@ -8,7 +9,7 @@
 			var main_account = 'admin';
 			var selected_account = 'admin';
 			var main_profile = {}
-			var lines_on_tab = 30;
+			var lines_on_tab = 10;
 			sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param){main_profile = JSON.parse(param);}); //get logged in profile as global var
 //---------------------------------------------------------------------------------------------------------------------------------------------------			
 //mok pages for local testing			
@@ -65,18 +66,18 @@ var t_page = '<div id="transactions" style="width:100%; height:100%">\
 	</div>\
 	<div>\
 		<div><span>История операций</span><br/><span>Количество строк на странице</span>\
-			<select>\
-				<option>5</option>\
-				<option>10</option>\
-				<option>20</option>\
-				<option>30</option>\
-				<option>50</option>\
-				<option>100</option>\
+			<select id="lines_on_tab">\
+				<option value="5">5</option>\
+				<option value="10">10</option>\
+				<option value="20">20</option>\
+				<option value="30">30</option>\
+				<option value="50">50</option>\
+				<option value="100">100</option>\
 			</select>\
 		</div>\
-		<table id="transactions_list">\
-		</table>\
-		<div><span><<Назад<<  </span><span>  >>Вперед>></span></div>\
+		<div id="transactions_list">\
+		</div>\
+		<div><span id="back_link"><<Назад  </span><span id="fw_link">  Вперед>></span></div>\
 	</div>\
 </div>';
 
@@ -89,6 +90,23 @@ var t_page = '<div id="transactions" style="width:100%; height:100%">\
 				var hash = btoa(tok);
 				return "Basic " + hash;
 			}
+			function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str = ""){
+				var result = "";
+				//count of pages
+				for(offset = 0; offset * lines_per_page < elements_list.length; offset++)
+				{
+					result = result + "<table id = '" + page_id_prefix + "_" + offset +"' style='display: none'>" + header_str;
+					var tmp_limit = lines_per_page;
+					if(offset*lines_per_page + lines_per_page > elements_list.length){
+						tmp_limit = elements_list.length - offset*lines_per_page;
+					}
+					for(i = 0; i < tmp_limit; i++) result = result + elements_list[offset*lines_per_page + i];
+					result = result + "</table>";
+				}				
+				//change_page_buttons
+
+				return result;
+			}
 			function get_auth_tok(){
 				//get basic auth token from cookies
 				var tok = "";
@@ -98,10 +116,12 @@ var t_page = '<div id="transactions" style="width:100%; height:100%">\
 				return tok;
 			}
 			function logout(p_name){
-				
+				//delete auth token, redirect to login page
+				alert('Buy');
 				window.location.href = url + "/login.html";				
 			}
 			function sendAPIRequest(func_url, type, callback){
+				//send async API reqest, on responce proceed by callbakc function
 				var xhttp = new XMLHttpRequest();
 				xhttp.onreadystatechange = function(){
 					if (this.readyState == 4 && this.status == 200) callback(this.responseText);
@@ -111,6 +131,7 @@ var t_page = '<div id="transactions" style="width:100%; height:100%">\
 				xhttp.send();
 			}			
 			function insertDocumentToWrapper(wrapper_id, document_href, rq_type){
+				//load sub-page into wrapper
 				var xhttp = new XMLHttpRequest();
 				xhttp.onreadystatechange = function() 
 				{
@@ -171,17 +192,36 @@ var t_page = '<div id="transactions" style="width:100%; height:100%">\
 				//insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
 				//mok html for localtesting, replace^ before deploy
 				document.getElementById("content_wrapper").innerHTML = t_page;
+				document.getElementById("lines_on_tab").value = lines_on_tab;
+				document.getElementById("lines_on_tab").onchange = function(){
+					lines_on_tab = document.getElementById("lines_on_tab").value;
+					//should rebuild transactions table here
+					sendAPIRequest(url + "/api/transactions?login=" + p_name, "GET", function(param){
+						var t_list = JSON.parse(param);
+						var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
+						var page_str = "";
+						var t_str = [];
+						for(i = 0; i < t_list.length; i++){
+							t_str[i] = "<tr><td>" + t_list[i].Id + "</td><td>" + t_list[i].Sender + "</td><td>" + t_list[i].Receiver + "</td><td>" + t_list[i].Time + "</td>";
+							t_str[i] = t_str[i] + "<td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
+						}
+						page_str = buildTabs(t_str, lines_on_tab, "transaction_table",head_str);					
+						document.getElementById("transactions_list").innerHTML = page_str;
+						document.getElementById("transaction_table_0").style.display = "block";
+					});					
+				}
 				sendAPIRequest(url + "/api/transactions?login=" + p_name, "GET", function(param){
 					var t_list = JSON.parse(param);
 					var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
-					var page_str = head_str;
+					var page_str = "";
 					var t_str = [];
 					for(i = 0; i < t_list.length; i++){
 						t_str[i] = "<tr><td>" + t_list[i].Id + "</td><td>" + t_list[i].Sender + "</td><td>" + t_list[i].Receiver + "</td><td>" + t_list[i].Time + "</td>";
 						t_str[i] = t_str[i] + "<td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
-						page_str = page_str + t_str[i];
 					}
+					page_str = buildTabs(t_str, lines_on_tab, "transaction_table",head_str);					
 					document.getElementById("transactions_list").innerHTML = page_str;
+					document.getElementById("transaction_table_0").style.display = "block";
 				});
 			}
 			function load_corp_admin(p_name){
@@ -190,15 +230,17 @@ var t_page = '<div id="transactions" style="width:100%; height:100%">\
 				return function(){handler(obj);}
 			}
 			function onButton(obj){
-				obj.style.backgroundColor = '#99FF00';
+				obj.style.backgroundColor = '#000099';
+				obj.style.color = '#FFFFFF';
 				obj.style.cursor = 'pointer';
 			}			
 			function outButton(obj){
 				obj.style.backgroundColor = '#FFFFFF';
+				obj.style.color = '#000000';
 			}
 			function initUI(){
-				//init all active UI elements on page, set event handlers
-				//onmouseover="onButton(this);" onmouseout="this.style.backgroundColor = 'white';"
+				//init all general UI elements on page, set event handlers
+				//init of subpage UI elements should be done in load functions
 				var buttons = ['profile_menu','corp_menu','transactions_menu','logout_menu'];
 				for(i = 0; i < buttons.length; i++){
 					document.getElementById(buttons[i]).onmouseover = createHandler(document.getElementById(buttons[i]), onButton);
@@ -208,24 +250,26 @@ var t_page = '<div id="transactions" style="width:100%; height:100%">\
 				document.getElementById("profile_menu").onclick = createHandler(selected_account, load_profile);
 				document.getElementById("corp_menu").onclick = createHandler(selected_account, load_corp_admin);
 				document.getElementById("transactions_menu").onclick = createHandler(selected_account, load_transactions);
-				document.getElementById("logout_menu").onclick = createHandler(selected_account, logout);
+				document.getElementById("logout_menu").onclick = createHandler(selected_account, logout);	
 			}
 		</script>
 	</head>
 	<body onload="initUI();">
 		<div id="wrapper" style="height: 100%; width: 100%">
 			<div id="top_menu" style="height: 8%; width: 100%; border-style:solid;">			
-				<div id="current_account" style="border-style: solid; width: 20%; height: 80%; float: left;">ACCOUNT NAME</div>
+				<div id="current_account" style="border-style: solid; width: 20%; height: 80%; float: left; vertical-align: middle;">ACCOUNT NAME</div>
 				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
-					<div id="profile_menu" style="height: 100%; width: 100%; text-align: center;">Профиль аккаунта</div>
+					<div id="profile_menu" style="height: 100%; width: 100%; text-align: center; vertical-align: middle;">Профиль аккаунта</div>
 				</div>
 				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
-					<div id="corp_menu" style=" height: 100%; width: 100%; text-align: center;">Администрирование</div>
+					<div id="corp_menu" style=" height: 100%; width: 100%; text-align: center; vertical-align: middle;">Управление</br>корпорацией</div>
 				</div>
 				<div style="border-style: solid; width: 10%; height: 80%; float: left;">
-					<div id="transactions_menu" style="height: 100%; width: 100%; text-align: center;">Транзакции</div>
+					<div id="transactions_menu" style="height: 100%; width: 100%; text-align: center; vertical-align: middle;">Транзакции</div>
 				</div>				
-				<div id="logout_menu" style="border-style: solid; width: 10%; height: 80%; float: right;">LOGOUT</div>
+				<div style="border-style: solid; width: 10%; height: 80%; float: right; vertical-align: middle;">
+					<div id="logout_menu" style="height: 100%; width: 100%; text-align: center; vertical-align: middle;">LOGOUT</div>
+				</div>
 			</div>
 			<div id="left_menu" style="height: 90%; width: 20%; border-style:solid; float: left;">
 				Left Menu
@@ -237,7 +281,7 @@ var t_page = '<div id="transactions" style="width:100%; height:100%">\
 				Profile
 				</div>
 			</div>
-			<div id="content_wrapper" style="border-style: solid; width: 79%; height: 90%; float: right"></div>
+			<div id="content_wrapper" style="border-style: solid; width: 79%; height: 90%; float: right; overflow: auto;"></div>
 			<script>
 			</script>
 		</div>
