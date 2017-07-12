@@ -1,12 +1,31 @@
 <div id="transactions" style="width:100%; height:100%">
-	<div id="transactions_list">
-	</div>
 	<div id="trans_menu_holder">
-	<form id="new_transaction" action="">
-		<input type="text" id="user_name_id" name="user_name" value="NAME"/>
-		<input type="text" id="transaction_value_id" name="transaction_value" value="0"/>
-		<input type="text" id="transaction_comment_id" name="transaction_comment" value="COMMENT"/>
-		<input type="submit" id="send" name="send" value="SEND"/>
-	</form>
+		<div>Выполнить платеж</div>
+		<form id="new_transaction" action="">
+			<table>
+				<tr><th>Кому</th><th>Сумма</th><th>Комментарий</th><th></th></tr>
+				<tr>
+					<td><input type="text" id="user_name_id" name="user_name" value="NAME"/></td>
+					<td><input type="text" id="transaction_value_id" name="transaction_value" value="0"/></td>
+					<td><input type="text" id="transaction_comment_id" name="transaction_comment" value="COMMENT"/></td>
+					<td><input type="button" id="send_transaction" name="send" value="SEND"/></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<div>
+		<div><span>История операций</span><span>    Количество строк на странице</span>
+			<select id="lines_on_tab" onload="this.value=lines_on_tab;">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="20">20</option>
+				<option value="30">30</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
+			</select>
+		</div>
+		<div id="transactions_list">
+		</div>
+		<div><span id="back_link"><<Назад  </span><span id="fw_link">  Вперед>></span></div>
 	</div>
 </div>
