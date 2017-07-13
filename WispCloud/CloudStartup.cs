@@ -121,7 +121,7 @@ namespace DeusCloud
                     x.DocumentFilter<AllPropertiesWritableFilter>();
 
                     x.RootUrl(request => $"{_rootUrl}");
-                    x.Schemes(new[] { "http" });
+                    x.Schemes(new[] { "http" , "https"});
 
                     x.BasicAuth("auth").Description("Basic Authentication");
                     x.OperationFilter<MarkSecuredMethodsFilter>();

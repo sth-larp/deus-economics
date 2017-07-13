@@ -1,6 +1,6 @@
 ﻿//Basic web resources location
 //var url = "http://localhost:54294";
-var url = "http://deus2017economy.azurewebsites.net";
+var url = "https://alice.digital/econ";
 
 function sendAPIRequest(func_url, type, callback) {
     //send async API reqest, on responce proceed by callbakc function
@@ -20,7 +20,7 @@ function save_auth_tok(user, pass) {
     var cookieValue = 'Basic ' + btoa(user + ':' + pass);
     var myDate = new Date();
     myDate.setMonth(myDate.getMonth() + 12);
-    document.cookie = cookieId + "=" + cookieValue + ";expires=" + myDate;
+    document.cookie = cookieId + "=" + cookieValue + ";expires=" + myDate.toGMTString();
 }
 
 function get_auth_tok() {
