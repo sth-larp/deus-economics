@@ -14,6 +14,8 @@ using DeusCloud.Swashbuckle;
 using log4net;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
+using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles;
 using Newtonsoft.Json;
 using Owin;
 using Swashbuckle.Application;
@@ -44,7 +46,20 @@ namespace DeusCloud
             //ConfigureOAuth(app);
             //ConfigureSignalR(app);
             ConfigureApi(app);
+
+            //Serving html files from ./content folder
+            const string rootFolder = "./content";
+            var fileSystem = new PhysicalFileSystem(rootFolder);
+            var options = new FileServerOptions
+            {
+                EnableDefaultFiles = true,
+                FileSystem = fileSystem
+            };
+            app.UseFileServer(options);
+
             LogManager.GetLogger("").Info("Server configured");
+
+
         }
 
         void ConfigureSignalR(IAppBuilder app)

@@ -1,0 +1,36 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>DeusEx Economical Trash Login</title>
+
+    <script src="js/deus_api.js"></script>
+    <script>
+        function onLoginClick() {
+            var user = document.getElementsByName("username")[0].value;
+            var pass = document.getElementsByName("pass")[0].value;
+            save_auth_tok(user, pass);
+            sendAPIRequest(url + "/api/accounts/profile?login=" + user, "GET", function(response, status) {
+                 //window.document = param;
+				if(status == 200)
+				 	 window.location.assign(url + "/content/main.html");
+				else
+					document.getElementById('text_warning').innerHTML = 'Wrong username or password';
+					 
+            });
+            //document.getElementById('text_warning').innerHTML = 'Wrong username or password';
+            return false;
+        }
+    </script>
+</head>
+	<body>
+		<div class="de_warning_text">
+		<label id="text_warning"></label>
+		</div>
+	
+		<form action=""  onsubmit="return onLoginClick();">
+			<span>LOGIN:</span><input type="text" name="username" value=""/>
+			<span>PASSWORD:</span><input type="password" name="pass" value=""/>
+			<input type="submit" name="login" value="SIGN IN"/>
+		</form>
+	</body>
+</html>
