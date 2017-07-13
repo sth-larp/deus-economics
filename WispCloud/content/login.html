@@ -12,7 +12,7 @@
             sendAPIRequest(url + "/api/accounts/profile?login=" + user, "GET", function(response, status) {
                  //window.document = param;
 				if(status == 200)
-				 	 window.location.assign(url + "/content/main.html");
+				 	 window.location.assign("./main.html");
 				else
 					document.getElementById('text_warning').innerHTML = 'Wrong username or password';
 					 

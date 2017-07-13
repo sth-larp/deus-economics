@@ -2,6 +2,15 @@
 //var url = "http://localhost:54294";
 var url = "https://alice.digital/econ";
 
+var cookieId = 'local_arm_id';
+
+function loginRedirect()
+{
+	document.cookie = cookieId + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+	window.location.assign("./login.html");
+}
+
+
 function sendAPIRequest(func_url, type, callback) {
     //send async API reqest, on responce proceed by callbakc function
     var xhttp = new XMLHttpRequest();
@@ -14,8 +23,6 @@ function sendAPIRequest(func_url, type, callback) {
     xhttp.send();
 }
 
-var cookieId = 'local_arm_id';
-
 function save_auth_tok(user, pass) {
     var cookieValue = 'Basic ' + btoa(user + ':' + pass);
     var myDate = new Date();
@@ -27,6 +34,20 @@ function get_auth_tok() {
     //get basic auth token from cookies
 	var tok = document.cookie.split(';')[0];
 	var tokVal = tok.substring(tok.indexOf(cookieId) + cookieId.length + 1);
+
+    //tok = document.cookie.replace(/(?:(?:^|.*;\s*)local_arm_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    //test login, replace^ before deploy
+    //tok = make_base_auth("admin", "123456"); //delete before use
+    return tokVal;
+}
+
+function get_auth_tok_user() {
+    //get basic auth token from cookies
+	var tok = document.cookie.split(';')[0];
+	var tokVal = tok.substring(tok.indexOf(cookieId) + cookieId.length + 1);
+	tokVal = tokVal.split(' ')[1];
+	tokVal = atob(tokVal);
+	tokVal = tokVal.split(':')[0];
 
     //tok = document.cookie.replace(/(?:(?:^|.*;\s*)local_arm_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");
     //test login, replace^ before deploy
