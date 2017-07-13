@@ -3,16 +3,19 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>DeusEx Economical Trash</title>
 
-    <script src="js/deus_api.js"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/deus_api.js"></script>
+    <script type="text/javascript" src="js/slave_box.js"></script>
 
-    <script type="text/javascript">
-        var main_account = '';
+        <script type="text/javascript">
+            var main_account = '';
         var selected_account = '';
         var main_profile = {}
         var lines_on_tab = 10;
 
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------------------------------------------------------------------------
         //mok pages for local testing
 
         //profile page mok
@@ -92,7 +95,7 @@
                     if (status == 200) {
                         main_profile = JSON.parse(param);
                         document.getElementById("current_account").innerHTML = "Привет, " + main_profile.Login;
-                        load_profile(main_profile.Login);
+                        load_full_profile(main_profile.Login);
                     }
                     else if (status == 401) {
                         loginRedirect();
@@ -100,19 +103,31 @@
                     else{
                         alert(param + "\n\n" + status);
                     }
-                }); 
+                });
             }
             catch(e) {
                 loginRedirect();
             }
+            sendAPIRequest(url + "/api/accounts/access/slaves?master=" + main_account, "GET", function(param, status) {
+                if (status == 200)
+                    fill_slaves(param, main_account);
+            });
         }
 
-        function make_base_auth(user, password){
-            //make basic auth token from scratch
-            var tok = user + ':' + password;
-            var hash = btoa(tok);
-            return "Basic " + hash;
+        function setCurrentAccount(acc, role) {
+            selected_account = acc;
+
+            sendAPIRequest(url + "/api/accounts/profile?login=" + selected_account, "GET", function(param, status){
+                if (status == 200) {
+                    main_profile = JSON.parse(param);
+                    load_full_profile(main_profile.Login);
+                }
+                else{
+                    alert(param + "\n\n" + status);
+                }
+            });
         }
+
         function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str = ""){
             var result = "";
             var page_links = "";
@@ -178,47 +193,49 @@
                 xhttp.send();
             }
 
-            function load_profile(p_name) {
+            function fill_full_profile(param) {
+                var prof = {};
+                if (param.length > 0) {
+                    prof = JSON.parse(param);
+                    //result mapping to visual elements
+                    document.getElementById("login_name").innerHTML = prof.User.Login + " ";
+                    document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
+                    document.getElementById("live_status").innerHTML = prof.User.Status + " ";
+                    prof.isCorp = prof.User.Roles.includes("Corp");
+                    if (prof.isCorp) {
+                        document.getElementById("current_index").innerHTML = prof.User.Index;
+                        document.getElementById("spent_index").innerHTML = prof.User.Index;
+                        document.getElementById("index_label").style.display = "inline";
+                        document.getElementById("insurances_supported").style.display = "block";
+
+                    }
+                    document.getElementById("current_account_value").innerHTML = prof.User.Cash;
+                    document.getElementById("insurance").innerHTML = prof.User.Insurance;
+                    document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
+                    document.getElementById("insurance_points").innerHTML = prof.User.InsurancePoints;
+                    var history_html = "<tr><th>Id</th><th>User</th><th>Time</th><th>Type</th><th>Description</th></tr>";
+                    for (i = 0; i < prof.History.length; i++) {
+                        history_html = history_html + "<tr><td>" + prof.History[i].Id + "</td>";
+                        history_html = history_html + "<td>" + prof.History[i].User + "</td>";
+                        history_html = history_html + "<td>" + prof.History[i].Time + "</td>";
+                        history_html = history_html + "<td>" + prof.History[i].Type + "</td>";
+                        history_html = history_html + "<td>" + prof.History[i].Description + "</td>";
+                        history_html = history_html + "</tr>";
+                    }
+                    document.getElementById("history").innerHTML = history_html;
+                }
+            }
+
+            function load_full_profile(p_name) {
                 //insertDocumentToWrapper("content_wrapper", url + "/profile_page.html","GET");
                 //mok html for localtesting, replace^ before deploy
                 document.getElementById("content_wrapper").innerHTML = p_page;
-                //get general profile info
-                sendAPIRequest(url + "/api/accounts/fullprofile?login=" + p_name, "GET", function(param){
-                    var prof = {};
-                    if (param.length > 0) {
-                        prof = JSON.parse(param);
-                        //result mapping to visual elements
-                        document.getElementById("login_name").innerHTML = prof.User.Login + " ";
-                        document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
-                        document.getElementById("live_status").innerHTML = prof.User.Status + " ";
-                        prof.isCorp = prof.User.Roles.includes("Corp");
-                        if (prof.isCorp) {
-                            document.getElementById("current_index").innerHTML = prof.User.Index;
-                            document.getElementById("spent_index").innerHTML = prof.User.Index;
-                            document.getElementById("index_label").style.display = "inline";
-                            document.getElementById("insurances_supported").style.display = "block";
 
-                        }
-                        document.getElementById("current_account_value").innerHTML = prof.User.Cash;
-                        document.getElementById("insurance").innerHTML = prof.User.Insurance;
-                        document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
-                        document.getElementById("insurance_points").innerHTML = prof.User.InsurancePoints;
-                        var history_html = "<tr><th>Id</th><th>User</th><th>Time</th><th>Type</th><th>Description</th></tr>";
-                        for (i = 0; i < prof.History.length; i++) {
-                            history_html = history_html + "<tr><td>" + prof.History[i].Id + "</td>";
-                            history_html = history_html + "<td>" + prof.History[i].User + "</td>";
-                            history_html = history_html + "<td>" + prof.History[i].Time + "</td>";
-                            history_html = history_html + "<td>" + prof.History[i].Type + "</td>";
-                            history_html = history_html + "<td>" + prof.History[i].Description + "</td>";
-                            history_html = history_html + "</tr>";
-                        }
-                        document.getElementById("history").innerHTML = history_html;
-                    }
-                }
-				);
-                //get slaves
-                sendAPIRequest(url + "/api/accounts/access/slaves?master=" + p_name, "GET", function(param){
+                sendAPIRequest(url + "/api/accounts/fullprofile?login=" + p_name, "GET", function(param, status) {
+                    if (status == 200) fill_full_profile(param);
+                    else alert(param + "\n\nStatus " + status);
                 });
+
                 //get masters
                 sendAPIRequest(url + "/api/accounts/access/masters?slave=" + p_name, "GET", function(param){
                 });
@@ -293,7 +310,7 @@
                     document.getElementById(buttons[i]).onmouseout = createHandler(document.getElementById(buttons[i]), outButton);
                 }
                 //init onclick actions
-                document.getElementById("profile_menu").onclick = createHandler(selected_account, load_profile);
+                document.getElementById("profile_menu").onclick = createHandler(selected_account, load_full_profile);
                 document.getElementById("corp_menu").onclick = createHandler(selected_account, load_corp_admin);
                 document.getElementById("transactions_menu").onclick = createHandler(selected_account, load_transactions);
                 document.getElementById("logout_menu").onclick = createHandler(selected_account, loginRedirect);
@@ -321,6 +338,8 @@
             Left Menu
             <div id="slave_list" style="height: 45%; border-style: solid;">
                 Slaves
+                <table id="slave_table" class="slave_table">
+                </table>
             </div>
             <br/>
             <div id="master_list" style="height: 45%; border-style: solid;">

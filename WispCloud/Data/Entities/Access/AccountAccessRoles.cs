@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 namespace DeusCloud.Data.Entities.Access
 {
     [DataContract]
-    [Flags]
     public enum AccountAccessRoles
     {
         None = 0,

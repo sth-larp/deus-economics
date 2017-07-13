@@ -25,11 +25,7 @@ namespace DeusCloud.Data.Entities.Access
         public virtual Account MasterAccount { get; protected set; }
 
         [Required]
-        [JsonIgnore]
         public AccountAccessRoles Role { get; set; }
-
-        [NotMapped]
-        public IEnumerable<AccountAccessRoles> Roles { get { return Role.GetFlags(); } }
 
         public AccountAccess()
         {

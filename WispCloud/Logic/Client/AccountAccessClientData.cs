@@ -9,7 +9,7 @@ namespace DeusCloud.Logic.Client
     {
         public string MasterLogin { get; set; }
         public string SlaveLogin { get; set; }
-        public IEnumerable<AccountAccessRoles> Roles { get; set; }
+        public AccountAccessRoles Role { get; set; }
 
         public AccountAccessClientData()
         {
@@ -19,14 +19,14 @@ namespace DeusCloud.Logic.Client
         {
             MasterLogin = access.Master;
             SlaveLogin = access.Slave;
-            Roles = access.Roles;
+            Role = access.Role;
         }
 
         public override void Validate()
         {
             Try.NotEmpty(MasterLogin, $"{nameof(MasterLogin)} cant be empty.");
             Try.NotEmpty(SlaveLogin, $"{nameof(SlaveLogin)} cant be empty.");
-            Try.Condition(Roles != null, $"{nameof(Roles)} cant be null.");
+            Try.Condition(Role != null, $"{nameof(Role)} cant be null.");
         }
 
     }

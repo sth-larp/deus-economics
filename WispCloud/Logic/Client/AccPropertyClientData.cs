@@ -16,7 +16,7 @@ namespace DeusCloud.Logic.Client
         public override void Validate()
         {
             Try.NotEmpty(Login, $"{nameof(Login)} cant be empty.");
-            //Try.Condition(Roles != null && Roles.Any(x => x != AccountRole.None), $"{nameof(Roles)} cant be empty.");
+            //Try.Condition(Roles != null && Role.Any(x => x != AccountRole.None), $"{nameof(Role)} cant be empty.");
         }
 
     }

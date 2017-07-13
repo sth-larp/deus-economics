@@ -207,7 +207,9 @@
     <Content Include="content\corp_admin.html">
       <BrowseToURL>~/corp_admin.html</BrowseToURL>
     </Content>
+    <Content Include="content\css\styles.css" />
     <Content Include="content\js\deus_api.js" />
+    <Content Include="content\js\slave_box.js" />
     <Content Include="content\main.html">
       <BrowseToURL>~/deus_economics.html</BrowseToURL>
     </Content>
@@ -393,6 +395,7 @@
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="content\js\jquery-1.7.1.min.js" />
     <None Include="Properties\PublishProfiles\Default Settings %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\deus2017economy - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\deus2017economy - Web Deploy %282%29.pubxml" />

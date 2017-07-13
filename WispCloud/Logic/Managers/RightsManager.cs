@@ -57,7 +57,7 @@ namespace DeusCloud.Logic.Managers
             return CheckForAccessOverSlave(slaveAccount, roles);
         }
 
-        public Account CheckForAccessOverSlave(Account slaveAccount, AccountAccessRoles roles)
+        public Account CheckForAccessOverSlave(Account slaveAccount, AccountAccessRoles role)
         {
             //Admin can do anything
             if ((UserContext.CurrentUser.Role & AccountRole.Admin) > 0)
@@ -68,7 +68,7 @@ namespace DeusCloud.Logic.Managers
                 return slaveAccount;
 
             var accessLevel = GetCurrentAccountAccess(slaveAccount.Login);
-            Try.Condition(accessLevel != null && (accessLevel.Role - roles) >= 0, NotEnoughPrivilegeText);
+            Try.Condition(accessLevel != null && accessLevel.Role >= role, NotEnoughPrivilegeText);
             return slaveAccount;
         }
 
@@ -137,15 +137,13 @@ namespace DeusCloud.Logic.Managers
             var masterAccount = _userManager.FindById(accessData.MasterLogin);
             Try.NotNull(masterAccount, $"Не найден логин: {accessData.MasterLogin}.");
 
-            var newRole = accessData.Roles.Aggregate(AccountAccessRoles.None, (role, next) => role |= next);
-
             var currentAccess = UserContext.Data.AccountAccesses.
                 Find(accessData.SlaveLogin, accessData.MasterLogin);
 
             if (currentAccess == null)
-                currentAccess = CreateAccountAccess(slaveAccount, masterAccount, newRole);
+                currentAccess = CreateAccountAccess(slaveAccount, masterAccount, accessData.Role);
             else
-                currentAccess.Role = newRole;
+                currentAccess.Role = accessData.Role;
 
             UserContext.Data.SaveChanges();
             SetAccessChangeGameEvents(slaveAccount, masterAccount);

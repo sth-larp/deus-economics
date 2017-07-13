@@ -34,10 +34,6 @@ function get_auth_tok() {
     //get basic auth token from cookies
 	var tok = document.cookie.split(';')[0];
 	var tokVal = tok.substring(tok.indexOf(cookieId) + cookieId.length + 1);
-
-    //tok = document.cookie.replace(/(?:(?:^|.*;\s*)local_arm_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-    //test login, replace^ before deploy
-    //tok = make_base_auth("admin", "123456"); //delete before use
     return tokVal;
 }
 
@@ -50,8 +46,6 @@ function get_auth_tok_user() {
 	tokVal = tokVal.split(':')[0];
 
     //tok = document.cookie.replace(/(?:(?:^|.*;\s*)local_arm_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-    //test login, replace^ before deploy
-    //tok = make_base_auth("admin", "123456"); //delete before use
     return tokVal;
 }
 
