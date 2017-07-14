@@ -249,14 +249,19 @@
                 document.getElementById("lines_on_tab").onchange = function(){
                     lines_on_tab = document.getElementById("lines_on_tab").value;
                     //should rebuild transactions table here
-                    sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param){
-                        fill_transactions_table(param)});
+                    sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status){
+                        fill_transactions_table(param, status)});
                 }
-                sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param) {
-                    fill_transactions_table(param);});
+                sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
+                    fill_transactions_table(param, status);});
             }
 
-            function fill_transactions_table(param) {
+            function fill_transactions_table(param, status) {
+                if (status != 200) {
+                    document.getElementById("transactions_list").innerHTML = "Error " + status + "\n" + param;
+                    return;
+                }
+
                 var t_list = JSON.parse(param);
                 var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
                 var page_str = "";
