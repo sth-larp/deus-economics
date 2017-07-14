@@ -213,12 +213,10 @@
                     document.getElementById("insurance").innerHTML = prof.User.Insurance;
                     document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
                     document.getElementById("insurance_points").innerHTML = prof.User.InsurancePoints;
-                    var history_html = "<tr><th>Id</th><th>User</th><th>Time</th><th>Type</th><th>Description</th></tr>";
+                    var history_html = "<tr><th>Id</th><th>Time</th><th>Description</th></tr>";
                     for (i = 0; i < prof.History.length; i++) {
                         history_html = history_html + "<tr><td>" + prof.History[i].Id + "</td>";
-                        history_html = history_html + "<td>" + prof.History[i].User + "</td>";
-                        history_html = history_html + "<td>" + prof.History[i].Time + "</td>";
-                        history_html = history_html + "<td>" + prof.History[i].Type + "</td>";
+                        history_html = history_html + "<td>" + customDateFormat(prof.History[i].Time) + "</td>";
                         history_html = history_html + "<td>" + prof.History[i].Description + "</td>";
                         history_html = history_html + "</tr>";
                     }
@@ -252,34 +250,26 @@
                     lines_on_tab = document.getElementById("lines_on_tab").value;
                     //should rebuild transactions table here
                     sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param){
-                        var t_list = JSON.parse(param);
-                        var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
-                        var page_str = "";
-                        var t_str = [];
-                        for (i = 0; i < t_list.length; i++) {
-                            t_str[i] = "<tr><td>" + t_list[i].Id + "</td><td>" + t_list[i].Sender + "</td><td>" + t_list[i].Receiver + "</td><td>" + t_list[i].Time + "</td>";
-                            t_str[i] = t_str[i] + "<td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
-                        }
-                        page_str = buildTabs(t_str, lines_on_tab, "transaction_table", head_str);
-                        document.getElementById("transactions_list").innerHTML = page_str;
-                        document.getElementById("transaction_table_0").style.display = "block";
-                        initTabsControl("transaction_table");
-                    });
+                        fill_transactions_table(param)});
                 }
                 sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param) {
-                    var t_list = JSON.parse(param);
-                    var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
-                    var page_str = "";
-                    var t_str = [];
-                    for (i = 0; i < t_list.length; i++) {
-                        t_str[i] = "<tr><td>" + t_list[i].Id + "</td><td>" + t_list[i].Sender + "</td><td>" + t_list[i].Receiver + "</td><td>" + t_list[i].Time + "</td>";
-                        t_str[i] = t_str[i] + "<td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
-                    }
-                    page_str = buildTabs(t_str, lines_on_tab, "transaction_table", head_str);
-                    document.getElementById("transactions_list").innerHTML = page_str;
-                    document.getElementById("transaction_table_0").style.display = "block";
-                    initTabsControl("transaction_table");
-                });
+                    fill_transactions_table(param);});
+            }
+
+            function fill_transactions_table(param) {
+                var t_list = JSON.parse(param);
+                var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
+                var page_str = "";
+                var t_str = [];
+                for (i = 0; i < t_list.length; i++) {
+                    t_str[i] = "<tr><td>" + t_list[i].Id + "</td><td>" + t_list[i].Sender 
+                    + "</td><td>" + t_list[i].Receiver + "</td><td>" + customDateFormat(t_list[i].Time) 
+                    + "</td><td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
+                }
+                page_str = buildTabs(t_str, lines_on_tab, "transaction_table", head_str);
+                document.getElementById("transactions_list").innerHTML = page_str;
+                document.getElementById("transaction_table_0").style.display = "block";
+                initTabsControl("transaction_table");
             }
 
             function load_corp_admin() {
