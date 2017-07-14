@@ -71,6 +71,9 @@ namespace DeusCloud.Data.Entities.Accounts
         [Required]
         public AccountStatus Status { get; set; }
 
+        [JsonIgnore]
+        public bool InsuranceHidden { get; set; }
+
         string IUser<string>.Id { get { return Login; } }
 
         string IUser<string>.UserName

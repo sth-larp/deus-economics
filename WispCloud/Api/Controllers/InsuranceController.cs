@@ -49,7 +49,7 @@ namespace DeusCloud.Api.Controllers
         [HttpGet]
         [Route("insurance/holders")]
         [ResponseType(typeof(List<InsuranceHolderServerData>))]
-        public IHttpActionResult GetLoyaltyHolders(string company)
+        public IHttpActionResult GetInsuranceHolders(string company)
         {
             return Ok(UserContext.Insurances.GetInsuranceHolders(company));
         }
@@ -76,7 +76,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
         [Route("insurance/steal")]
-        public IHttpActionResult RemoveInsuranceHolder(StealInsuranceClientData data)
+        public IHttpActionResult StealInsurance(StealInsuranceClientData data)
         {
             UserContext.Insurances.StealInsurance(data);
             return Ok();

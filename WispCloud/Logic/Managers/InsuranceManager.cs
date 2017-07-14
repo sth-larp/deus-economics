@@ -119,7 +119,7 @@ namespace DeusCloud.Logic.Managers
             var t = _associations[login];
             var list = UserContext.Data.Accounts.Where(x => x.Insurance == t);
 
-            foreach (var user in list)
+            foreach (var user in list.Where(x => !x.InsuranceHidden))
             {
                 var h = new InsuranceHolderServerData(user.Login, login)
                 {
@@ -172,10 +172,10 @@ namespace DeusCloud.Logic.Managers
             var t = _associations[data.Company];
             Try.Condition(CheckInsuranceLevel(level, t), $"Неверный уровень страховки {level}");
 
-            SetInsuranceHolder_Checked(userAccount, level, t, true);
+            SetInsuranceHolder_Checked(userAccount, level, t);
         }
 
-        private void SetInsuranceHolder_Checked(Account userAccount, int level, InsuranceType t, bool countIndex = false)
+        private void SetInsuranceHolder_Checked(Account userAccount, int level, InsuranceType t, bool isStolen = false)
         {
             Try.Condition((userAccount.Role & AccountRole.Person) > 0,
                 $"Только персоны могут быть держателями страховки");
@@ -183,7 +183,7 @@ namespace DeusCloud.Logic.Managers
             var oldIssuer = GetIssuerFromType(userAccount.Insurance);
             var newIssuer = GetIssuerFromType(t);
 
-            if (countIndex)
+            if (!isStolen)
             {
                 var price = level;
                 if (userAccount.Insurance == t)
@@ -212,9 +212,10 @@ namespace DeusCloud.Logic.Managers
             userAccount.InsuranceLevel = level;
             UserContext.Accounts.Update(userAccount);
 
-            UserContext.AddGameEvent(newIssuer.Login, GameEventType.Insurance,
-                $"Выдана страховка {userAccount.Login} " +
-                $"уровня {userAccount.InsuranceLevel}");
+            if(!isStolen)
+                UserContext.AddGameEvent(newIssuer.Login, GameEventType.Insurance,
+                    $"Выдана страховка {userAccount.Login} " +
+                    $"уровня {userAccount.InsuranceLevel}");
 
             UserContext.AddGameEvent(userAccount.Login, GameEventType.Insurance,
                 $"Выдана страховка {userAccount.Insurance} " +
@@ -234,7 +235,8 @@ namespace DeusCloud.Logic.Managers
             var receiverAccount = _userManager.FindById(data.Receiver);
             Try.NotNull(receiverAccount, $"Не найден пользователь {data.Receiver}");
 
-            SetInsuranceHolder_Checked(receiverAccount, loserAccount.InsuranceLevel, loserAccount.Insurance);
+            receiverAccount.InsuranceHidden = true;
+            SetInsuranceHolder_Checked(receiverAccount, loserAccount.InsuranceLevel, loserAccount.Insurance, true);
             RemoveInsuranceHolder(data.Loser);
         }
 
@@ -264,7 +266,22 @@ namespace DeusCloud.Logic.Managers
         {
             _rightsManager.CheckRole(AccountRole.Admin);
             ResetIndexValues(data);
+            RemoveStolenInsurances();
             ProlongInsurance();
+        }
+
+        private void RemoveStolenInsurances()
+        {
+            var holders = UserContext.Data.Accounts.Where(x => x.InsuranceHidden).ToList();
+            foreach (var holder in holders)
+            {
+                UserContext.AddGameEvent(holder.Login, GameEventType.Index,
+                    $"{holder.Insurance} отменила вашу страховку", true);
+                holder.Insurance = InsuranceType.None;
+                holder.InsuranceLevel = 1;
+                holder.InsuranceHidden = false;
+                UserContext.Accounts.Update(holder);
+            }
         }
 
         private void ProlongInsurance()
@@ -274,7 +291,7 @@ namespace DeusCloud.Logic.Managers
                 var corp = _userManager.FindById(kv.Key);
                 if (corp == null) continue; //Not found in DB
 
-                var holders = GetInsuranceHolders(kv.Key).OrderByDescending(x => x.InsuranceLevel);
+                var holders = GetInsuranceHolders(kv.Key).OrderByDescending(x => x.InsuranceLevel).ToList();
                 foreach (var holder in holders)
                 {
                     if (corp.InsurancePoints >= holder.InsuranceLevel)
