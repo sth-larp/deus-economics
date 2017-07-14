@@ -226,24 +226,24 @@
                 }
             }
 
-            function load_full_profile(p_name) {
+            function load_full_profile() {
                 //insertDocumentToWrapper("content_wrapper", url + "/profile_page.html","GET");
                 //mok html for localtesting, replace^ before deploy
                 document.getElementById("content_wrapper").innerHTML = p_page;
 
-                sendAPIRequest(url + "/api/accounts/fullprofile?login=" + p_name, "GET", function(param, status) {
+                sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
                     if (status == 200) fill_full_profile(param);
                     else alert(param + "\n\nStatus " + status);
                 });
 
                 //get masters
-                sendAPIRequest(url + "/api/accounts/access/masters?slave=" + p_name, "GET", function(param){
+                sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status){
                 });
                 //get supported insurances (for corps only)
 
             }
 
-            function load_transactions(p_name) {
+            function load_transactions() {
                 //insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
                 //mok html for localtesting, replace^ before deploy
                 document.getElementById("content_wrapper").innerHTML = t_page;
@@ -251,7 +251,7 @@
                 document.getElementById("lines_on_tab").onchange = function(){
                     lines_on_tab = document.getElementById("lines_on_tab").value;
                     //should rebuild transactions table here
-                    sendAPIRequest(url + "/api/transactions?login=" + p_name, "GET", function(param){
+                    sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param){
                         var t_list = JSON.parse(param);
                         var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
                         var page_str = "";
@@ -266,7 +266,7 @@
                         initTabsControl("transaction_table");
                     });
                 }
-                sendAPIRequest(url + "/api/transactions?login=" + p_name, "GET", function(param) {
+                sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param) {
                     var t_list = JSON.parse(param);
                     var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
                     var page_str = "";
@@ -282,7 +282,7 @@
                 });
             }
 
-            function load_corp_admin(p_name) {
+            function load_corp_admin() {
             }
 
             function createHandler(obj, handler) {
@@ -310,10 +310,10 @@
                     document.getElementById(buttons[i]).onmouseout = createHandler(document.getElementById(buttons[i]), outButton);
                 }
                 //init onclick actions
-                document.getElementById("profile_menu").onclick = createHandler(selected_account, load_full_profile);
-                document.getElementById("corp_menu").onclick = createHandler(selected_account, load_corp_admin);
-                document.getElementById("transactions_menu").onclick = createHandler(selected_account, load_transactions);
-                document.getElementById("logout_menu").onclick = createHandler(selected_account, loginRedirect);
+                document.getElementById("profile_menu").onclick = function() { load_full_profile();};
+                document.getElementById("corp_menu").onclick = function() { load_corp_admin();};
+                document.getElementById("transactions_menu").onclick = function() { load_transactions();};
+                document.getElementById("logout_menu").onclick = function() { loginRedirect();};
             }
     </script>
 </head>
@@ -335,9 +335,8 @@
             </div>
         </div>
         <div id="left_menu" style="height: 90%; width: 20%; border-style:solid; float: left;">
-            Left Menu
             <div id="slave_list" style="height: 45%; border-style: solid;">
-                Slaves
+                Ваши счета
                 <table id="slave_table" class="slave_table">
                 </table>
             </div>

@@ -2,11 +2,11 @@
 type="button" value="{1} ({2})" onclick="setCurrentSlave(this);" />';
 
 var ROLE = {
-    NONE: { value: 0, name: "None"},
-    READ: { value: 1, name: "Read"},
-    WITHDRAW: { value: 2, name: "Withdraw" },
-    ADMIN: { value: 4, name: "Admin" },
-    MASTER: { value: 8, name: "Master" }
+    NONE: { value: 0, name: "None", rusname: "Нет"},
+    READ: { value: 1, name: "Read", rusname: "Просмотр" },
+    WITHDRAW: { value: 2, name: "Withdraw", rusname: "Снятие" },
+    ADMIN: { value: 4, name: "Admin", rusname: "Админ" },
+    MASTER: { value: 8, name: "Master", rusname: "Ваш счет" }
 };
 
 function get_role(role) {
@@ -35,15 +35,17 @@ function setCurrentSlave(item) {
     }
 }
 
-function add_slave_row(acc, role, id, table) {
+function add_slave_row(acc, roleName, id, table) {
     var row = table.insertRow(0);
     var cell = row.insertCell(0);
 
-    cell.innerHTML = format(slave_button, [id, acc, role]);
+    var role = get_role(roleName);
+
+    cell.innerHTML = format(slave_button, [id, acc, role.rusname]);
 
     var elem = document.getElementById('slave_btn' + id);
     elem.dataset.acc = acc;
-    elem.dataset.role = role;
+    elem.dataset.role = role.name;
 }
 
 function fill_slaves(json, master) {
@@ -58,4 +60,5 @@ function fill_slaves(json, master) {
         }
     }
     add_slave_row(master, ROLE.MASTER.name, 333, table);
+    $('#slave_btn333').addClass('selected_slave');
 }
