@@ -11,7 +11,7 @@ function loginRedirect()
 }
 
 
-function sendAPIRequest(func_url, type, callback) {
+function sendAPIRequest(func_url, type, callback, data) {
     //send async API reqest, on responce proceed by callbakc function
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -19,8 +19,9 @@ function sendAPIRequest(func_url, type, callback) {
 			callback(this.responseText, this.status);
     };
     xhttp.open(type, func_url, true);
+    xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.setRequestHeader("Authorization", get_auth_tok());
-    xhttp.send();
+    xhttp.send(data);
 }
 
 function save_auth_tok(user, pass) {
