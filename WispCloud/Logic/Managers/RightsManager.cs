@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
@@ -31,12 +32,6 @@ namespace DeusCloud.Logic.Managers
         {
             _userManager = new UserManager(UserContext);
         }
-
-        //public void CheckCurrentUserActive()
-        //{
-        //    Try.NotNull(UserContext.CurrentUser, NotEnoughRightsMessageText);
-        //    Try.Condition(UserContext.CurrentUser.Status == AccountStatus.Active, UserBlockedMessageText);
-        //}
 
         public void CheckRole(AccountRole role)
         {
@@ -77,16 +72,23 @@ namespace DeusCloud.Logic.Managers
             Try.Argument(clientData, nameof(clientData));
             CheckRole(AccountRole.Admin);
                 
-            var roles = clientData.Roles?.Aggregate(AccountRole.None, (curr, r) => curr |= r);
-
             var editAccount = _userManager.FindById(clientData.Login);
             Try.NotNull(editAccount, $"Не найден логин: {clientData.Login}.");
 
-            if (roles != null)
-                editAccount.Role = roles.Value;
+            if (clientData.Role != null)
+            {
+                editAccount.Role = clientData.Role.Value;
+                UserContext.AddGameEvent(editAccount.Login, GameEventType.Rights, $"Изменен тип аккаунта");
+            }
 
-            if(clientData.Status != null)
+            if (clientData.Status != null)
                 editAccount.Status = clientData.Status.Value;
+
+            if (!String.IsNullOrEmpty(clientData.Fullname))
+                editAccount.Fullname = clientData.Fullname;
+
+            if (!String.IsNullOrEmpty(clientData.Email))
+                editAccount.Email = clientData.Email;
 
             //if (clientData.Insurance != null)
             //{
@@ -107,7 +109,6 @@ namespace DeusCloud.Logic.Managers
             //}
 
             UserContext.Accounts.Update(editAccount);
-            UserContext.AddGameEvent(editAccount.Login, GameEventType.Rights, $"Изменены свойства аккаунта");
             return editAccount;
         }
 

@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.GameEvents;
+using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
@@ -16,27 +19,52 @@ namespace DeusCloud.Logic.Managers
     {
         UserManager _userManager;
         private RightsManager _rightsManager;
+        private ConstantManager _constantManager;
 
         public AccountsManager(UserContext context)
             : base(context)
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
+            _constantManager = new ConstantManager(UserContext);
         }
 
         public Account Registration(RegistrationClientData clientData)
         {
-            var newUser = new Account(clientData.Login, AccountRole.Admin);
-                //register all users as superusers for debug and tests
-            
-            newUser.Fullname = clientData.Fullname??"";
-            newUser.Cash = 100000;
+            _rightsManager.CheckRole(AccountRole.Admin);
 
+            var role = clientData.Role ?? AccountRole.Person;
+            var newUser = new Account(clientData.Login, role);
+           
+            newUser.Fullname = clientData.Fullname ?? "Нет имени";
+            newUser.Email = clientData.Email ?? "";
+            newUser.Cash = clientData.Cash ?? 0;
+            newUser.Insurance = clientData.Insurance ?? InsuranceType.None;
+            newUser.InsuranceLevel = newUser.Insurance.SetLevel(clientData.InsuranceLevel);
+            
             var result = _userManager.Create(newUser, clientData.Password);
             if (!result.Succeeded)
                 throw new DeusException(result.Errors.First());
 
             UserContext.AddGameEvent(clientData.Login, GameEventType.None, $"Аккаунт создан");
+
+            if (!String.IsNullOrEmpty(clientData.Workplace) && clientData.SalaryLevel != null)
+            {
+                var workPlace = _userManager.FindById(clientData.Workplace);
+                if (workPlace == null)
+                {
+                    UserContext.AddGameEvent(clientData.Login, GameEventType.None, 
+                        $"Не удалось добавить место работы {clientData.Workplace}");
+                }
+                else
+                {
+                    var salary = _constantManager.GetSalary(clientData.SalaryLevel.Value);
+                    var payment = new Payment(workPlace, newUser, salary);
+                    UserContext.Data.Payments.Add(payment);
+                    UserContext.Data.SaveChanges();
+                }
+            }
+
             return newUser;
         }
 

@@ -50,7 +50,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="500">Internal Server Error</response>
-        [AllowAnonymous]
+        [BasicAuth]
         [HttpPost]
         [Route("accounts/register")]
         [ResponseType(typeof(Account))]

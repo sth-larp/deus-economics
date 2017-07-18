@@ -16,7 +16,6 @@ namespace DeusCloud.Data
             //make id for installations that hard to count
             //make unique index on hub login with nulls
         }
-
     }
 
 }

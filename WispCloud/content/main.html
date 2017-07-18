@@ -10,7 +10,8 @@
 
         <script type="text/javascript">
             var main_account = '';
-        var selected_account = '';
+            var selected_account = '';
+            var selected_role = ROLE.MASTER;
         var main_profile = {}
         var lines_on_tab = 10;
 
@@ -79,7 +80,6 @@
         //transactions page mok
         var t_page = '<div id="transactions" style="width:100%; height:100%">\
 	<div id="trans_menu_holder">\
-		<div>Выполнить платеж</div>\
 		<form id="new_transaction" action="">\
 			<table>\
 				<tr><th>Кому</th><th>Сумма</th><th>Комментарий</th><th></th></tr>\
@@ -89,6 +89,7 @@
 					<td><input type="text" id="transaction_comment_id" name="transaction_comment" value="COMMENT"/></td>\
 					<td><input type="button" id="send_transaction" name="send" value="SEND"/></td>\
 				</tr>\
+                <tr><td colspan=4><label class="warning_text" id="transaction_warning"></label></td></tr>\
 			</table>\
 		</form>\
 	</div>\
@@ -140,7 +141,8 @@
 
         function setCurrentAccount(acc, role) {
             selected_account = acc;
-
+            selected_role = role;
+            
             sendAPIRequest(url + "/api/accounts/profile?login=" + selected_account, "GET", function(param, status){
                 if (status == 200) {
                     main_profile = JSON.parse(param);
@@ -266,9 +268,18 @@
             }
 
             function load_transactions() {
+
                 //insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
                 //mok html for localtesting, replace^ before deploy
                 document.getElementById("content_wrapper").innerHTML = t_page;
+                document.getElementById("trans_menu_holder").style.visibility =
+                        selected_role.value >= ROLE.WITHDRAW.value ? 'visible' : 'hidden';
+
+                document.getElementById("send_transaction").onclick = function() { sendTransaction();};
+                load_transactions_table();
+            }
+
+            function load_transactions_table() {
                 document.getElementById("lines_on_tab").value = lines_on_tab;
                 document.getElementById("lines_on_tab").onchange = function(){
                     lines_on_tab = document.getElementById("lines_on_tab").value;
@@ -278,6 +289,23 @@
                 }
                 sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
                     fill_transactions_table(param, status);});
+            }
+
+            function sendTransaction(elem) {
+                var user = document.getElementById("user_name_id").value;
+                var sum = document.getElementById("transaction_value_id").value;
+                var comment = document.getElementById("transaction_comment_id").value;
+                var txtField = document.getElementById("transaction_warning");
+                var data = JSON.stringify({"Sender": selected_account, "Receiver": user, "Amount": sum, "Comment" : comment});
+
+                sendAPIRequest(url + "/api/transfer", "POST", function(param, status) {
+                    if (status == 200) {
+                        txtField.innerHTML = "";
+                        load_transactions_table();
+                    } 
+                    else
+                        txtField.innerHTML = param;
+                }, data);
             }
 
             function fill_transactions_table(param, status) {

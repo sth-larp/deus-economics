@@ -18,12 +18,14 @@ namespace DeusCloud.Logic.Managers
         private UserManager _userManager;
         private RightsManager _rightsManager;
         private ConstantManager _constantManager;
+        private InsuranceManager _insuranceManager;
 
         public TransactionsManager(UserContext context) : base(context)
         {
             _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
             _constantManager = new ConstantManager(UserContext);
+            _insuranceManager = new InsuranceManager(UserContext);
         }
 
         public void Transfer(TransferClientData data)
@@ -118,7 +120,9 @@ namespace DeusCloud.Logic.Managers
         private List<Transaction> C2BTransfer(Account sender, Account receiver, TransferClientData data)
         {
             var ret = new List<Transaction>();
-            var discount = _constantManager.GetDiscountValue(sender, receiver);
+            var level = _insuranceManager.CheckLoyaltyLevel(sender, receiver);
+            var discount = _constantManager.GetDiscount(level);
+
             Try.Condition(sender.Cash >= data.Amount * (1 - discount), $"Недостаточно средств");
 
             if (discount == 0)

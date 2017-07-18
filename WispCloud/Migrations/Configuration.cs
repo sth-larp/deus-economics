@@ -7,7 +7,7 @@ namespace DeusCloud.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = true;
+            AutomaticMigrationsEnabled = false;
             ContextKey = "DeusCloud.Data.DeusData";
         }
 

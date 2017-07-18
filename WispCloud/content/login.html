@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>DeusEx Economical Trash Login</title>
@@ -10,21 +10,19 @@
             var pass = document.getElementsByName("pass")[0].value;
             save_auth_tok(user, pass);
             sendAPIRequest(url + "/api/accounts/profile?login=" + user, "GET", function(response, status) {
-                 //window.document = param;
 				if(status == 200)
 				 	 window.location.assign("./main.html");
 				else
-					document.getElementById('text_warning').innerHTML = 'Wrong username or password';
+				    document.getElementById('login_warning').innerHTML = 'Wrong username or password';
 					 
             });
-            //document.getElementById('text_warning').innerHTML = 'Wrong username or password';
             return false;
         }
     </script>
 </head>
 	<body>
-		<div class="de_warning_text">
-		<label id="text_warning"></label>
+		<div>
+		<label class="warning_text" id="login_warning"></label>
 		</div>
 	
 		<form action=""  onsubmit="return onLoginClick();">

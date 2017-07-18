@@ -33,14 +33,18 @@ namespace DeusCloud.Data.Entities.Accounts
         [JsonIgnore]
         public string PasswordHash { get; set; }
 
+        //[StringLength(80)]
         public string Fullname { get; set; }
+
+        [Index("IX_Email", IsUnique = true)]
+        [StringLength(80)]
+        public string Email { get; set; }
 
         [Required]
         [JsonIgnore]
         public Guid TokenSalt { get; set; }
 
         [Required]
-        [JsonIgnore]
         public AccountRole Role { get; set; }
 
         [Required]
@@ -61,9 +65,6 @@ namespace DeusCloud.Data.Entities.Accounts
                 return InsuranceLevel;
             }
         }
-
-        [NotMapped]
-        public IEnumerable<AccountRole> Roles { get { return Role.GetFlags(); } }
 
         [Required]
         public float Cash { get; set; }
