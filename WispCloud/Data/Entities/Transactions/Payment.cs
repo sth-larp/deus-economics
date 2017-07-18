@@ -32,6 +32,9 @@ namespace DeusCloud.Data.Entities.Transactions
         [ForeignKey("Receiver")]
         public virtual Account ReceiverAccount { get; set; }
 
+        [NotMapped]
+        public string ReceiverName { get { return $"{ReceiverAccount.Fullname} ({Receiver})";} }
+
         public DateTime? LastPaid { get; set; }
 
         public TimeSpan? Period { get; set; }

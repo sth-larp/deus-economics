@@ -326,16 +326,16 @@
 
                 var t_list = JSON.parse(param);
                 var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
-                var page_str = "";
                 var t_str = [];
                 for (i = 0; i < t_list.length; i++) {
                     t_str[i] = "<tr><td>" + t_list[i].Id + "</td><td>" + t_list[i].Sender 
                     + "</td><td>" + t_list[i].Receiver + "</td><td>" + customDateFormat(t_list[i].Time) 
                     + "</td><td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
                 }
-                page_str = buildTabs(t_str, lines_on_tab, "transaction_table", head_str);
+                var page_str = buildTabs(t_str, lines_on_tab, "transaction_table", head_str);
                 document.getElementById("transactions_list").innerHTML = page_str;
-                document.getElementById("transaction_table_0").style.display = "block";
+                var t = document.getElementById("transaction_table_0");
+                if(t != null) t.style.display = "block";
                 initTabsControl("transaction_table");
             }
 
@@ -347,14 +347,15 @@
                 sendAPIRequest(url + "/api/insurance/loyalties?login=" + selected_account, "GET", function(param, status) {
                     if (status == 200) 
 					{
-						var loyalties_list = [];
+                        var loyalties_list = JSON.parse(param);	
 						var head_str = "<tr><th>Id</th><th>Страховка</th><th>Уровень</th><th>Держатель</th></tr>";
-						var page_str = "";
-						var l_str = [];												
-						loyalties_list = JSON.parse(param);						
-						page_str = buildTabs(loyalties_list, lines_on_tab, "loyalties_table", head_str);
+						var l_str = [];	
+                        
+						var page_str = buildTabs(loyalties_list, lines_on_tab, "loyalties_table", head_str);
 						document.getElementById("insurance_users_list").innerHTML = page_str;
-						document.getElementById("loyalties_table_0").style.display = "block";
+						var t = document.getElementById("loyalties_table_0");
+						if(t != null) t.style.display = "block";
+
 						initTabsControl("loyalties_table");
 					}
                     else alert(param + "\n\nStatus " + status);
@@ -363,14 +364,19 @@
                 sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function(param, status) {
                     if (status == 200) 
 					{
-						var payments_list = [];
-						var head_str = "<tr><th>Id</th><th>Employer</th><th>EmployerName</th><th>Receiver</th><th>LastPaid</th><th>Period</th><th>Debt</th><th>Amount</th><th>Flags</th></tr>";
-						var page_str = "";
-						var l_str = [];												
-						loyalties_list = JSON.parse(param);						
-						page_str = buildTabs(payments_list, lines_on_tab, "payments_table", head_str);
-						document.getElementById("payments_list").innerHTML = page_str;
-						document.getElementById("payments_table_0").style.display = "block";
+                        var payments = JSON.parse(param);
+                        var head_str = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
+						var l_str = [];	
+						for (i = 0; i < payments.length; i++) {
+						    l_str[i] = "<tr><td>" + payments[i].ReceiverName +
+                                "</td><td>" + payments[i].Amount + 
+                                + "</td><td>" + customDateFormat(payments[i].LastPaid) + "</td></tr>";
+						}
+						var page_str = buildTabs(l_str, lines_on_tab, "payments_table", head_str);
+    					document.getElementById("payments_list").innerHTML = page_str;
+    					var t = document.getElementById("payments_table_0");
+    					if(t != null) t.style.display = "block";
+
 						initTabsControl("payments_table");
 					}
                     else alert(param + "\n\nStatus " + status);
