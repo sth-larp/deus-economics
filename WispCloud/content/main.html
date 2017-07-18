@@ -368,9 +368,13 @@
                         var head_str = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
 						var l_str = [];	
 						for (i = 0; i < payments.length; i++) {
-						    l_str[i] = "<tr><td>" + payments[i].ReceiverName +
+						    var displayName = "";
+						    if (selected_acc_role == ACC_ROLE.PERSON) displayName = payments[i].EmployerName;
+						    else displayName = payments[i].ReceiverName;
+
+						    l_str[i] = "<tr><td>" + displayName +
                                 "</td><td>" + payments[i].Amount + 
-                                + "</td><td>" + customDateFormat(payments[i].LastPaid) + "</td></tr>";
+                                "</td><td>" + customDateFormat(payments[i].LastPaid) + "</td></tr>";
 						}
 						var page_str = buildTabs(l_str, lines_on_tab, "payments_table", head_str);
     					document.getElementById("payments_list").innerHTML = page_str;
