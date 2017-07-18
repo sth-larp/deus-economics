@@ -72,8 +72,8 @@ namespace DeusCloud.Logic.Managers
 
             var corp = _userManager.FindById(data.LoyalName);
             Try.NotNull(corp, $"Не найден логин: {corp}");
-            Try.Condition((corp.Role & AccountRole.Tavern) > 0, 
-                $"{corp} не является организацией типа {AccountRole.Tavern}");
+            Try.Condition((corp.Role & AccountRole.Company) > 0, 
+                $"{corp} не является организацией типа {AccountRole.Company}");
 
             var check = UserContext.Data.Loyalties.Where(x =>
                 x.LoyalName == corp.Login && x.Insurance == data.Insurance);

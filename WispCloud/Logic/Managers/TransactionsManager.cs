@@ -44,7 +44,7 @@ namespace DeusCloud.Logic.Managers
                 
             if ((receiverAcc.Role & AccountRole.Person) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
                 trList = C2CTransfer(senderAcc, receiverAcc, data);
-            else if((receiverAcc.Role & AccountRole.Tavern) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
+            else if((receiverAcc.Role & AccountRole.Company) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
                 trList = C2BTransfer(senderAcc, receiverAcc, data);
             else if ((receiverAcc.Role & AccountRole.Corp) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
                 trList = C2BTransfer(senderAcc, receiverAcc, data);

@@ -1,29 +1,6 @@
 ﻿var slave_button = '<input class="slave_button" id="slave_btn{0}" \
 type="button" value="{1} ({2})" onclick="setCurrentSlave(this);" />';
 
-var ROLE = {
-    NONE: { value: 0, name: "None", rusname: "Нет"},
-    READ: { value: 1, name: "Read", rusname: "Просмотр" },
-    WITHDRAW: { value: 2, name: "Withdraw", rusname: "Снятие" },
-    ADMIN: { value: 4, name: "Admin", rusname: "Админ" },
-    MASTER: { value: 8, name: "Master", rusname: "Ваш счет" }
-};
-
-function get_role(role) {
-    for (var i in ROLE) {
-        if (ROLE[i].name == role)
-            return ROLE[i];
-    }
-    return ROLE[0];
-}
-
-function format(source, params) {
-    $.each(params, function (i, n) {
-        source = source.replace(new RegExp("\\{" + i + "\\}", "g"), n);
-    })
-    return source;
-}
-
 function setCurrentSlave(item) {
     if (!$('#' + item.id).hasClass('selected_slave'))
     {

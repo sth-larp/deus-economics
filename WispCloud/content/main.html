@@ -12,8 +12,8 @@
             var main_account = '';
             var selected_account = '';
             var selected_role = ROLE.MASTER;
-        var main_profile = {}
-        var lines_on_tab = 10;
+            var main_profile = {}
+            var lines_on_tab = 10;
 
 
         //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,17 +21,21 @@
 
         //profile page mok
         var p_page = '<div id="profile_page" style="width:100%; height:100%"> \
-	<div><span> Логин:</span><span id="login_name"></span></div>\
-	<div><span> Полное имя:</span><span id="full_name"></span></div>\
+	<div><span> Логин: </span><span id="login_name"></span></div>\
+    <div><span> Тип: </span><span id="acc_role"></span></div>\
+	<div><span> Полное имя: </span><span id="full_name"></span></div>\
 	<div><span> Статус: </span><span id="live_status"></span></div>\
+    <div><span> Кредиты: </span><span id="current_account_value"></span></div>\
 	<span id="index_label" style="display: none;">\
-	<div><span> Индекс: </span><span id="current_index"></span>\
-		<span> Потраченный индекс: </span><span id="spent_index"></span></div>\
+	    <div><span> Индекс: </span><span id="current_index"></span>\
+		<span> Очки страховки: </span><span id="index_points"></span></div>\
 	</span>\
-	<div><span> Деньги: </span><span id="current_account_value"></span></div>\
-	<div><span> Страховка: </span><span id="insurance"></span>\
-	<span> Уровень страховки: </span><span id="insurance_level"></span>\
-	<span> Очки страховки страховки: </span><span id="insurance_points"></span></div>\
+	<span id="insurance_label" style="display: none;">\
+	    <div><span> Страховка: </span>\
+        <span id="insurance"></span> \
+        (<span id="insurance_level"></span>)\
+        </div>\
+    </span>\
 	<div>\
 		<table id="slave_list">\
 		</table>\
@@ -92,6 +96,7 @@
             try {
                 main_account = get_auth_tok_user();
                 selected_account = main_account;
+
                 sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param, status){
                     if (status == 200) {
                         main_profile = JSON.parse(param);
@@ -199,26 +204,31 @@
                 var prof = {};
                 if (param.length > 0) {
                     prof = JSON.parse(param);
+                    selected_acc_role = get_acc_role(prof.User.Role);
                     //result mapping to visual elements
                     document.getElementById("login_name").innerHTML = prof.User.Login + " ";
+                    document.getElementById("acc_role").innerHTML = get_acc_role(prof.User.Role).rusname + " ";
                     document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
                     document.getElementById("live_status").innerHTML = prof.User.Status + " ";
-                    prof.isCorp = prof.User.Roles.includes("Corp");
-                    if (prof.isCorp) {
+                    document.getElementById("current_account_value").innerHTML = prof.User.Cash;
+
+                    if (selected_acc_role == ACC_ROLE.CORP) {
                         document.getElementById("current_index").innerHTML = prof.User.Index;
-                        document.getElementById("spent_index").innerHTML = prof.User.Index;
+                        document.getElementById("index_points").innerHTML = prof.User.InsurancePoints;
                         document.getElementById("index_label").style.display = "inline";
                         document.getElementById("insurances_supported").style.display = "block";
-
                     }
-                    document.getElementById("current_account_value").innerHTML = prof.User.Cash;
-                    document.getElementById("insurance").innerHTML = prof.User.Insurance;
-                    document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
-                    document.getElementById("insurance_points").innerHTML = prof.User.InsurancePoints;
-                    var history_html = "<tr><th>Id</th><th>Time</th><th>Description</th></tr>";
+
+                    if (selected_acc_role == ACC_ROLE.PERSON) {
+                        document.getElementById("insurance_label").style.display = "inline";
+                        document.getElementById("insurance").innerHTML = prof.User.Insurance;
+                        document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
+                    }
+
+                    var history_html = "<tr><th>Время</th><th>Событие</th></tr>";
                     for (i = 0; i < prof.History.length; i++) {
-                        history_html = history_html + "<tr><td>" + prof.History[i].Id + "</td>";
-                        history_html = history_html + "<td>" + customDateFormat(prof.History[i].Time) + "</td>";
+                        //history_html = history_html + "<td>" + prof.History[i].Id + "</td>";
+                        history_html = history_html + "<tr><td>" + customDateFormat(prof.History[i].Time) + "</td>";
                         history_html = history_html + "<td>" + prof.History[i].Description + "</td>";
                         history_html = history_html + "</tr>";
                     }

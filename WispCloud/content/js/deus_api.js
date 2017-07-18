@@ -4,6 +4,47 @@ var url = "https://alice.digital/econ";
 
 var cookieId = 'local_arm_id';
 
+var ROLE = {
+    NONE: { value: 0, name: "None", rusname: "Нет" },
+    READ: { value: 1, name: "Read", rusname: "Просмотр" },
+    WITHDRAW: { value: 2, name: "Withdraw", rusname: "Снятие" },
+    ADMIN: { value: 4, name: "Admin", rusname: "Админ" },
+    MASTER: { value: 8, name: "Master", rusname: "Ваш счет" }
+};
+
+var ACC_ROLE = {
+    NONE: { value: 0, name: "None", rusname: "Нет" },
+    PERSON: { value: 1, name: "Person", rusname: "Персона" },
+    MASTER: { value: 2, name: "Master", rusname: "Мастер" },
+    ADMIN: { value: 4, name: "Admin", rusname: "Админ" },
+    CORP: { value: 8, name: "Corp", rusname: "Корпорация" },
+    GOVT: { value: 16, name: "Govt", rusname: "Правительство" },
+    COMPANY: { value: 32, name: "Company", rusname: "Компания" }
+};
+
+function get_role(role) {
+    for (var i in ROLE) {
+        if (ROLE[i].name == role)
+            return ROLE[i];
+    }
+    return ROLE[0];
+}
+
+function get_acc_role(role) {
+    for (var i in ACC_ROLE) {
+        if (ACC_ROLE[i].name == role)
+            return ACC_ROLE[i];
+    }
+    return ACC_ROLE[0];
+}
+
+function format(source, params) {
+    $.each(params, function (i, n) {
+        source = source.replace(new RegExp("\\{" + i + "\\}", "g"), n);
+    })
+    return source;
+}
+
 function loginRedirect()
 {
 	document.cookie = cookieId + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
