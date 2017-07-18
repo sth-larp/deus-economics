@@ -55,7 +55,31 @@
 </div>';
 
         //corp admin page mok
-        var ca_page = '';
+        var ca_page = '<div id="corp_admin" style="width:100%; height:100%">\
+	<div id="add_ins_overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10; background: rgba(150, 150, 150, 0.5);">\
+		<div id="add_ins_form" style="vertical-align: middle; width: 350px; height: 100px; display: block; z-index: 11; background: rgba(255, 255, 255, 1); border-style: solid; margin: auto;">\
+			<table>\
+				<tr><td>Insurance name:</td><td id="ins_name">#CORP</td></tr>\
+				<tr><td>Username</td><td><input id="ins_form_user" type="text" value=""/></td></tr>\
+				<tr><td>Password</td><td><input id="ins_form_pass" type="password" value=""/></td></tr>\
+				<tr><td></td><td><input id="ins_form_ok" type="button" value="Accept"/>\
+				<input id="ins_form_no" type="button" value="Decline" onclick="document.getElementById(\'add_ins_overlay\').style.display=\'none\';document.getElementById(\'ins_form_pass\').value=\'\';document.getElementById(\'ins_form_user\').value=\'\';"/></td></tr>\
+			</table>\
+		</div>\
+	</div>\
+	<div>\
+		<div>Список застрахованных</div>\
+		<div id="insurance_users_list">\
+		</div>\
+	</div>\
+	<div id="add_ins_user_button"><input type="button" value="Add insurance" onclick="document.getElementById(\'add_ins_overlay\').style.display=\'block\';"/></div>\
+	<hr/>\
+	<div>\
+		<div>Список зарплат компании</div>\
+		<div id="payments_list">\
+		</div>	\
+	</div>\
+</div>';
 
         //transactions page mok
         var t_page = '<div id="transactions" style="width:100%; height:100%">\
@@ -316,8 +340,42 @@
             }
 
             function load_corp_admin() {
+                //insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
+                //mok html for localtesting, replace^ before deploy
+                document.getElementById("content_wrapper").innerHTML = ca_page;
+				//insurances
+                sendAPIRequest(url + "/api/insurance/loyalties?login=" + selected_account, "GET", function(param, status) {
+                    if (status == 200) 
+					{
+						var loyalties_list = [];
+						var head_str = "<tr><th>Id</th><th>Страховка</th><th>Уровень</th><th>Держатель</th></tr>";
+						var page_str = "";
+						var l_str = [];												
+						loyalties_list = JSON.parse(param);						
+						page_str = buildTabs(loyalties_list, lines_on_tab, "loyalties_table", head_str);
+						document.getElementById("insurance_users_list").innerHTML = page_str;
+						document.getElementById("loyalties_table_0").style.display = "block";
+						initTabsControl("loyalties_table");
+					}
+                    else alert(param + "\n\nStatus " + status);
+                });
+				//payments
+                sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function(param, status) {
+                    if (status == 200) 
+					{
+						var payments_list = [];
+						var head_str = "<tr><th>Id</th><th>Employer</th><th>EmployerName</th><th>Receiver</th><th>LastPaid</th><th>Period</th><th>Debt</th><th>Amount</th><th>Flags</th></tr>";
+						var page_str = "";
+						var l_str = [];												
+						loyalties_list = JSON.parse(param);						
+						page_str = buildTabs(payments_list, lines_on_tab, "payments_table", head_str);
+						document.getElementById("payments_list").innerHTML = page_str;
+						document.getElementById("payments_table_0").style.display = "block";
+						initTabsControl("payments_table");
+					}
+                    else alert(param + "\n\nStatus " + status);
+                });				
             }
-
             function createHandler(obj, handler) {
                 return function() { handler(obj); }
             }
