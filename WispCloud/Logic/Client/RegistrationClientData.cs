@@ -1,4 +1,6 @@
-﻿using DeusCloud.Exceptions;
+﻿using System.Data.Entity;
+using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Exceptions;
 using DeusCloud.Logic.CommonBase;
 
 namespace DeusCloud.Logic.Client
@@ -8,24 +10,29 @@ namespace DeusCloud.Logic.Client
         public string Login { get; set; }
         public string Password { get; set; }
         public string Fullname { get; set; }
+        public string Email { get; set; }
+        public string Workplace { get; set; }
+        public int? SalaryLevel { get; set; }
 
+        public InsuranceType? Insurance;
+        public int? InsuranceLevel { get; set; }
+
+        public AccountRole? Role { get; set; }
+
+        public int? Cash;
         //public UserSettings Settings { get; set; }
 
         public override void Validate()
         {
-            Try.NotEmpty(Login, "Login is empty;");
-            Try.NotEmpty(Password, "Password is empty;");
+            Try.NotEmpty(Login, "Пустое поле Login");
+            Try.NotEmpty(Password, "Пустое поле Password");
+            Try.Condition(Cash == null || Cash >= 0, "Поле Cash должно быть неотрицательным");
+            Try.Condition(SalaryLevel == null || SalaryLevel >= 0, "Поле SalaryLevel должно быть неотрицательным");
+            Try.Condition(SalaryLevel == null || SalaryLevel <= 3, "Поле SalaryLevel должно быть в диапазоне 0 -3");
 
-            //check email by .net classes instead of huge regexp,
-            //this can pass some strange emails, but it simple to use
-            //try
-            //{
-            //    var addr = new MailAddress(Login);
-            //}
-            //catch
-            //{
-            //    throw new DeusException("Incorrect email.");
-            //}
+            Try.Condition(InsuranceLevel == null || InsuranceLevel >= 0, "Поле InsuranceLevel должно быть неотрицательным");
+            Try.Condition(InsuranceLevel == null || InsuranceLevel <= 3, "Поле InsuranceLevel должно быть в диапазоне 1 -3");
+
         }
     }
 

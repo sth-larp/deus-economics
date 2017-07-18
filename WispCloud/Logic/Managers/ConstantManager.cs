@@ -31,22 +31,24 @@ namespace DeusCloud.Logic.Managers
             }
         }
 
-        public float GetDiscountValue(Account sender, Account receiver)
-        {
-            var level = _insuranceManager.CheckLoyaltyLevel(sender, receiver);
-            return GetDiscount(level);
-        }
-
         public List<Constant> GetConstants()
         {
             return Constants.Values.ToList();
         }
 
-        private float GetDiscount(int level)
+        public float GetDiscount(int level)
         {
             if (level == 1) return 0.25f;
             if (level == 2) return 0.5f;
             if (level == 3) return 0.75f;
+            return 0;
+        }
+
+        public float GetSalary(int level)
+        {
+            if (level == 1) return 10;
+            if (level == 2) return 50;
+            if (level == 3) return 200;
             return 0;
         }
 

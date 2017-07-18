@@ -235,6 +235,9 @@
     <EmbeddedResource Include="Migrations\201707141436293_New-unsirance-steal.resx">
       <DependentUpon>201707141436293_New-unsirance-steal.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707181153134_Emails.resx">
+      <DependentUpon>201707181153134_Emails.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\CommonPrefixProvider .cs" />
@@ -361,6 +364,10 @@
     <Compile Include="Migrations\201707141436293_New-unsirance-steal.cs" />
     <Compile Include="Migrations\201707141436293_New-unsirance-steal.Designer.cs">
       <DependentUpon>201707141436293_New-unsirance-steal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201707181153134_Emails.cs" />
+    <Compile Include="Migrations\201707181153134_Emails.Designer.cs">
+      <DependentUpon>201707181153134_Emails.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />
