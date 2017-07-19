@@ -1,57 +1,162 @@
 ﻿body {
+    background: #111;
+    color: #ddd;
 }
 
-.slave_button {
-  display: flex;
-  overflow: hidden;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    padding-left: 10px;
+    font-size: 14px;
+        margin: auto;
+    width: auto;
+}
 
-  margin: 0px;
-  padding: 0px;
+h2 {
+    font-size: 20px;
+    text-align: center;
+}
 
-  cursor: pointer;
-  user-select: none;
-  transition: all 60ms ease-in-out;
-  text-align: center;
-  white-space: nowrap;
-  text-decoration: none !important;
-  text-transform: none;
-  text-transform: capitalize;
-
-  color: #ffffe0;
-  background: #b0c4de;
-  border: 0 none;
-  border-radius: 0px;
-
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.3;
-
-  -webkit-appearance: none;
-  -moz-appearance:    none;
-  appearance:         none;
- 
-  justify-content: center;
-  align-items: center;
-  flex: 0 0 160px;
-
-  &:hover {
-    transition: all 60ms ease;
-
-    opacity: .85;
-  }
-  
-  &:active {
-    transition: all 60ms ease;
-    opacity: .75;
-  }
-  
-  &:focus {
-    outline: 1px dotted #959595;
-    outline-offset: -4px;
-  }
+th {
+    background-color: goldenrod;
+    color: #111;
+    font-weight: bold;
 }
 
 
-.selected_slave {
-    background: #00ced1;
+tr {
+    background-color: #333
+}
+
+tr:nth-child(even) {background-color: #222}
+
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+
+.top-menu {
+    height: 8%; 
+    width: 100%;
+    border-width: 1px;
+    border-bottom: thin solid #555;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.top-menu-elem {
+    width: 15%; 
+    height: 80%; 
+    float: left;
+    line-height: 35px; /* provides vert-align */
+    vertical-align: middle;
+}
+
+.logout {
+    float: right;
+    width: auto;
+    margin-right: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+.greetings {
+    width: 20%; 
+    margin-left: 20px;
+    text-align: left;
+}
+
+.left-menu {
+    height: 100vh;  
+    width: 20%;
+    float: left;
+    border-width: 1px;
+    border-right: thin solid #555;
+}
+
+.selected-menu {
+    background: #222;
+    color: #fedc3d;
+    cursor:pointer;
+}
+
+
+.user-info {
+    margin: auto;
+    width: auto;
+}
+
+.content {
+    width: 79%; 
+    height: 90%; 
+    float: right; 
+    #overflow: auto;
+}
+
+tr:hover {background-color: #555
+}
+
+.slave-menu-head {
+    line-height: 35px; /* provides vert-align */
+    vertical-align: middle;
+    padding-left: 20px;
+}
+
+.slave-menu-elem {
+    line-height: 30px; /* provides vert-align */
+    vertical-align: middle;
+    border-width: 1px;
+    #background: #222;
+    border-radius: 8px;
+    border: thin solid #555;
+    padding-left: 15px;
+    margin-right: 40px;
+    margin-top: 5px;
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+.slave-menu-elem:hover {
+    background: #555;
+    cursor:pointer;
+}
+
+
+.selected-slave {
+    background: #555;
+}
+
+.table-nav {
+    font-size: 12px;
+    text-align: center;
+}
+
+.custom-button {
+    display: block;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    float: none;
+    z-index: auto;
+    width: 120px;
+    height: 30px;
+    background: gold;
+    color: #fff;
+    margin: 0 auto;
+    padding: 0;
+    overflow: visible;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    text-overflow: clip;
+}
+
+.custom-button:hover {
+    background: goldenrod;
+    cursor:pointer;
+}
+
+.warning-text {
+    font-size: 14px;
+    color: crimson;
 }

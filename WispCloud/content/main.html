@@ -1,7 +1,7 @@
 ﻿<html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>DeusEx Economical Trash</title>
+    <title>DeusEx Economics</title>
 
     <link rel="stylesheet" href="./css/styles.css">
     <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
@@ -20,31 +20,26 @@
         //mok pages for local testing
 
         //profile page mok
-        var p_page = '<div id="profile_page" style="width:100%; height:100%"> \
-	<div><span> Логин: </span><span id="login_name"></span></div>\
-    <div><span> Тип: </span><span id="acc_role"></span></div>\
-	<div><span> Полное имя: </span><span id="full_name"></span></div>\
-	<div><span> Статус: </span><span id="live_status"></span></div>\
-    <div><span> Кредиты: </span><span id="current_account_value"></span></div>\
-	<span id="index_label" style="display: none;">\
-	    <div><span> Индекс: </span><span id="current_index"></span>\
-		<span> Очки страховки: </span><span id="index_points"></span></div>\
-	</span>\
-	<span id="insurance_label" style="display: none;">\
-	    <div><span> Страховка: </span>\
-        <span id="insurance"></span> \
-        (<span id="insurance_level"></span>)\
-        </div>\
-    </span>\
-	<div>\
+            var p_page = '<div id="profile_page" style="width:100%; height:100%"> <h2>Профиль</h2>\
+	<table class="user-info">\
+    <tr><td>Логин:</td><td id="login_name"></td></tr>\
+    <tr><td>Полное имя:</td><td id="full_name"></td></tr>\
+    <tr><td>Тип:</td><td id="acc_role"></td></tr>\
+    <tr><td>Статус:</td><td id="live_status"></td></tr>\
+    <tr><td>Кредиты:</td><td id="current_account_value"></td></tr>\
+    <tr id="index_label" style="display:none;"><td>Индекс:</td><td id="current_index"></td></tr>\
+    <tr id="index_p_label" style="display:none;"><td>Очки страховки:</td><td id="index_points"></td></tr>\
+    <tr id="insurance_label" style="display:none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>\
+    </table>\
+	<div><h2>Ваши доступы</h2>\
 		<table id="slave_list">\
 		</table>\
 	</div>\
-	<div>\
+	<div><h2>Доверенные лица</h2>\
 		<table id="masters_list">\
 		</table>	\
 	</div>\
-	<div>\
+	<div><h2>События</h2>\
 		<table id="history">\
 		</table>\
 	</div>\
@@ -57,7 +52,7 @@
         //corp admin page mok
         var ca_page = '<div id="corp_admin" style="width:100%; height:100%">\
 	<div id="add_ins_overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10; background: rgba(150, 150, 150, 0.5);">\
-		<div id="add_ins_form" style="vertical-align: middle; width: 350px; height: 100px; display: block; z-index: 11; background: rgba(255, 255, 255, 1); border-style: solid; margin: auto;">\
+		<div id="add_ins_form" style="vertical-align: middle; width: 350px; height: 100px; display: block; z-index: 11; background: rgba(255, 255, 255, 1); margin: auto;">\
 			<table>\
 				<tr><td>Insurance name:</td><td id="ins_name">#CORP</td></tr>\
 				<tr><td>Username</td><td><input id="ins_form_user" type="text" value=""/></td></tr>\
@@ -68,14 +63,14 @@
 		</div>\
 	</div>\
 	<div>\
-		<div>Список застрахованных</div>\
+		<div><h2>Страховки</h2></div>\
 		<div id="insurance_users_list">\
 		</div>\
 	</div>\
 	<div id="add_ins_user_button"><input type="button" value="Add insurance" onclick="document.getElementById(\'add_ins_overlay\').style.display=\'block\';"/></div>\
 	<hr/>\
 	<div>\
-		<div>Список зарплат компании</div>\
+		<div><h2>Сотрудники</h2></div>\
 		<div id="payments_list">\
 		</div>	\
 	</div>\
@@ -98,7 +93,8 @@
 		</form>\
 	</div>\
 	<div>\
-		<div><span>История операций</span><br/><span>Количество строк на странице</span>\
+		<div><h2>История операций</h2>\
+            <span>Количество строк на странице</span>\
 			<select id="lines_on_tab">\
 				<option value="5">5</option>\
 				<option value="10">10</option>\
@@ -172,7 +168,7 @@
                 page_links = page_links + "<span id='"  + page_id_prefix + "_page_" + offs + "'>| " + (offs + 1) + "</span>";
             }
             //change_page_buttons
-            result = result + "<div><span id='" + page_id_prefix + "_bookmark' style='display:none'>0</span>";
+            result = result + "<div class=\"table-nav\"><span id='" + page_id_prefix + "_bookmark' style='display:none'>0</span>";
             result = result + "<span id='" + page_id_prefix + "_maxpage' style='display:none'>" + offs + "</span>"
             result = result + "<span id='" + page_id_prefix + "_back'><< Назад </span>" + page_links + "<span id='" + page_id_prefix + "_fw'> | Вперед >></span></div>";
             return result;
@@ -239,12 +235,15 @@
                     if (selected_acc_role == ACC_ROLE.CORP) {
                         document.getElementById("current_index").innerHTML = prof.User.Index;
                         document.getElementById("index_points").innerHTML = prof.User.InsurancePoints;
-                        document.getElementById("index_label").style.display = "inline";
+                        document.getElementById("index_label").style.display = "table-row";
+                        document.getElementById("index_p_label").style.display = "table-row";
+                        //document.getElementById("insurance_label").style.display = "none";
                         document.getElementById("insurances_supported").style.display = "block";
                     }
 
                     if (selected_acc_role == ACC_ROLE.PERSON) {
-                        document.getElementById("insurance_label").style.display = "inline";
+                        document.getElementById("insurance_label").style.display = "table-row";
+                        //document.getElementById("index_label").style.display = "none";
                         document.getElementById("insurance").innerHTML = prof.User.Insurance;
                         document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
                     }
@@ -391,14 +390,11 @@
             }
 
             function onButton(obj) {
-                obj.style.backgroundColor = '#000099';
-                obj.style.color = '#FFFFFF';
-                obj.style.cursor = 'pointer';
+                obj.classList.add('selected-menu');
             }
 
             function outButton(obj) {
-                obj.style.backgroundColor = '#FFFFFF';
-                obj.style.color = '#000000';
+                obj.classList.remove('selected-menu');
             }
 
             function initUI() {
@@ -419,36 +415,20 @@
     </script>
 </head>
 <body onload="initUI();">
-    <div id="wrapper" style="height: 100%; width: 100%">
-        <div id="top_menu" style="height: 8%; width: 100%; border-style:solid;">
-            <div id="current_account" style="border-style: solid; width: 20%; height: 80%; float: left; vertical-align: middle;">ACCOUNT NAME</div>
-            <div style="border-style: solid; width: 10%; height: 80%; float: left;">
-                <div id="profile_menu" style="height: 100%; width: 100%; text-align: center; vertical-align: middle;">Профиль</div>
-            </div>
-            <div style="border-style: solid; width: 10%; height: 80%; float: left;">
-                <div id="corp_menu" style=" height: 100%; width: 100%; text-align: center; vertical-align: middle;">Управление</div>
-            </div>
-            <div style="border-style: solid; width: 10%; height: 80%; float: left;">
-                <div id="transactions_menu" style="height: 100%; width: 100%; text-align: center; vertical-align: middle;">Транзакции</div>
-            </div>
-            <div style="border-style: solid; width: 10%; height: 80%; float: right; vertical-align: middle;">
-                <div id="logout_menu" style="height: 100%; width: 100%; text-align: center; vertical-align: middle;">LOGOUT</div>
+        <div id="top_menu" class="top-menu">
+            <div id="current_account" class="top-menu-elem greetings"></div>
+            <div id="profile_menu" class="top-menu-elem">Профиль</div>
+            <div id="corp_menu" class="top-menu-elem">Управление</div>
+            <div id="transactions_menu" class="top-menu-elem">Транзакции</div>
+            <div id="logout_menu" class="top-menu-elem logout">Выйти</div>
+        </div>
+        <div id="left_menu" class="left-menu">
+            <div id="slave_list" class="slave-list">
+                <div class="slave-menu-head">Ваши счета</div>
             </div>
         </div>
-        <div id="left_menu" style="height: 90%; width: 20%; border-style:solid; float: left;">
-            <div id="slave_list" style="height: 45%; border-style: solid;">
-                Ваши счета
-                <table id="slave_table" class="slave_table">
-                </table>
-            </div>
-            <br/>
-            <div id="master_list" style="height: 45%; border-style: solid;">
-                Profile
-            </div>
-        </div>
-        <div id="content_wrapper" style="border-style: solid; width: 79%; height: 90%; float: right; overflow: auto;"></div>
+        <div id="content_wrapper" class="content"></div>
         <script>
         </script>
-    </div>
 </body>
 </html>

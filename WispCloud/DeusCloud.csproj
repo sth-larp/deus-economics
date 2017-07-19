@@ -288,6 +288,7 @@
     <Compile Include="Logic\Client\SetInsuranceClientData.cs" />
     <Compile Include="Logic\Client\StealInsuranceClientData.cs" />
     <Compile Include="Logic\Client\SwitchCycleClientData.cs" />
+    <Compile Include="Logic\Client\ImplantClientData.cs" />
     <Compile Include="Logic\Client\TransferClientData.cs" />
     <Compile Include="Logic\Server\FullAccountServerData.cs" />
     <Compile Include="Logic\Server\InsuranceHolderServerData.cs" />

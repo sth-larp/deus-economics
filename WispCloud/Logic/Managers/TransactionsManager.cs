@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Identity;
@@ -35,18 +36,17 @@ namespace DeusCloud.Logic.Managers
 
             var senderAcc = _userManager.FindById(data.Sender);
             Try.NotNull(senderAcc, $"Не найден пользователь {data.Sender}.");
-            Try.Condition(data.Amount > 0, $"Неверная сумма перевода");
 
             _rightsManager.CheckForAccessOverSlave(senderAcc, AccountAccessRoles.Withdraw);
             data.Description = data.Description ?? "";
 
             var trList = new List<Transaction>();
                 
-            if ((receiverAcc.Role & AccountRole.Person) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
+            if (receiverAcc.Role == AccountRole.Person && senderAcc.Role == AccountRole.Person)
                 trList = C2CTransfer(senderAcc, receiverAcc, data);
-            else if((receiverAcc.Role & AccountRole.Company) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
+            else if(receiverAcc.Role == AccountRole.Company && senderAcc.Role == AccountRole.Person)
                 trList = C2BTransfer(senderAcc, receiverAcc, data);
-            else if ((receiverAcc.Role & AccountRole.Corp) > 0 && (senderAcc.Role & AccountRole.Person) > 0)
+            else if (receiverAcc.Role == AccountRole.Corp && senderAcc.Role == AccountRole.Person)
                 trList = C2BTransfer(senderAcc, receiverAcc, data);
             else
                 trList = B2BTransfer(senderAcc, receiverAcc, data);
@@ -54,21 +54,56 @@ namespace DeusCloud.Logic.Managers
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
                 UserContext.Data.BeginFastSave();
-
-                trList.ForEach(x =>
-                {
-                    x.SenderAccount.Cash -= data.Amount;
-                    x.ReceiverAccount.Cash += data.Amount;
-
-                    UserContext.Accounts.Update(x.SenderAccount);
-                    UserContext.Accounts.Update(x.ReceiverAccount);
-
-                    UserContext.Data.Transactions.Add(x);
-                    UserContext.Data.SaveChanges();
-                });
-
+                trList.ForEach(TransactiontoDb);
                 dbTransact.Commit();
             }
+        }
+
+        private void TransactiontoDb(Transaction t)
+        {
+            t.SenderAccount.Cash -= t.Amount;
+            t.ReceiverAccount.Cash += t.Amount;
+
+            UserContext.Accounts.Update(t.SenderAccount);
+            UserContext.Accounts.Update(t.ReceiverAccount);
+
+            UserContext.Data.Transactions.Add(t);
+            UserContext.Data.SaveChanges();
+        }
+
+        public void Implant(ImplantClientData data)
+        {
+            var receiverAcc = UserContext.Accounts.Get(data.Receiver, data.ReceiverPass);
+            Try.NotNull(receiverAcc, $"Неверное имя или пароль {data.Receiver}.");
+
+            var sellerAcc = _userManager.FindById(data.Seller);
+            Try.NotNull(sellerAcc, $"Не найден пользователь {data.Seller}.");
+
+            _rightsManager.CheckForAccessOverSlave(sellerAcc, AccountAccessRoles.Withdraw);
+            data.Description = data.Description ?? "";
+
+            Try.Condition(sellerAcc.Role == AccountRole.Corp, $"Продавать импланты может только корпорация");
+            Try.Condition(receiverAcc.Role == AccountRole.Person, $"Получать импланты может только персона");
+            Try.Condition(sellerAcc.Index >= data.Index, $"Недостаточно индекса");
+            
+            var tranData = new TransferClientData(sellerAcc.Login, receiverAcc.Login, data.Price);
+            tranData.Description = data.Description;
+
+            var trList = C2BTransfer(receiverAcc, sellerAcc, tranData);
+
+            using (var dbTransact = UserContext.Data.Database.BeginTransaction())
+            {
+                UserContext.Data.BeginFastSave();
+                trList.ForEach(TransactiontoDb);
+                sellerAcc.Index -= data.Index;
+                dbTransact.Commit();
+            }
+
+            UserContext.AddGameEvent(sellerAcc.Login, GameEventType.Index, 
+                $"Установлен имплант за {data.Index} индекса пользователю {receiverAcc.Login}", true);
+
+            UserContext.AddGameEvent(receiverAcc.Login, GameEventType.Index,
+                $"Получен имплант от {sellerAcc.Fullname}", true);
         }
 
         public float GetTax(string sender, string receiver)

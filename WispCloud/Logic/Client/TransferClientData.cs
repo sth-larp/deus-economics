@@ -25,7 +25,7 @@ namespace DeusCloud.Logic.Client
         {
             Try.NotEmpty(Sender, $"Поле {nameof(Sender)} не должно быть пустым");
             Try.NotEmpty(Receiver, $"Поле {nameof(Receiver)} не должно быть пустым");
-            Try.Condition(Amount > 0, $"Сумма транзакции должна быть положительной");
+            Try.Condition(Amount >= 1, $"Сумма транзакции должна быть не менее 1 кр");
         }
     }
 }

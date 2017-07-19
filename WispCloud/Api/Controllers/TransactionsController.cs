@@ -13,7 +13,7 @@ namespace DeusCloud.Api.Controllers
     [BasicAuth]
     public sealed class TransactionsController : ApiController
     {
-        /// <summary>Transfer money between accounts</summary>
+        /// <summary>Перевести кредиты между счетами</summary>
         /// <param name="data">Transaction data</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
@@ -24,6 +24,20 @@ namespace DeusCloud.Api.Controllers
         public IHttpActionResult Transfer(TransferClientData data)
         {
             UserContext.Transactions.Transfer(data);
+            return Ok();
+        }
+
+        /// <summary>Купить имплант со списанием индекса</summary>
+        /// <param name="data">Transaction data</param>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Internal Server Error</response>
+        [HttpPost]
+        [Route("implant")]
+        public IHttpActionResult TransferImplant(ImplantClientData data)
+        {
+            UserContext.Transactions.Implant(data);
             return Ok();
         }
 

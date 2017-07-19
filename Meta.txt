@@ -1,0 +1,558 @@
+
+{
+                    "ProjectFieldVariantId": 2053,
+                    "Label": "Страховка США, штат Золотые Ворота / Sunlight",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2055,
+                    "Label": "Страховка Serenity / Kintsugi Group",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2056,
+                    "Label": "Страховка Johnson & Johnson",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2057,
+                    "Label": "Страховка Pan American Sunrise Technology Corp.",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2058,
+                    "Label": "Страховка Особая",
+                    "IsActive": true,
+                    "Description": ""
+                }
+            ]
+        },
+        {
+            "FieldName": "Место работы",
+            "ProjectFieldId": 2017,
+            "IsActive": true,
+            "FieldType": "Dropdown",
+            "ValueList": [
+                {
+                    "ProjectFieldVariantId": 2247,
+                    "Label": "«Американская кофейня»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2248,
+                    "Label": "«Клуб-Хель»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2249,
+                    "Label": "«Танго-Бар»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2250,
+                    "Label": "CBS 13 (California Broadcast System 13)",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2251,
+                    "Label": "Автокефальная Ортодоксальная Церковь Алеутского Сейчас",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2252,
+                    "Label": "Агентство «Ищем пропавшие вещи»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2465,
+                    "Label": "Агентство \"Лучше звоните Солу\"",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2253,
+					"Label": "Агентство Lightbringer",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2254,
+                    "Label": "Агентство знакомств The F.I.M.S - Family Individual Modern Solutions",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2255,
+                    "Label": "Администрация франшизы Johnson & Johnson",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2256,
+                    "Label": "Администрация франшизы Serenity",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2257,
+                    "Label": "Арена Death Metal",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2258,
+                    "Label": "Арена в ВР (пока без названия)",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2259,
+                    "Label": "Бар «Сумерки Человечества»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2260,
+                    "Label": "Благотворительный медицинский кабинет",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2261,
+                    "Label": "Благотворительный фонд «Перерождение»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2262,
+                    "Label": "Бордель «Багровые облака»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2263,
+                    "Label": "Вейп-бар Сloud connected",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2264,
+                    "Label": "Гаражный кооператив",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2265,
+                    "Label": "Департамент Полиции Сан-Франциско",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2266,
+                    "Label": "Детективное агентство Джека Валентайна",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2267,
+                    "Label": "Детективное Агентство Токанавы",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2268,
+                    "Label": "Инженерный комитет",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2269,
+                    "Label": "Кабак «Масонская Ложка»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2270,
+                    "Label": "Капсульная гостиница",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2271,
+					"Label": "Кафе «Маяк»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2272,
+                    "Label": "Клуб Elysium",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2273,
+                    "Label": "Колумбарий",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2274,
+                    "Label": "комитет общественного спасения",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2275,
+                    "Label": "комитет общественной безопасности",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2276,
+                    "Label": "комитет общественной солидарности",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2277,
+                    "Label": "Компания Arasaka Inc",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2278,
+                    "Label": "Компания DEX Company",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2279,
+                    "Label": "Компания JoyCorp",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2280,
+                    "Label": "Компания Kintsugi Corp",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2281,
+                    "Label": "Компания Opensource",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2282,
+                    "Label": "Компания Sunlight",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2283,
+                    "Label": "Компьютерный клуб «Выход»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2284,
+                    "Label": "Конфуцианский суд Serenity",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2285,
+                    "Label": "Корпорация Johnson & Johnson",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2286,
+                    "Label": "Корпорация Kintsugi Group",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2287,
+                    "Label": "Корпорация Pan American Sunrise Technology Corp.",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2288,
+                    "Label": "Лаборатория биоинженерии «ЛайфСкан»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2289,
+                    "Label": "Лаборатория доктора Кархала",
+                    "IsActive": true,
+					"Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2290,
+                    "Label": "Лаборатория Космохирургии",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2291,
+                    "Label": "Лапшичная «Бесконечность»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2292,
+                    "Label": "Лапшичная Spanglish",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2293,
+                    "Label": "Мемориальный госпиталь Святого Франциска",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2294,
+                    "Label": "Мотель «Кутузка»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2295,
+                    "Label": "Общество «Активисты Нижнего города»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2296,
+                    "Label": "Открытый клуб Сo-Dinasty",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2297,
+                    "Label": "Порно-студия (пока без названия, у гаражников)",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2298,
+                    "Label": "Представительство 13-й Региональной Корпорации Aleut Corp/Ghost Corporation",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2299,
+                    "Label": "Представительство государства-корпорации «Израиль»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2300,
+                    "Label": "Продюсерский центр сестер Smith",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2301,
+                    "Label": "Рюмочная «Третий Лишний»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2302,
+                    "Label": "Салон «42»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2303,
+                    "Label": "Салон BrainStorm",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2304,
+                    "Label": "Салон CrystalSkin",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2305,
+                    "Label": "Салон dExtazy",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2306,
+                    "Label": "Сервисный центр",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2307,
+                    "Label": "Спа-салон SPA-city",
+                    "IsActive": true,
+                    "Description": ""
+				},
+                {
+                    "ProjectFieldVariantId": 2308,
+                    "Label": "Тату салон N.E.E.D.L.E.",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2309,
+                    "Label": "Тату-салон «Black Ice»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2310,
+                    "Label": "Фармацевтическая лаборатория «Янссен фармасъютика»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2311,
+                    "Label": "Федеральный Кибер-Экспресс",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2312,
+                    "Label": "Хранилище чувств",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2313,
+                    "Label": "Церковь в Johnson & Johnson (названия пока нет)",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2314,
+                    "Label": "Церковь Святой Регины",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2315,
+                    "Label": "Цирк роботов дядюшки Джованни",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2316,
+                    "Label": "Чайная в Serenity (названия пока нет)",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2317,
+                    "Label": "Экспериментальный колледж Онидзуки Оказаки",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2318,
+                    "Label": "Юридический комитет",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2322,
+                    "Label": "франшиза Jonson & Jonson",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2319,
+                    "Label": "«Джон Смитт»",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2320,
+                    "Label": "Лаборатория нейродизайна личности  ",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2321,
+                    "Label": "GenTech",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2323,
+                    "Label": "Морг",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2327,
+                    "Label": "Симбипет",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2471,
+                    "Label": "правительство штата Золотые Ворота / совет директоров корпорации SunLight",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+					"ProjectFieldVariantId": 2472,
+                    "Label": "Фонд Джон Смитт",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2473,
+                    "Label": "Фонд Маккензи",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2474,
+                    "Label": "Фонд Кранион",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2475,
+                    "Label": "Фонд Гуров",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2476,
+                    "Label": "Фонд Джонсон",
+                    "IsActive": true,
+                    "Description": ""
+                },
+                {
+                    "ProjectFieldVariantId": 2477,
+                    "Label": "Фонд Co-Dinasty (не путать с Открытым клубом)",
+                    "IsActive": true,
+                    "Description": ""
+                }
+            ]
+        },
+       
