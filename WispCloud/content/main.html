@@ -342,19 +342,23 @@
                 //insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
                 //mok html for localtesting, replace^ before deploy
                 document.getElementById("content_wrapper").innerHTML = ca_page;
-				//insurances
-                sendAPIRequest(url + "/api/insurance/loyalties?login=" + selected_account, "GET", function(param, status) {
+				//insurances (???)
+                sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function(param, status) {
                     if (status == 200) 
 					{
-                        var loyalties_list = JSON.parse(param);	
-						var head_str = "<tr><th>Id</th><th>Страховка</th><th>Уровень</th><th>Держатель</th></tr>";
-						var l_str = [];	
+                        var loyalties_list = JSON.parse(param);
+						var l_str = [];						
+						for (i = 0; i < loyalties_list.length; i++) {
+							l_str[i] = "<tr><td>" + loyalties_list[i].Insurance + "</td><td>" + loyalties_list[i].UserLogin 
+							+ "</td><td>" + loyalties_list[i].UserFullname + "</td><td>" + loyalties_list[i].InsuranceLevel 
+							+ "</td></tr>";
+						}						
+						var head_str = "<tr><th>Страховка</th><th>Логин</th><th>Имя пользователя</th><th>Уровень</th></tr>";
                         
-						var page_str = buildTabs(loyalties_list, lines_on_tab, "loyalties_table", head_str);
+						var page_str = buildTabs(l_str, lines_on_tab, "loyalties_table", head_str);
 						document.getElementById("insurance_users_list").innerHTML = page_str;
 						var t = document.getElementById("loyalties_table_0");
 						if(t != null) t.style.display = "block";
-
 						initTabsControl("loyalties_table");
 					}
                     else alert(param + "\n\nStatus " + status);
