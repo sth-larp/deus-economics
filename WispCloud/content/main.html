@@ -4,6 +4,8 @@
     <title>DeusEx Economics</title>
 
     <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/top-menu.css">
+    <link rel="stylesheet" href="./css/left-menu.css">
     <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="js/deus_api.js"></script>
     <script type="text/javascript" src="js/slave_box.js"></script>
@@ -258,7 +260,7 @@
             function load_full_profile() {
                 //insertDocumentToWrapper("content_wrapper", url + "/profile_page.html","GET");
                 //mok html for localtesting, replace^ before deploy
-                document.getElementById("content_wrapper").innerHTML = p_page;
+                document.getElementById("content-body").innerHTML = p_page;
 
                 sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
                     if (status == 200) fill_full_profile(param);
@@ -303,7 +305,7 @@
 
                 //insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
                 //mok html for localtesting, replace^ before deploy
-                document.getElementById("content_wrapper").innerHTML = t_page;
+                document.getElementById("content-body").innerHTML = t_page;
                 document.getElementById("trans_menu_holder").style.visibility =
                         selected_role.value >= ROLE.WITHDRAW.value ? 'visible' : 'hidden';
 
@@ -364,7 +366,7 @@
             function load_corp_admin() {
                 //insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
                 //mok html for localtesting, replace^ before deploy
-                document.getElementById("content_wrapper").innerHTML = ca_page;
+                document.getElementById("content-body").innerHTML = ca_page;
 				//insurances (???)
                 sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function(param, status) {
                     if (status == 200) 
@@ -416,12 +418,9 @@
                 return function() { handler(obj); }
             }
 
-            function onButton(obj) {
-                obj.classList.add('selected-menu');
-            }
-
-            function outButton(obj) {
-                obj.classList.remove('selected-menu');
+            function topMenuSwitch(e) {
+                $('.top-menu-elem').removeClass('top-menu-selected');
+                e.classList.add('top-menu-selected');
             }
 
             function initUI() {
@@ -429,33 +428,43 @@
                 //init all general UI elements on page, set event handlers
                 //init of subpage UI elements should be done in load functions
                 var buttons = ['profile_menu', 'corp_menu', 'transactions_menu', 'logout_menu'];
-                for (i = 0; i < buttons.length; i++) {
-                    document.getElementById(buttons[i]).onmouseover = createHandler(document.getElementById(buttons[i]), onButton);
-                    document.getElementById(buttons[i]).onmouseout = createHandler(document.getElementById(buttons[i]), outButton);
-                }
+                
                 //init onclick actions
-                document.getElementById("profile_menu").onclick = function() { load_full_profile();};
-                document.getElementById("corp_menu").onclick = function() { load_corp_admin();};
-                document.getElementById("transactions_menu").onclick = function() { load_transactions();};
+                var btnProfile = document.getElementById("profile_menu");
+                btnProfile.onclick = function() {
+                    topMenuSwitch(btnProfile); 
+                    load_full_profile();
+                };
+
+                var btnTrans = document.getElementById("transactions_menu");
+                btnTrans.onclick = function() {
+                    topMenuSwitch(btnTrans); 
+                    load_transactions();
+                };
+
+                var btnCorp = document.getElementById("corp_menu");
+                btnCorp.onclick = function() {
+                    topMenuSwitch(btnCorp); 
+                    load_corp_admin();
+                };
                 document.getElementById("logout_menu").onclick = function() { loginRedirect();};
             }
     </script>
 </head>
 <body onload="initUI();">
-        <div id="top_menu" class="top-menu">
-            <div id="current_account" class="top-menu-elem greetings"></div>
-            <div id="profile_menu" class="top-menu-elem">Профиль</div>
-            <div id="corp_menu" class="top-menu-elem">Управление</div>
-            <div id="transactions_menu" class="top-menu-elem">Транзакции</div>
-            <div id="logout_menu" class="top-menu-elem logout">Выйти</div>
-        </div>
+    <div id="top_menu" class="top-menu">
+        <div id="current_account" class="top-menu-elem greetings">Привет,</div>
+        <div id="profile_menu" class="top-menu-elem top-menu-selected">Профиль</div>
+        <div id="corp_menu" class="top-menu-elem">Управление</div>
+        <div id="transactions_menu" class="top-menu-elem">Транзакции</div>
+        <div id="logout_menu" class="top-menu-elem logout">Выйти</div>
+    </div>
         <div id="left_menu" class="left-menu">
             <div id="slave_list" class="slave-list">
                 <div class="slave-menu-head">Ваши счета</div>
             </div>
         </div>
-        <div id="content_wrapper" class="content"></div>
-        <script>
-        </script>
+
+    <div id="content-wrapper"><div id="content-body"></div></div>
 </body>
 </html>
