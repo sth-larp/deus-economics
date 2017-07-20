@@ -16,11 +16,6 @@
     border-right: thin solid #444;
 }
 
-.user-info {
-    margin: auto;
-    width: auto;
-}
-
 .slave-menu-head {
     line-height: 35px; /* provides vert-align */
     vertical-align: middle;

@@ -15,12 +15,11 @@ body {
 
 table {
     border-collapse: collapse;
-    padding-left: 10px;
     font-size: 14px;
-    margin: auto;
     width: auto;
-    border: none;
+    margin: 0 20px 0 0;
 }
+
 
 th {
     background-color: #849aaa;
@@ -30,7 +29,8 @@ th {
 
 
 tr {
-    background-color: #333;
+    background-color: #272727;
+    height: 30px;
 }
 
 tr:nth-child(even) {background-color: #222}
@@ -43,6 +43,10 @@ th, td {
 .table-nav {
     font-size: 12px;
     text-align: center;
+}
+
+.table-nav-wrapper {
+    display: table;
 }
 
 .custom-button {
@@ -87,7 +91,7 @@ th, td {
 #content-body {
   position: absolute;
   top: 0px;
-  left: 200px;
+  left: 220px;
   padding: 0 10px 0 10px;
 }
 

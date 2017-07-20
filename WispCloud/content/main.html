@@ -15,7 +15,7 @@
             var selected_account = '';
             var selected_role = ROLE.MASTER;
             var main_profile = {}
-            var lines_on_tab = 10;
+            var lines_on_tab = 20;
 
 
         //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@
 
         //profile page mok
             var p_page = '<div id="profile_page" style="width:100%; height:100%"> <h2>Профиль</h2>\
-	<table class="user-info">\
+	<table class="narrow">\
     <tr><td>Логин:</td><td id="login_name"></td></tr>\
     <tr><td>Полное имя:</td><td id="full_name"></td></tr>\
     <tr><td>Тип:</td><td id="acc_role"></td></tr>\
@@ -49,8 +49,7 @@
 
         //corp admin page mok
         var ca_page = '<div id="corp_admin" style="width:100%; height:100%">\
-	<div id="add_ins_overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10; background: rgba(150, 150, 150, 0.5);">\
-		<div id="add_ins_form" style="vertical-align: middle; width: 350px; height: 100px; display: block; z-index: 11; background: rgba(255, 255, 255, 1); margin: auto;">\
+	<div id="add_ins_overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10; ">\
 			<table>\
 				<tr><td>Insurance name:</td><td id="ins_name">#CORP</td></tr>\
 				<tr><td>Username</td><td><input id="ins_form_user" type="text" value=""/></td></tr>\
@@ -58,7 +57,6 @@
 				<tr><td></td><td><input id="ins_form_ok" type="button" value="Accept"/>\
 				<input id="ins_form_no" type="button" value="Decline" onclick="document.getElementById(\'add_ins_overlay\').style.display=\'none\';document.getElementById(\'ins_form_pass\').value=\'\';document.getElementById(\'ins_form_user\').value=\'\';"/></td></tr>\
 			</table>\
-		</div>\
 	</div>\
 	<div>\
 		<div><h2>Страховки</h2></div>\
@@ -92,6 +90,7 @@
 	</div>\
 	<div>\
 		<div><h2>История операций</h2>\
+            <div style="display:none;">\
             <span>Количество строк на странице</span>\
 			<select id="lines_on_tab">\
 				<option value="5">5</option>\
@@ -100,7 +99,7 @@
 				<option value="30">30</option>\
 				<option value="50">50</option>\
 				<option value="100">100</option>\
-			</select>\
+			</select></div>\
 		</div>\
 		<div id="transactions_list">\
 		</div>\
@@ -153,8 +152,8 @@
             });
         }
 
-        function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str = ""){
-            var result = "";
+        function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str){
+            var result = "<div class=\"table-nav-wrapper\">";
             var page_links = "";
             //count of pages
             for(offs = 0; offs * lines_per_page < elements_list.length; offs++)
@@ -168,7 +167,7 @@
             //change_page_buttons
             result = result + "<div class=\"table-nav\"><span id='" + page_id_prefix + "_bookmark' style='display:none'>0</span>";
             result = result + "<span id='" + page_id_prefix + "_maxpage' style='display:none'>" + offs + "</span>"
-            result = result + "<span id='" + page_id_prefix + "_back'><< Назад </span>" + page_links + "<span id='" + page_id_prefix + "_fw'> | Вперед >></span></div>";
+            result = result + "<span id='" + page_id_prefix + "_back'><< Назад </span>" + page_links + "<span id='" + page_id_prefix + "_fw'> | Вперед >></span></div></div>";
             return result;
         }
             function initTabsControl(page_id_prefix)
@@ -270,7 +269,7 @@
                 //get slaves
                 sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function(param, status){
 					var slave_list = JSON.parse(param);
-                    var head_str = "<tr><th>Доступный логин</th><th>Роль</th></tr>";
+					var head_str = "<tr><th>Пользователь</th><th>Роль</th></tr>";
 					var s_str = [];	
 					for (i = 0; i < slave_list.length; i++) {
 					    s_str[i] = "<tr><td>" + slave_list[i].Slave +
@@ -279,17 +278,17 @@
 					var slave_str = buildTabs(s_str, lines_on_tab, "slaves_table", head_str);
 					document.getElementById("slaves_list").innerHTML = document.getElementById("slaves_list").innerHTML + slave_str;
 					var t = document.getElementById("slaves_table_0");
-					if(t != null) t.style.display = "block";
+					if(t != null) t.style.display = "table";
 					initTabsControl("slaves_table");
                 });
 				//get masters
                 sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status){
 					var masters_list = JSON.parse(param);
-                    var head_str = "<tr><th>Доверенное лицо</th><th>Роль</th></tr>";
+                    var head_str = "<tr><th>Пользователь</th><th>Роль</th></tr>";
 					var m_str = [];	
 					for (i = 0; i < masters_list.length; i++) {
 					    m_str[i] = "<tr><td>" + masters_list[i].Master +
-                            "</td><td>" + masters_list[i].Role + "</td></tr>";
+                            "</td><td>" + get_role(masters_list[i].Role).rusname + "</td></tr>";
 					}
 					var master_str = buildTabs(m_str, lines_on_tab, "masters_table", head_str);
 					document.getElementById("masters_list").innerHTML = document.getElementById("masters_list").innerHTML + master_str;
