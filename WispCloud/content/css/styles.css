@@ -98,8 +98,8 @@ th, td {
   position: relative;
   top: 0px;
   left: 220px;
-    right: 0;
-    width: 60%;
+  right: 0;
+  width: 70%;
   padding: 0 10px 0 10px;    
   #border: 1px solid green;
 }
@@ -128,3 +128,6 @@ th, td {
     vertical-align: baseline;
     background: transparent;
 } 
+
+
+

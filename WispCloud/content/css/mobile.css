@@ -1,8 +1,32 @@
 ﻿body {
-    font-size: 40px;
+    font-size: 32px;
 }
 
 input
 {
-    font-size:40px;
+    font-size:32px;
+}
+
+.mobile-visible {
+    display: inline-block !important;
+}
+
+.mobile-invisible {
+    display: none !important;
+}
+
+.greetings {
+    display: none !important;
+}
+
+.left-menu {
+    display: none;
+}
+
+#menu-icon {
+    display: inline-block;
+}
+
+#content-body {
+    left: 25px !important;
 }

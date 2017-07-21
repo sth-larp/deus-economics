@@ -2,6 +2,8 @@
     onclick="setCurrentSlave(this);">{1} ({2})</div>';
 
 function setCurrentSlave(item) {
+    showLeftMenu(false);
+
     if (!$('#' + item.id).hasClass('selected-slave'))
     {
         $('.selected-slave').removeClass('selected-slave');

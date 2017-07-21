@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="./css/top-menu.css">
     <link rel="stylesheet" href="./css/left-menu.css">
+    <link rel="stylesheet" href="./css/mobile.css" media="(max-device-width:800px)">
     <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="js/deus_api.js"></script>
     <script type="text/javascript" src="js/slave_box.js"></script>
@@ -440,16 +441,26 @@
                 };
                 document.getElementById("logout_menu").onclick = function() { loginRedirect();};
             }
+
+            function showLeftMenu(x) {
+                if (x) {
+                    document.getElementById("left_menu").classList.add('mobile-visible');
+                }
+                else {
+                    document.getElementById("left_menu").classList.remove('mobile-visible');
+                }
+            }
     </script>
 </head>
 <body onload="initUI();">
-    <div id="top_menu" class="top-menu">
-        <div id="current_account" class="top-menu-elem greetings">Привет,</div>
-        <div id="profile_menu" class="top-menu-elem top-menu-selected" onclick="load_full_profile();">Профиль</div>
-        <div id="corp_menu" class="top-menu-elem" style="display: none;" onclick="load_corp_admin();">Управление</div>
-        <div id="transactions_menu" class="top-menu-elem" onclick="load_transactions();">Транзакции</div>
-        <div id="logout_menu" class="top-menu-elem logout">Выйти</div>
-    </div>
+<div id="top_menu" class="top-menu">
+    <div id="menu-icon" class="top-menu-elem" onclick="showLeftMenu(true);">&#9776;</div>
+    <div id="current_account" class="top-menu-elem greetings">Привет,</div>
+    <div id="profile_menu" class="top-menu-elem top-menu-selected" onclick="load_full_profile();">Профиль</div>
+    <div id="corp_menu" class="top-menu-elem" style="display: none;" onclick="load_corp_admin();">Управление</div>
+    <div id="transactions_menu" class="top-menu-elem" onclick="load_transactions();">Транзакции</div>
+    <div id="logout_menu" class="top-menu-elem logout">Выйти</div>
+</div>
         <div id="left_menu" class="left-menu">
             <div id="slave_list" class="slave-list">
                 <div class="slave-menu-head">Ваши счета</div>
