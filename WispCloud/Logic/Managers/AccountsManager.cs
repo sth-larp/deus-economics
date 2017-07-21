@@ -76,8 +76,9 @@ namespace DeusCloud.Logic.Managers
             IdentityResult result;
             if (clientData.Login != UserContext.CurrentUser.Login)
             {
-                Try.Condition((UserContext.CurrentUser.Role | AccountRole.Admin) > 0,
-                    $"Only Administrators can change user account password: {clientData.Login}.");
+                //Only Administrators can change user account password
+                _rightsManager.CheckRole(AccountRole.Admin);
+
                 result = _userManager.NewPassword(clientData.Login, clientData.NewPassword);
             }
             else
@@ -116,7 +117,7 @@ namespace DeusCloud.Logic.Managers
 
         public List<Account> GetAccountList()
         {
-            _rightsManager.CheckRole(AccountRole.Admin);
+            _rightsManager.CheckRole(AccountRole.Admin | AccountRole.Master);
             var res = UserContext.Data.Accounts.ToList();
             return res;
         }

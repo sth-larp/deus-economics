@@ -55,7 +55,11 @@ namespace DeusCloud.Logic.Managers
         public Account CheckForAccessOverSlave(Account slaveAccount, AccountAccessRoles role)
         {
             //Admin can do anything
-            if ((UserContext.CurrentUser.Role & AccountRole.Admin) > 0)
+            if (UserContext.CurrentUser.Role == AccountRole.Admin)
+                return slaveAccount;
+
+            //Master can read anything
+            if (UserContext.CurrentUser.Role == AccountRole.Master && role == AccountAccessRoles.Read)
                 return slaveAccount;
 
             //You have all access rights for yourself

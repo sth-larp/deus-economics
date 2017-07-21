@@ -41,7 +41,7 @@ namespace DeusCloud.Logic.Managers
 
         public List<Loyalty> GetLoyalties()
         {
-            _rightsManager.CheckRole(AccountRole.Admin);
+            _rightsManager.CheckRole(AccountRole.Admin | AccountRole.Master);
 
             return UserContext.Data.Loyalties.ToList();
         }
