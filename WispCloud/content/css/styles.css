@@ -8,14 +8,14 @@ body {
     color: #C1C1C0;
     overflow-y: hidden;
     overflow-x: auto;
-    min-width: 1200px;
+    #min-width: 1200px;
     margin: 0;
     font-family: play;
 }
 
 table {
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 80%;
     width: auto;
     margin: 0 20px 0 0;
 }
@@ -41,7 +41,7 @@ th, td {
 }
 
 .table-nav {
-    font-size: 12px;
+    font-size: 80%;
     text-align: center;
 }
 
@@ -56,12 +56,11 @@ th, td {
     box-sizing: content-box;
     float: none;
     z-index: auto;
-    width: 120px;
-    height: 30px;
-    background: gold;
+    background: #a2b4c2;
     color: #fff;
     margin: 0 auto;
-    padding: 0;
+    display: table-cell;
+    padding: 10px 80px;
     overflow: visible;
     border: none;
     border-radius: 4px;
@@ -75,7 +74,7 @@ th, td {
 }
 
 .warning-text {
-    font-size: 14px;
+    font-size: 80%;
     color: crimson;
 }
 
@@ -93,7 +92,7 @@ th, td {
   position: relative;
   top: 0;
   bottom: 0;
-  height: 130px;
+  height: 110px;
   #border: 1px solid red;
 }
 
@@ -121,4 +120,13 @@ th, td {
 
 #content-body h2 {
 	color: #f4f4f4;
+    font-size: 140%;
 }
+
+.login-table table, .login-table tr, .login-table td {
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+} 

@@ -17,21 +17,15 @@
 }
 
 .slave-menu-head {
-    line-height: 35px; /* provides vert-align */
+    #line-height: 35px; /* provides vert-align */
     vertical-align: middle;
-    padding-left: 30px;
+    margin: 10px 20px 10px 20px;
 }
 
 .slave-menu-elem {
     line-height: 30px; /* provides vert-align */
-    vertical-align: middle;
-    border-width: 1px;
-    border-radius: 8px;
-    border: thin solid #444;
-    padding-left: 25px;
-    margin-right: 40px;
-    margin-top: 5px;
-    margin-left: 5px;
+    vertical-align: top;
+    margin: 1px 20px 10px 30px;
     font-size: 14px;
 }
 
@@ -40,7 +34,12 @@
     cursor:pointer;
 }
 
-
 .selected-slave {
-    background: #555;
+    #color: white;
+    border-bottom: 1.5px solid;
+}
+
+.selected-slave:before {
+    content:"\2192\0020";
+    color: #849aaa;
 }

@@ -208,6 +208,7 @@
       <BrowseToURL>~/corp_admin.html</BrowseToURL>
     </Content>
     <Content Include="content\css\left-menu.css" />
+    <Content Include="content\css\mobile.css" />
     <Content Include="content\css\styles.css" />
     <Content Include="content\css\top-menu.css" />
     <Content Include="content\js\deus_api.js" />
