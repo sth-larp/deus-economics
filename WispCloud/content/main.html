@@ -336,7 +336,7 @@
                 var sum = document.getElementById("transaction_value_id").value;
                 var comment = document.getElementById("transaction_comment_id").value;
                 var txtField = document.getElementById("transaction_warning");
-                var data = JSON.stringify({"Sender": selected_account, "Receiver": user, "Amount": sum, "Comment" : comment});
+                var data = JSON.stringify({ "Sender": selected_account, "Receiver": user, "Amount": sum, "Description": comment });
 
                 sendAPIRequest(url + "/api/transfer", "POST", function(param, status) {
                     if (status == 200) {
