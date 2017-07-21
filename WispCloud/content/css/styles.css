@@ -81,18 +81,30 @@ th, td {
 
 #content-wrapper {
   position: absolute;
-  top: 130px;
+  top: 0px;
   bottom: 0;
   width: 100%;
   overflow: auto;
   z-index: 100;
+  #border: 1px solid yellow;
+}
+
+#content-preceder {
+  position: relative;
+  top: 0;
+  bottom: 0;
+  height: 130px;
+  #border: 1px solid red;
 }
 
 #content-body {
-  position: absolute;
+  position: relative;
   top: 0px;
   left: 220px;
-  padding: 0 10px 0 10px;
+    right: 0;
+    width: 60%;
+  padding: 0 10px 0 10px;    
+  #border: 1px solid green;
 }
 
 #content-body a {
