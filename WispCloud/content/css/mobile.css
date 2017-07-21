@@ -29,4 +29,17 @@ input
 
 #content-body {
     left: 25px !important;
+    width: 95%;
+}
+
+.slave-menu-elem {
+    margin: 30px 10px 0px 50px ;
+}
+
+.top-menu-elem {
+    font-size: 80%;
+}
+
+.top-menu-elem {
+    width: 20%;
 }

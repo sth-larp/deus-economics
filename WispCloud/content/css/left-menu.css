@@ -28,10 +28,10 @@
 }
 
 .slave-menu-elem {
-    line-height: 30px; /* provides vert-align */
+    line-height: 35px; /* provides vert-align */
     vertical-align: top;
     margin: 1px 20px 10px 30px;
-    font-size: 14px;
+    font-size: 100%;
 }
 
 .slave-menu-elem:hover {
