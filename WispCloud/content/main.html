@@ -80,16 +80,25 @@
         //transactions page mok
         var t_page = '<div id="transactions" style="width:100%; height:100%">\
 	<div id="trans_menu_holder">\
+            <h2>Выполнить перевод</h2>\
 		<form id="new_transaction" action="">\
-			<table>\
-				<tr><th>Кому</th><th>Сумма</th><th>Комментарий</th><th></th></tr>\
+			<table class="clear-table">\
 				<tr>\
-					<td><input type="text" id="user_name_id" name="user_name" value="NAME"/></td>\
+					<td>Кому</td>\
+                    <td><input type="text" id="user_name_id" name="user_name" value="master"/></td>\
+                </tr>\
+                <tr>\
+					<td>Сумма</td>\
 					<td><input type="text" id="transaction_value_id" name="transaction_value" value="0"/></td>\
-					<td><input type="text" id="transaction_comment_id" name="transaction_comment" value="COMMENT"/></td>\
-					<td><input type="button" id="send_transaction" name="send" value="SEND"/></td>\
+                </tr>\
+                <tr>\
+					<td>Комментарий</td>\
+					<td><input type="text" id="transaction_comment_id" name="transaction_comment" value="Frontend"/></td>\
 				</tr>\
-                <tr><td colspan=4><label class="warning_text" id="transaction_warning"></label></td></tr>\
+                <tr>\
+                	<td colspan=2><input type="button" class="custom-button smaller" name="send" value="Отправить" onClick="sendTransaction();"/></td>\
+				</tr>\
+                <tr><td colspan=2><label class="warning_text" id="transaction_warning"></label></td></tr>\
 			</table>\
 		</form>\
 	</div>\
@@ -364,10 +373,9 @@
                 topMenuSwitch(document.getElementById("transactions_menu"));
 
                 document.getElementById("content-body").innerHTML = t_page;
-                document.getElementById("trans_menu_holder").style.visibility =
-                        selected_role.value >= ROLE.WITHDRAW.value ? 'visible' : 'hidden';
+                document.getElementById("trans_menu_holder").style.display =
+                        selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
 
-                document.getElementById("send_transaction").onclick = function() { sendTransaction();};
                 load_transactions_table();
             }
 
@@ -407,10 +415,10 @@
                 }
 
                 var t_list = JSON.parse(param);
-                var head_str = "<tr><th>Id</th><th>Отправитель</th><th>Получатель</th><th>Дата</th><th>Сумма</th><th>Комментарий</th></tr>";
+                var head_str = "<tr><th>Перевел</th><th>Получил</th><th>Время</th><th>Сумма</th><th>Комментарий</th></tr>";
                 var t_str = [];
                 for (i = 0; i < t_list.length; i++) {
-                    t_str[i] = "<tr><td>" + t_list[i].Id + "</td><td>" + t_list[i].Sender 
+                    t_str[i] = "<tr><td>" + t_list[i].Sender 
                     + "</td><td>" + t_list[i].Receiver + "</td><td>" + customDateFormat(t_list[i].Time) 
                     + "</td><td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
                 }

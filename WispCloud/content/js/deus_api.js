@@ -100,7 +100,7 @@ function make_base_auth(user, password) {
 
 function customDateFormat(dateStr) {
     var d = new Date(dateStr);
-    var f = formatDate(d, "d MMM HH:mm:ss");
+    var f = formatDate(d, "d MMM HH:mm");
     return f;
 }
 

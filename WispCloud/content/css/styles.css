@@ -54,7 +54,7 @@ th, td {
     float: none;
     z-index: auto;
     background: #a2b4c2;
-    color: #fff;
+    #color: #fff;
     margin: 0 auto;
     display: table-cell;
     padding: 10px 20px;
@@ -63,6 +63,10 @@ th, td {
     border-radius: 4px;
     text-align: center;
     text-overflow: clip;
+}
+
+.smaller {
+    padding: 5px 5px;
 }
 
 .btn-image {
@@ -124,7 +128,7 @@ th, td {
     font-size: 140%;
 }
 
-.login-table table, .login-table tr, .login-table td {
+.clear-table table, .clear-table tr, .clear-table td {
     border: 0;
     outline: 0;
     font-size: 100%;
