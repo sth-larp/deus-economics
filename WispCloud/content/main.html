@@ -18,6 +18,7 @@
             var selected_acc_role = ACC_ROLE.PERSON;
             var main_profile = {}
             var lines_on_tab = 20;
+            var corpNames = ['Serenity', 'Panam', 'JJ', 'Govt'];
 
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,59 +68,8 @@
             });
         }
 
-        function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str){
-            var result = "<div class=\"table-nav-wrapper\">";
-            var page_links = "";
-            //count of pages
-            for(offs = 0; offs * lines_per_page < elements_list.length; offs++)
-            {
-                result = result + "<table id = '" + page_id_prefix + "_" + offs +"' style='display: none'>" + header_str;
-                var tmp_limit = lines_per_page;
-                for(i = 0; i < tmp_limit; i++) if(offs*lines_per_page + i < elements_list.length) result = result + elements_list[offs*lines_per_page + i];
-                result = result + "</table>";
-                page_links = page_links + "<span id='"  + page_id_prefix + "_page_" + offs + "'>| " + (offs + 1) + "</span>";
-            }
-            //change_page_buttons
-            result = result + "<div class=\"table-nav\"><span id='" + page_id_prefix + "_bookmark' style='display:none'>0</span>";
-            result = result + "<span id='" + page_id_prefix + "_maxpage' style='display:none'>" + offs + "</span>"
-            result = result + "<span id='" + page_id_prefix + "_back'><< Назад </span>" + page_links + "<span id='" + page_id_prefix + "_fw'> | Вперед >></span></div></div>";
-            return result;
-        }
-            function initTabsControl(page_id_prefix)
-            {
-                var max_page = parseInt(document.getElementById(page_id_prefix + "_maxpage").innerHTML);
-                var tab_name = "";
-                function createPageHandler(page_number){
-                    return function(){
-                        //for(j = 0; j < max_page; j++) document.getElementById(page_id_prefix + "_" + j).style.display = "none";
-                        document.getElementById(page_id_prefix + "_" + parseInt(document.getElementById(page_id_prefix + "_bookmark").innerHTML)).style.display = "none";
-                        document.getElementById(page_id_prefix + "_" + page_number).style.display = "block";
-                        document.getElementById(page_id_prefix + "_bookmark").innerHTML = page_number;
-                    }
-                }
-                function createArrowHandler(direction)
-                {
-                    return function(){
-                        var cur_page = parseInt(document.getElementById(page_id_prefix + "_bookmark").innerHTML);
-                        var new_page = cur_page + direction;
-                        if((new_page >=0 && new_page < max_page)){
-                            document.getElementById(page_id_prefix + "_bookmark").innerHTML = new_page;
-                            document.getElementById(page_id_prefix + "_" + cur_page).style.display = "none";
-                            document.getElementById(page_id_prefix + "_" + new_page).style.display = "block";
-                        }
-                    }
-                }
-                for(var i = 0; i < max_page; i++){
-                    tab_button_name = page_id_prefix + "_page_" + i;
-                    document.getElementById(tab_button_name).style.cursor = "pointer";
-                    document.getElementById(tab_button_name).onclick = createPageHandler(i);
-                }
-                document.getElementById(page_id_prefix + "_fw").style.cursor = "pointer";
-                document.getElementById(page_id_prefix + "_back").style.cursor = "pointer";
-                document.getElementById(page_id_prefix + "_fw").onclick = createArrowHandler(1);
-                document.getElementById(page_id_prefix + "_back").onclick = createArrowHandler(-1);
-            }
 
+        
             function insertDocumentToWrapper(wrapper_id, document_href, rq_type){
                 //load sub-page into wrapper
                 var xhttp = new XMLHttpRequest();
@@ -164,16 +114,15 @@
                         document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
                     }
 
-                    var history_html = "<tr><th>Время</th><th>Событие</th></tr>";
+                    var hist = "<tr><th>Время</th><th>Событие</th></tr>";
                     for (i = 0; i < prof.History.length; i++) {
-                        //history_html = history_html + "<td>" + prof.History[i].Id + "</td>";
-                        history_html = history_html + "<tr><td>" + customDateFormat(prof.History[i].Time) + "</td>";
-                        history_html = history_html + "<td>" + prof.History[i].Description + "</td>";
-                        history_html = history_html + "</tr>";
+                        hist += "<tr><td>" + customDateFormat(prof.History[i].Time) + "</td>";
+                        hist += "<td>" + prof.History[i].Description + "</td></tr>";
                     }
-                    document.getElementById("history").innerHTML = history_html;
+                    document.getElementById("history").innerHTML = hist;
                 }
             }
+
 
             function load_profile_page() {
                 topMenuSwitch(document.getElementById("profile_menu"));
@@ -324,26 +273,8 @@
                 topMenuSwitch(document.getElementById("corp_menu"));
                 document.getElementById("corp_admin").style.display = 'block';
 
-                if (selected_acc_role == ACC_ROLE.CORP) {
-                    document.getElementById("insurance_users_list").style.display = 'block';
-                    sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function(param, status) {
-                        if (status == 200) {
-                            var loyalties_list = JSON.parse(param);
-                            var l_str = [];
-                            for (i = 0; i < loyalties_list.length; i++) {
-                                l_str[i] = "<tr><td>" + loyalties_list[i].Insurance + "</td><td>" + loyalties_list[i].UserLogin
-                                    + "</td><td>" + loyalties_list[i].UserFullname + "</td><td>" + loyalties_list[i].InsuranceLevel
-                                    + "</td></tr>";
-                            }
-                            var head_str = "<tr><th>Страховка</th><th>Логин</th><th>Имя пользователя</th><th>Уровень</th></tr>";
-                            var page_str = buildTabs(l_str, lines_on_tab, "loyalties_table", head_str);
-                            document.getElementById("insurance_users_list").innerHTML = page_str;
-                            var t = document.getElementById("loyalties_table_0");
-                            if (t != null) t.style.display = "block";
-                            initTabsControl("loyalties_table");
-                        } else alert(param + "\n\nStatus " + status);
-                    });
-                }
+                load_ins_holders();
+
                 //payments
                 sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function(param, status) {
                     if (status == 200) 
@@ -367,6 +298,81 @@
                     else alert(param + "\n\nStatus " + status);
                 });				
             }
+
+            function load_ins_holders() {
+                if (corpNames.indexOf(selected_account) == -1) return;
+                
+                document.getElementById("insurance-holder").style.display = 'block';
+                $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
+
+                sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
+                        $("#insurance-table tbody tr").remove();
+                        $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
+                        if (status == 200) {
+                            var holders = JSON.parse(param);
+                            var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelHolder('{1}');\"/></td></tr>";
+                            var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
+
+                            if (selected_role.value < ROLE.WITHDRAW.value)
+                                row = rowNormal;
+
+                            for (i = 0; i < holders.length; i++) {
+                                var newRow = format(row, [holders[i].UserFullname, holders[i].UserLogin, holders[i].InsuranceLevel]);
+                                $('#insurance-table').append(newRow);
+                            }
+
+                            if (selected_role.value >= ROLE.WITHDRAW.value) {
+                                $('#insurance-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_insurance_menu();\"/></td><td><select id=\"level-selector\"><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option></td><td></td></tr>");
+                            }
+                        }
+                        else {
+                            document.getElementById("insurance-table").innerHTML = param;
+                        }
+                });
+            }
+
+            function cancelHolder(holder) {
+                sendAPIRequest(url + "/api/insurance/removeholder?user=" + holder, "POST", function (param, status) {
+                    if (status == 200) {
+                        load_corp_page();
+                    }
+                    else {
+                        document.getElementById("ins_table_warning").innerHTML = param;
+                    }
+                });
+            }
+
+            function fill_add_insurance_menu() {
+                document.getElementById('ins_form_name').innerHTML = selected_account;
+                var e = document.getElementById('level-selector');
+                document.getElementById('ins_form_level').innerHTML = e.options[e.selectedIndex].value;
+                document.getElementById('add_ins_overlay').style.display = 'flex';
+                document.getElementById("add_ins_warning").innerHTML = "";
+            }
+
+            function run_add_insurance() {
+                document.getElementById("add_ins_warning").innerHTML = "";
+                var level = document.getElementById('ins_form_level').innerHTML;
+                var holder = document.getElementById('ins_form_user').value;
+                var pass = document.getElementById('ins_form_pass').value;
+                var data = JSON.stringify({ "Company": selected_account, "Holder": holder, "Password": pass, "Level": level });
+                sendAPIRequest(url + "/api/insurance/changeholder", "POST", function (param, status) {
+                    if (status == 200) {
+                        hide_add_ins_menu();
+                        load_corp_page();
+                    }
+                    else {
+                        document.getElementById("add_ins_warning").innerHTML = param;
+                    }
+                }, data);
+            }
+
+            function hide_add_ins_menu() {
+                document.getElementById('add_ins_overlay').style.display = 'none';
+                document.getElementById('ins_form_pass').value = '';
+                document.getElementById('ins_form_user').value = '';
+            }
+
             function createHandler(obj, handler) {
                 return function() { handler(obj); }
             }
@@ -374,7 +380,6 @@
             function topMenuSwitch(e) {
                 $('.top-menu-elem').removeClass('top-menu-selected');
                 e.classList.add('top-menu-selected');
-
                 $('.page-display').css('display', 'none');
             }
 
@@ -383,12 +388,8 @@
             }
 
             function showLeftMenu(x) {
-                if (x) {
-                    document.getElementById("left_menu").classList.add('mobile-visible');
-                }
-                else {
-                    document.getElementById("left_menu").classList.remove('mobile-visible');
-                }
+                if (x) document.getElementById("left_menu").classList.add('mobile-visible');
+                else document.getElementById("left_menu").classList.remove('mobile-visible');
             }
     </script>
 </head>
@@ -413,7 +414,7 @@
 
         <!-- Страница Профиль -->
 
-        <div id="profile_page" class="page-display" style="width: 100%; height: 100%">
+        <div id="profile_page" class="page-display">
             <h2>Профиль</h2>
             <table class="narrow">
                 <tr><td>Логин:</td><td id="login_name"></td></tr>
@@ -451,28 +452,14 @@
 
         <!-- Страница Управление -->
 
-        <div id="corp_admin" class="page-display" style="width: 100%; height: 100%">
-            <div id="add_ins_overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10;">
-                <table>
-                    <tr><td>Insurance name:</td><td id="ins_name">#CORP</td></tr>
-                    <tr><td>Username</td><td><input id="ins_form_user" type="text" value=""/></td></tr>
-                    <tr><td>Password</td><td><input id="ins_form_pass" type="password" value=""/></td></tr>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <input id="ins_form_ok" type="button" value="Accept"/>
-                            <input id="ins_form_no" type="button" value="Decline" onclick="document.getElementById('add_ins_overlay').style.display = 'none';document.getElementById('ins_form_pass').value = '';document.getElementById('ins_form_user').value = '';"/>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div>
-                <div id="insurance_users_list" style="display: none;">
-                    <h2>Страховки</h2>
+        <div id="corp_admin" class="page-display">
+            <div id="insurance-holder" style="display: none;">
+                <h2>Страховки</h2>
+                <table id="insurance-table"></table>
+                <div id="ins_table_warning" class="warning-text" style="float: left; width: 100%; height: 10%;">
                 </div>
             </div>
-            <div id="add_ins_user_button"><input type="button" value="Add insurance" onclick="document.getElementById('add_ins_overlay').style.display = 'block';"/>
-            </div>
+
             <div>
                 <div>
                     <h2>Сотрудники</h2>
@@ -483,15 +470,15 @@
 
         <!-- Страница Переводы -->
 
-        <div id="transactions" class="page-display" style="width:100%; height:100%">
+        <div id="transactions" class="page-display">
             <div id="trans_menu_holder">
                 <h2>Выполнить перевод</h2>
                 <form id="new_transaction" action="">
                     <table class="clear-table">
-                        <tr><td>Кому</td><td><input type="text" id="user_name_id" name="user_name" value="master" /></td></tr>
-                        <tr><td>Сумма</td><td><input type="text" id="transaction_value_id" name="transaction_value" value="0" /></td></tr>
-                        <tr><td>Комментарий</td><td><input type="text" id="transaction_comment_id" name="transaction_comment" value="Frontend" /></td></tr>
-                        <tr><td colspan=2><input type="button" class="custom-button smaller" name="send" value="Отправить" onClick="sendTransaction();" /></td></tr>
+                        <tr><td>Кому</td><td><input type="text" id="user_name_id" name="user_name" value="master"/></td></tr>
+                        <tr><td>Сумма</td><td><input type="text" id="transaction_value_id" name="transaction_value" value="0"/></td></tr>
+                        <tr><td>Комментарий</td><td><input type="text" id="transaction_comment_id" name="transaction_comment" value="Frontend"/></td></tr>
+                        <tr><td colspan=2><input type="button" class="custom-button smaller" name="send" value="Отправить" onClick="sendTransaction();"/></td></tr>
                         <tr><td colspan=2><label class="warning_text" id="transaction_warning"></label></td></tr>
                     </table>
                 </form>
@@ -499,7 +486,7 @@
             <div>
                 <div>
                     <h2>История операций</h2>
-                    <div style="display:none;">
+                    <div style="display: none;">
                         <span>Количество строк на странице</span>
                         <select id="lines_on_tab">
                             <option value="5">5</option>
@@ -516,6 +503,30 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+<div id="add_ins_overlay" class="disabling-div">
+    <div style="float: left; margin: 0 auto;">
+        <p>Необходимо получить согласие человека, который получит страховку</p>
+        <p>Прошлая страховка будет отменена!</p>
+        <table>
+            <tr><td>Страховка:</td><td id="ins_form_name" value="">#CORP</td></tr>
+            <tr><td>Уровень:</td><td id="ins_form_level" value=""></td></tr>
+            <tr><td>Логин:</td><td><input id="ins_form_user" type="text" value="" /></td></tr>
+            <tr><td>Пароль:</td><td><input id="ins_form_pass" type="password" value="" /></td></tr>
+            <tr>
+                <td>
+                    <input id="ins_form_no" type="button" class="custom-button smaller" value="Отменить" onclick="hide_add_ins_menu();" />
+                </td>
+                <td>
+                    <input id="ins_form_ok" type="button" class="custom-button smaller" value="Принять" onclick="run_add_insurance();" />
+                </td>
+            </tr>
+        </table>
+        <div style="float: left; width: 100%; height: 10%;">
+            <span class="warning-text" id="add_ins_warning"></span>
+        </div>
     </div>
 </div>
 </body>

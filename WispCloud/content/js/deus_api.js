@@ -186,3 +186,53 @@ function formatDate(date, format, utc) {
 
     return format;
 };
+
+function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str) {
+    var result = "<div class=\"table-nav-wrapper\">";
+    var page_links = "";
+    //count of pages
+    for (offs = 0; offs * lines_per_page < elements_list.length; offs++) {
+        result = result + "<table id = '" + page_id_prefix + "_" + offs + "' style='display: none'>" + header_str;
+        var tmp_limit = lines_per_page;
+        for (i = 0; i < tmp_limit; i++) if (offs * lines_per_page + i < elements_list.length) result = result + elements_list[offs * lines_per_page + i];
+        result = result + "</table>";
+        page_links = page_links + "<span id='" + page_id_prefix + "_page_" + offs + "'>| " + (offs + 1) + "</span>";
+    }
+    //change_page_buttons
+    result = result + "<div class=\"table-nav\"><span id='" + page_id_prefix + "_bookmark' style='display:none'>0</span>";
+    result = result + "<span id='" + page_id_prefix + "_maxpage' style='display:none'>" + offs + "</span>"
+    result = result + "<span id='" + page_id_prefix + "_back'><< Назад </span>" + page_links + "<span id='" + page_id_prefix + "_fw'> | Вперед >></span></div></div>";
+    return result;
+}
+function initTabsControl(page_id_prefix) {
+    var max_page = parseInt(document.getElementById(page_id_prefix + "_maxpage").innerHTML);
+    var tab_name = "";
+    function createPageHandler(page_number) {
+        return function () {
+            //for(j = 0; j < max_page; j++) document.getElementById(page_id_prefix + "_" + j).style.display = "none";
+            document.getElementById(page_id_prefix + "_" + parseInt(document.getElementById(page_id_prefix + "_bookmark").innerHTML)).style.display = "none";
+            document.getElementById(page_id_prefix + "_" + page_number).style.display = "block";
+            document.getElementById(page_id_prefix + "_bookmark").innerHTML = page_number;
+        }
+    }
+    function createArrowHandler(direction) {
+        return function () {
+            var cur_page = parseInt(document.getElementById(page_id_prefix + "_bookmark").innerHTML);
+            var new_page = cur_page + direction;
+            if ((new_page >= 0 && new_page < max_page)) {
+                document.getElementById(page_id_prefix + "_bookmark").innerHTML = new_page;
+                document.getElementById(page_id_prefix + "_" + cur_page).style.display = "none";
+                document.getElementById(page_id_prefix + "_" + new_page).style.display = "block";
+            }
+        }
+    }
+    for (var i = 0; i < max_page; i++) {
+        tab_button_name = page_id_prefix + "_page_" + i;
+        document.getElementById(tab_button_name).style.cursor = "pointer";
+        document.getElementById(tab_button_name).onclick = createPageHandler(i);
+    }
+    document.getElementById(page_id_prefix + "_fw").style.cursor = "pointer";
+    document.getElementById(page_id_prefix + "_back").style.cursor = "pointer";
+    document.getElementById(page_id_prefix + "_fw").onclick = createArrowHandler(1);
+    document.getElementById(page_id_prefix + "_back").onclick = createArrowHandler(-1);
+}
