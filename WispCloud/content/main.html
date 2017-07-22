@@ -20,106 +20,6 @@
             var lines_on_tab = 20;
 
 
-        //---------------------------------------------------------------------------------------------------------------------------------------------------
-        //mok pages for local testing
-
-        //profile page mok
-            var p_page = '<div id="profile_page" style="width:100%; height:100%"> <h2>Профиль</h2>\
-	<table class="narrow">\
-    <tr><td>Логин:</td><td id="login_name"></td></tr>\
-    <tr><td>Полное имя:</td><td id="full_name"></td></tr>\
-    <tr><td>Тип:</td><td id="acc_role"></td></tr>\
-    <tr><td>Статус:</td><td id="live_status"></td></tr>\
-    <tr><td>Кредиты:</td><td id="current_account_value"></td></tr>\
-    <tr id="index_label" style="display:none;"><td>Индекс:</td><td id="current_index"></td></tr>\
-    <tr id="index_p_label" style="display:none;"><td>Очки страховки:</td><td id="index_points"></td></tr>\
-    <tr id="insurance_label" style="display:none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>\
-    </table>\
-	<div id="slaves_list"><h2>Ваши доступы</h2>\
-            <p>Список пользователей, к которым вы имеете доступ</p>\
-            <div id="slaves-list-content"></div>\
-	</div>\
-	<div id="masters_list"><h2>Доверенные лица</h2>\
-            <p>Список пользователей, которые имеют доступ к вам</p>\
-            <div id="masters-list-content"></div>\
-	</div>\
-	<div><h2>События</h2>\
-		<table id="history">\
-		</table>\
-	</div>\
-	<div id="insurances_supported" style="display: none;">\
-		<table id="insurance_supported_list">\
-		</table>\
-	</div>\
-</div>';
-
-        //corp admin page mok
-        var ca_page = '<div id="corp_admin" style="width:100%; height:100%">\
-	<div id="add_ins_overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10; ">\
-			<table>\
-				<tr><td>Insurance name:</td><td id="ins_name">#CORP</td></tr>\
-				<tr><td>Username</td><td><input id="ins_form_user" type="text" value=""/></td></tr>\
-				<tr><td>Password</td><td><input id="ins_form_pass" type="password" value=""/></td></tr>\
-				<tr><td></td><td><input id="ins_form_ok" type="button" value="Accept"/>\
-				<input id="ins_form_no" type="button" value="Decline" onclick="document.getElementById(\'add_ins_overlay\').style.display=\'none\';document.getElementById(\'ins_form_pass\').value=\'\';document.getElementById(\'ins_form_user\').value=\'\';"/></td></tr>\
-			</table>\
-	</div>\
-	<div>\
-		<div id="insurance_users_list" style="display:none;"><h2>Страховки</h2>\
-		</div>\
-	</div>\
-	<div id="add_ins_user_button"><input type="button" value="Add insurance" onclick="document.getElementById(\'add_ins_overlay\').style.display=\'block\';"/></div>\
-	<hr/>\
-	<div>\
-		<div><h2>Сотрудники</h2></div>\
-		<div id="payments_list">\
-		</div>	\
-	</div>\
-</div>';
-
-        //transactions page mok
-        var t_page = '<div id="transactions" style="width:100%; height:100%">\
-	<div id="trans_menu_holder">\
-            <h2>Выполнить перевод</h2>\
-		<form id="new_transaction" action="">\
-			<table class="clear-table">\
-				<tr>\
-					<td>Кому</td>\
-                    <td><input type="text" id="user_name_id" name="user_name" value="master"/></td>\
-                </tr>\
-                <tr>\
-					<td>Сумма</td>\
-					<td><input type="text" id="transaction_value_id" name="transaction_value" value="0"/></td>\
-                </tr>\
-                <tr>\
-					<td>Комментарий</td>\
-					<td><input type="text" id="transaction_comment_id" name="transaction_comment" value="Frontend"/></td>\
-				</tr>\
-                <tr>\
-                	<td colspan=2><input type="button" class="custom-button smaller" name="send" value="Отправить" onClick="sendTransaction();"/></td>\
-				</tr>\
-                <tr><td colspan=2><label class="warning_text" id="transaction_warning"></label></td></tr>\
-			</table>\
-		</form>\
-	</div>\
-	<div>\
-		<div><h2>История операций</h2>\
-            <div style="display:none;">\
-            <span>Количество строк на странице</span>\
-			<select id="lines_on_tab">\
-				<option value="5">5</option>\
-				<option value="10">10</option>\
-				<option value="20">20</option>\
-				<option value="30">30</option>\
-				<option value="50">50</option>\
-				<option value="100">100</option>\
-			</select></div>\
-		</div>\
-		<div id="transactions_list">\
-		</div>\
-	</div>\
-</div>';
-
         //------------------------------------------------------------------------------------------------------------------------------------------------------------
         //check if login is not set, return to login page
         function preLoad()
@@ -132,7 +32,7 @@
                     if (status == 200) {
                         main_profile = JSON.parse(param);
                         document.getElementById("current_account").innerHTML = "Привет, " + main_profile.Login;
-                        load_full_profile(main_profile.Login);
+                        load_profile_page(main_profile.Login);
                     }
                     else if (status == 401) {
                         loginRedirect();
@@ -159,7 +59,7 @@
             sendAPIRequest(url + "/api/accounts/profile?login=" + selected_account, "GET", function(param, status){
                 if (status == 200) {
                     main_profile = JSON.parse(param);
-                    load_full_profile(main_profile.Login);
+                    load_profile_page(main_profile.Login);
                 }
                 else{
                     alert(param + "\n\n" + status);
@@ -275,11 +175,9 @@
                 }
             }
 
-            function load_full_profile() {
-                //insertDocumentToWrapper("content_wrapper", url + "/profile_page.html","GET");
-                //mok html for localtesting, replace^ before deploy
+            function load_profile_page() {
                 topMenuSwitch(document.getElementById("profile_menu"));
-                document.getElementById("content-body").innerHTML = p_page;
+                document.getElementById("profile_page").style.display = "block";
 
                 sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
                     if (status == 200) fill_full_profile(param);
@@ -287,12 +185,9 @@
                 });
 
                 load_slaves();
-
                 load_masters();
                 
-					
                 //get supported insurances (for corps only)
-
             }
 
             function load_masters() {
@@ -353,7 +248,7 @@
                 sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
                     if (selected_account == main_account)
                         window.location.reload(false); //Потому что еще левый список есть
-                    load_full_profile();
+                    load_profile_page();
                 }, data);
             }
 
@@ -363,18 +258,14 @@
                 sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
                     if (main_account == master)
                         window.location.reload(false); //Потому что еще левый список есть
-                    load_full_profile();
+                    load_profile_page();
                 }, data);
             }
 
-            function load_transactions() {
-                //insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
-                //mok html for localtesting, replace^ before deploy
+            function load_transactions_page() {
                 topMenuSwitch(document.getElementById("transactions_menu"));
-
-                document.getElementById("content-body").innerHTML = t_page;
-                document.getElementById("trans_menu_holder").style.display =
-                        selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
+                document.getElementById("transactions").style.display = "block";
+                document.getElementById("trans_menu_holder").style.display = selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
 
                 load_transactions_table();
             }
@@ -429,11 +320,10 @@
                 initTabsControl("transaction_table");
             }
 
-            function load_corp_admin() {
-                //insertDocumentToWrapper("content_wrapper", url + "/transactions.html","GET");
-                //mok html for localtesting, replace^ before deploy
+            function load_corp_page() {
                 topMenuSwitch(document.getElementById("corp_menu"));
-                document.getElementById("content-body").innerHTML = ca_page;
+                document.getElementById("corp_admin").style.display = 'block';
+
                 if (selected_acc_role == ACC_ROLE.CORP) {
                     document.getElementById("insurance_users_list").style.display = 'block';
                     sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function(param, status) {
@@ -484,21 +374,12 @@
             function topMenuSwitch(e) {
                 $('.top-menu-elem').removeClass('top-menu-selected');
                 e.classList.add('top-menu-selected');
+
+                $('.page-display').css('display', 'none');
             }
 
             function initUI() {
                 preLoad();
-                //init all general UI elements on page, set event handlers
-                //init of subpage UI elements should be done in load functions
-                var buttons = ['profile_menu', 'corp_menu', 'transactions_menu', 'logout_menu'];
-                
-
-                var btnCorp = document.getElementById("corp_menu");
-                btnCorp.onclick = function() {
-                    topMenuSwitch(btnCorp); 
-                    load_corp_admin();
-                };
-                document.getElementById("logout_menu").onclick = function() { loginRedirect();};
             }
 
             function showLeftMenu(x) {
@@ -515,10 +396,10 @@
 <div id="top_menu" class="top-menu">
     <div id="menu-icon" class="top-menu-elem" onclick="showLeftMenu(true);">&#9776;</div>
     <div id="current_account" class="top-menu-elem greetings">Привет,</div>
-    <div id="profile_menu" class="top-menu-elem top-menu-selected" onclick="load_full_profile();">Профиль</div>
-    <div id="corp_menu" class="top-menu-elem" style="display: none;" onclick="load_corp_admin();">Управление</div>
-    <div id="transactions_menu" class="top-menu-elem" onclick="load_transactions();">Переводы</div>
-    <div id="logout_menu" class="top-menu-elem logout">Выйти</div>
+    <div id="profile_menu" class="top-menu-elem top-menu-selected" onclick="load_profile_page();">Профиль</div>
+    <div id="corp_menu" class="top-menu-elem" style="display: none;" onclick="load_corp_page();">Управление</div>
+    <div id="transactions_menu" class="top-menu-elem" onclick="load_transactions_page();">Переводы</div>
+    <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
 </div>
         <div id="left_menu" class="left-menu">
             <div id="slave_list" class="slave-list">
@@ -526,6 +407,116 @@
             </div>
         </div>
 
-    <div id="content-wrapper"><div id="content-preceder"></div><div id="content-body"></div></div>
+<div id="content-wrapper">
+    <div id="content-preceder"></div>
+    <div id="content-body">
+
+        <!-- Страница Профиль -->
+
+        <div id="profile_page" class="page-display" style="width: 100%; height: 100%">
+            <h2>Профиль</h2>
+            <table class="narrow">
+                <tr><td>Логин:</td><td id="login_name"></td></tr>
+                <tr><td>Полное имя:</td><td id="full_name"></td></tr>
+                <tr><td>Тип:</td><td id="acc_role"></td></tr>
+                <tr><td>Статус:</td><td id="live_status"></td></tr>
+                <tr><td>Кредиты:</td><td id="current_account_value"></td></tr>
+                <tr id="index_label" style="display: none;"><td>Индекс:</td><td id="current_index"></td></tr>
+                <tr id="index_p_label" style="display: none;"><td>Очки страховки:</td><td id="index_points"></td></tr>\
+                <tr id="insurance_label" style="display: none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>\
+            </table>
+
+            <div id="slaves_list">
+                <h2>Ваши доступы</h2>
+                <p>Список пользователей, к которым вы имеете доступ</p>
+                <div id="slaves-list-content"></div>
+            </div>
+
+            <div id="masters_list">
+                <h2>Доверенные лица</h2>
+                <p>Список пользователей, которые имеют доступ к вам</p>
+                <div id="masters-list-content"></div>
+            </div>
+
+            <div>
+                <h2>События</h2>
+                <table id="history"></table>
+            </div>
+
+            <div id="insurances_supported" style="display: none;">
+                <table id="insurance_supported_list">
+                </table>
+            </div>
+        </div>
+
+        <!-- Страница Управление -->
+
+        <div id="corp_admin" class="page-display" style="width: 100%; height: 100%">
+            <div id="add_ins_overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10;">
+                <table>
+                    <tr><td>Insurance name:</td><td id="ins_name">#CORP</td></tr>
+                    <tr><td>Username</td><td><input id="ins_form_user" type="text" value=""/></td></tr>
+                    <tr><td>Password</td><td><input id="ins_form_pass" type="password" value=""/></td></tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input id="ins_form_ok" type="button" value="Accept"/>
+                            <input id="ins_form_no" type="button" value="Decline" onclick="document.getElementById('add_ins_overlay').style.display = 'none';document.getElementById('ins_form_pass').value = '';document.getElementById('ins_form_user').value = '';"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <div id="insurance_users_list" style="display: none;">
+                    <h2>Страховки</h2>
+                </div>
+            </div>
+            <div id="add_ins_user_button"><input type="button" value="Add insurance" onclick="document.getElementById('add_ins_overlay').style.display = 'block';"/>
+            </div>
+            <div>
+                <div>
+                    <h2>Сотрудники</h2>
+                </div>
+                <div id="payments_list"></div>
+            </div>
+        </div>
+
+        <!-- Страница Переводы -->
+
+        <div id="transactions" class="page-display" style="width:100%; height:100%">
+            <div id="trans_menu_holder">
+                <h2>Выполнить перевод</h2>
+                <form id="new_transaction" action="">
+                    <table class="clear-table">
+                        <tr><td>Кому</td><td><input type="text" id="user_name_id" name="user_name" value="master" /></td></tr>
+                        <tr><td>Сумма</td><td><input type="text" id="transaction_value_id" name="transaction_value" value="0" /></td></tr>
+                        <tr><td>Комментарий</td><td><input type="text" id="transaction_comment_id" name="transaction_comment" value="Frontend" /></td></tr>
+                        <tr><td colspan=2><input type="button" class="custom-button smaller" name="send" value="Отправить" onClick="sendTransaction();" /></td></tr>
+                        <tr><td colspan=2><label class="warning_text" id="transaction_warning"></label></td></tr>
+                    </table>
+                </form>
+            </div>
+            <div>
+                <div>
+                    <h2>История операций</h2>
+                    <div style="display:none;">
+                        <span>Количество строк на странице</span>
+                        <select id="lines_on_tab">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="transactions_list">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
 </body>
 </html>
