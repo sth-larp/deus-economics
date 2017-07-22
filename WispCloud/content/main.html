@@ -114,30 +114,31 @@
 
         load_slaves();
         load_masters();
-
-        //get supported insurances (for corps only)
     }
 
     function load_masters() {
         sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status) {
+            $("#masters-table tbody tr").remove();
             if (status == 200) {
-                var mastersList = JSON.parse(param);
-                var headRow = "<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>";
+                var masters = JSON.parse(param);
+                $('#masters-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
+
                 var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMaster('{0}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
                 if (selected_role.value < ROLE.ADMIN.value)
                     row = rowNormal;
 
-                var arr = [];
-                for (i = 0; i < mastersList.length; i++) {
-                    var roleRus = get_role(mastersList[i].Role).rusname;
-                    arr[i] = format(row, [mastersList[i].Master, roleRus]);
+                for (i = 0; i < masters.length; i++) {
+                    var roleRus = get_role(masters[i].Role).rusname;
+                    var newRow = format(row, [masters[i].Master, roleRus]);
+                    $('#masters-table').append(newRow);
                 }
-                var page = buildTabs(arr, lines_on_tab, "masters_table", headRow);
-                document.getElementById("masters-list-content").innerHTML = page;
-                var t = document.getElementById("masters_table_0");
-                if (t != null) t.style.display = "block";
-                initTabsControl("masters_table");
+
+                if(selected_role.value >= ROLE.ADMIN.value)
+                    $('#masters-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_master_menu();\"/></td><td></td><td></td></tr>");
+            }
+            else {
+                document.getElementById("masters-table-warning").innerHTML = param;
             }
         });
     }
@@ -145,27 +146,27 @@
 
     function load_slaves() {
         sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function(param, status) {
+            $("#slaves-table tbody tr").remove();
+            
             if (status == 200) {
-                document.getElementById("slaves-list-content").innerHTML = "";
-                var slaveList = JSON.parse(param);
-
-                var head_str = "<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>";
+                var slaves = JSON.parse(param);
                 var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelAccess('{0}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
+
                 if (selected_role.value < ROLE.ADMIN.value)
                     row = rowNormal;
 
-                var sstr = [];
-                for (i = 0; i < slaveList.length; i++) {
-                    var roleRus = get_role(slaveList[i].Role).rusname;
-                    sstr[i] = format(row, [slaveList[i].Slave, roleRus]);
-                }
-                var slaveStr = buildTabs(sstr, lines_on_tab, "slaves_table", head_str);
-                document.getElementById("slaves-list-content").innerHTML = slaveStr;
-                var t = document.getElementById("slaves_table_0");
-                if (t != null) t.style.display = "table";
-                initTabsControl("slaves_table");
+                if(slaves.length > 0)
+                    $('#slaves-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
 
+                for (i = 0; i < slaves.length; i++) {
+                    var roleRus = get_role(slaves[i].Role).rusname;
+                    var newRow = format(row, [slaves[i].Slave, roleRus]);
+                    $('#slaves-table').append(newRow);
+                }
+            }
+            else {
+                document.getElementById("slaves-table-warning").innerHTML = param;
             }
         });
     }
@@ -350,7 +351,13 @@
         var e = document.getElementById('level-selector');
         document.getElementById('ins_form_level').innerHTML = e.options[e.selectedIndex].value;
         document.getElementById('add_ins_overlay').style.display = 'flex';
-        document.getElementById("add_ins_warning").innerHTML = "";
+        document.getElementById('add_ins_warning').innerHTML = "";
+    }
+
+    function fill_add_master_menu() {
+        document.getElementById('master_form_user').value = "";
+        document.getElementById('add_master_overlay').style.display = 'flex';
+        document.getElementById('add_master_warning').innerHTML = "";
     }
 
     function run_add_insurance() {
@@ -369,10 +376,30 @@
         }, data);
     }
 
+    function run_add_master() {
+        document.getElementById("add_master_warning").innerHTML = "";
+        var master = document.getElementById('master_form_user').value;
+        var role = document.getElementById('master_form_role').value;
+        var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": role });
+        sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
+            if (status == 200) {
+                hide_add_master_menu();
+                load_profile_page();
+            } else {
+                document.getElementById("add_master_warning").innerHTML = param;
+            }
+        }, data);
+    }
+
     function hide_add_ins_menu() {
         document.getElementById('add_ins_overlay').style.display = 'none';
         document.getElementById('ins_form_pass').value = '';
         document.getElementById('ins_form_user').value = '';
+    }
+
+    function hide_add_master_menu() {
+        document.getElementById('add_master_overlay').style.display = 'none';
+        document.getElementById('master_form_user').value = '';
     }
 
     function createHandler(obj, handler) {
@@ -430,13 +457,15 @@
             <div id="slaves_list">
                 <h2>Ваши доступы</h2>
                 <p>Список пользователей, к которым вы имеете доступ</p>
-                <div id="slaves-list-content"></div>
+                <table id="slaves-table"></table>
+                <div id="slaves-table-warning" class="warning-text"></div>
             </div>
 
             <div id="masters_list">
                 <h2>Доверенные лица</h2>
                 <p>Список пользователей, которые имеют доступ к вам</p>
-                <div id="masters-list-content"></div>
+                <table id="masters-table"></table>
+                <div id="masters-table-warning" class="warning-text"></div>
             </div>
 
             <div>
@@ -513,19 +542,41 @@
         <table>
             <tr><td>Страховка:</td><td id="ins_form_name" value="">#CORP</td></tr>
             <tr><td>Уровень:</td><td id="ins_form_level" value=""></td></tr>
-            <tr><td>Логин:</td><td><input id="ins_form_user" type="text" value="" /></td></tr>
-            <tr><td>Пароль:</td><td><input id="ins_form_pass" type="password" value="" /></td></tr>
+            <tr><td>Логин:</td><td><input id="ins_form_user" type="text" value=""/></td></tr>
+            <tr><td>Пароль:</td><td><input id="ins_form_pass" type="password" value=""/></td></tr>
             <tr>
                 <td>
-                    <input id="ins_form_no" type="button" class="custom-button smaller" value="Отменить" onclick="hide_add_ins_menu();" />
+                    <input type="button" class="custom-button smaller" value="Отменить" onclick="hide_add_ins_menu();"/>
                 </td>
                 <td>
-                    <input id="ins_form_ok" type="button" class="custom-button smaller" value="Принять" onclick="run_add_insurance();" />
+                    <input type="button" class="custom-button smaller" value="Принять" onclick="run_add_insurance();"/>
                 </td>
             </tr>
         </table>
         <div class="warning-text" id="add_ins_warning"></div>
     </div>
 </div>
+
+    <div id="add_master_overlay" class="disabling-div">
+        <div style="float: left; margin: 0 auto;">
+            <p>Вы можете дать любому пользователю права на использование вашего счета</p>
+            <p>Чтение: возможность просматривать любую информацию, но не менять ее</p>
+            <p>Снятие: возможность делать переводы, выдавать страховки</p>
+            <p>Админ: возможность, помимо переводов, управлять правами доступа</p>
+            <table>
+                <tr><td>Права:</td><td><select id="master_form_role"><option value="Read">Чтение</option><option value="Withdraw">Снятие</option><option value="Admin">Админ</option></select></td></tr>
+                <tr><td>Логин:</td><td><input id="master_form_user" type="text" value=""/></td></tr>
+                <tr>
+                    <td>
+                        <input type="button" class="custom-button smaller" value="Отменить" onclick="hide_add_master_menu();"/>
+                    </td>
+                    <td>
+                        <input type="button" class="custom-button smaller" value="Принять" onclick="run_add_master();"/>
+                    </td>
+                </tr>
+            </table>
+            <div class="warning-text" id="add_master_warning"></div>
+        </div>
+    </div>
 </body>
 </html>
