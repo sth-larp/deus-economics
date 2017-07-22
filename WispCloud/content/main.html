@@ -35,9 +35,13 @@
     <tr id="index_p_label" style="display:none;"><td>Очки страховки:</td><td id="index_points"></td></tr>\
     <tr id="insurance_label" style="display:none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>\
     </table>\
-	<div id="slaves_list"><h2>Ваши доступы</h2><div id="slaves-list-content"></div>\
+	<div id="slaves_list"><h2>Ваши доступы</h2>\
+            <p>Список пользователей, к которым вы имеете доступ</p>\
+            <div id="slaves-list-content"></div>\
 	</div>\
 	<div id="masters_list"><h2>Доверенные лица</h2>\
+            <p>Список пользователей, которые имеют доступ к вам</p>\
+            <div id="masters-list-content"></div>\
 	</div>\
 	<div><h2>События</h2>\
 		<table id="history">\
@@ -274,32 +278,46 @@
                 });
 
                 load_slaves();
+
+                load_masters();
                 
-				//get masters
-                sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status){
-					var masters_list = JSON.parse(param);
-                    var head_str = "<tr><th>Пользователь</th><th>Роль</th></tr>";
-					var m_str = [];	
-					for (i = 0; i < masters_list.length; i++) {
-					    m_str[i] = "<tr><td>" + masters_list[i].Master +
-                            "</td><td>" + get_role(masters_list[i].Role).rusname + "</td></tr>";
-					}
-					var master_str = buildTabs(m_str, lines_on_tab, "masters_table", head_str);
-					document.getElementById("masters_list").innerHTML = document.getElementById("masters_list").innerHTML + master_str;
-					var t = document.getElementById("masters_table_0");
-					if(t != null) t.style.display = "block";
-					initTabsControl("masters_table");
-                });				
+					
                 //get supported insurances (for corps only)
 
             }
 
+            function load_masters() {
+                sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function (param, status) {
+                    if (status == 200) {
+                        var mastersList = JSON.parse(param);
+                        var headRow = "<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>";
+                        var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMaster('{0}');\"/></td></tr>";
+                        var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
+                        if (selected_role.value < ROLE.ADMIN.value)
+                            row = rowNormal;
+
+                        var arr = [];
+                        for (i = 0; i < mastersList.length; i++) {
+                            var roleRus = get_role(mastersList[i].Role).rusname;
+                            arr[i] = format(row, [mastersList[i].Master, roleRus]);
+                        }
+                        var page = buildTabs(arr, lines_on_tab, "masters_table", headRow);
+                        document.getElementById("masters-list-content").innerHTML = page;
+                        var t = document.getElementById("masters_table_0");
+                        if (t != null) t.style.display = "block";
+                        initTabsControl("masters_table");
+                    }
+                });		
+            }
+
+
             function load_slaves() {
                 sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function (param, status) {
                     if (status == 200) {
+                        document.getElementById("slaves-list-content").innerHTML = "";
                         var slaveList = JSON.parse(param);
 
-                        var head_str = "<tr><th>Пользователь</th><th>Роль</th><th></th></tr>";
+                        var head_str = "<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>";
                         var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelAccess('{0}');\"/></td></tr>";
                         var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
                         if (selected_role.value < ROLE.ADMIN.value)
@@ -324,11 +342,19 @@
                 //TODO вставить диалог
                 var data = JSON.stringify({ "MasterLogin": selected_account, "SlaveLogin": slave, "Role": "None" });
                 sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-                    if (status == 200) {
-                        if (selected_account == main_account)
-                            window.location.reload(false);
-                        load_full_profile();
-                    }
+                    if (selected_account == main_account)
+                        window.location.reload(false); //Потому что еще левый список есть
+                    load_full_profile();
+                }, data);
+            }
+
+            function cancelMaster(master) {
+                //TODO вставить диалог
+                var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": "None" });
+                sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
+                    if (main_account == master)
+                        window.location.reload(false); //Потому что еще левый список есть
+                    load_full_profile();
                 }, data);
             }
 
