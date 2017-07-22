@@ -39,11 +39,20 @@ namespace DeusCloud.Logic.Managers
             _rightsManager = new RightsManager(UserContext);
         }
 
-        public List<Loyalty> GetLoyalties()
+        public List<LoyaltyServerData> GetLoyalties()
         {
-            _rightsManager.CheckRole(AccountRole.Admin | AccountRole.Master);
+            //_rightsManager.CheckRole(AccountRole.Admin | AccountRole.Master);
 
-            return UserContext.Data.Loyalties.ToList();
+            var list = UserContext.Data.Loyalties.ToList();
+            var newList = new List<LoyaltyServerData>();
+
+            list.ForEach(x =>
+            {
+                var l = new LoyaltyServerData(x.Id, x.Insurance, x.LoyalService.Login, x.LoyalService.Fullname);
+                l.MinLevel = x.MinLevel;
+                newList.Add(l);
+            });
+            return newList;
         }
 
         public void DeleteLoyalty(int id)

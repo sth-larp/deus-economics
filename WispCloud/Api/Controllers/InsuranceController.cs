@@ -20,7 +20,7 @@ namespace DeusCloud.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpGet]
         [Route("insurance/loyals")]
-        [ResponseType(typeof(List<Loyalty>))]
+        [ResponseType(typeof(List<LoyaltyServerData>))]
         public IHttpActionResult GetLoyalties()
         {
             return Ok(UserContext.Insurances.GetLoyalties());

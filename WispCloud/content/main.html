@@ -1,399 +1,399 @@
 ﻿<html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>DeusEx Economics</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>DeusEx Economics</title>
 
-    <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="./css/top-menu.css">
-    <link rel="stylesheet" href="./css/left-menu.css">
-    <link rel="stylesheet" href="./css/mobile.css" media="(max-device-width:800px)">
-    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
-    <script type="text/javascript" src="js/deus_api.js"></script>
-    <script type="text/javascript" src="js/slave_box.js"></script>
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/top-menu.css">
+<link rel="stylesheet" href="./css/left-menu.css">
+<link rel="stylesheet" href="./css/mobile.css" media="(max-device-width:800px)">
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="js/deus_api.js"></script>
+<script type="text/javascript" src="js/slave_box.js"></script>
 
-        <script type="text/javascript">
-            var main_account = '';
-            var selected_account = '';
-            var selected_role = ROLE.MASTER;
-            var selected_acc_role = ACC_ROLE.PERSON;
-            var main_profile = {}
-            var lines_on_tab = 20;
-            var corpNames = ['Serenity', 'Panam', 'JJ', 'Govt'];
+<script type="text/javascript">
+    var main_account = '';
+    var selected_account = '';
+    var selected_role = ROLE.MASTER;
+    var selected_acc_role = ACC_ROLE.PERSON;
+    var main_profile = {}
+    var lines_on_tab = 20;
+    var corpNames = ['Serenity', 'Panam', 'JJ', 'Govt'];
 
 
-        //------------------------------------------------------------------------------------------------------------------------------------------------------------
-        //check if login is not set, return to login page
-        function preLoad()
-        {
-            try {
-                main_account = get_auth_tok_user();
-                selected_account = main_account;
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //check if login is not set, return to login page
+    function preLoad() {
+        try {
+            main_account = get_auth_tok_user();
+            selected_account = main_account;
 
-                sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param, status){
-                    if (status == 200) {
-                        main_profile = JSON.parse(param);
-                        document.getElementById("current_account").innerHTML = "Привет, " + main_profile.Login;
-                        load_profile_page(main_profile.Login);
-                    }
-                    else if (status == 401) {
-                        loginRedirect();
-                    }
-                    else{
-                        alert(param + "\n\n" + status);
-                    }
-                });
-            }
-            catch(e) {
-                loginRedirect();
-            }
-            sendAPIRequest(url + "/api/accounts/access/slaves?master=" + main_account, "GET", function (param, status) {
-                if (status == 200)
-                    fill_slave_menu(param, main_account);
-            });
-        }
-
-        function setCurrentAccount(acc, role) {
-            selected_account = acc;
-            selected_role = role;
-            document.getElementById('corp_menu').style.display = 'none';
-            
-            sendAPIRequest(url + "/api/accounts/profile?login=" + selected_account, "GET", function(param, status){
+            sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param, status) {
                 if (status == 200) {
                     main_profile = JSON.parse(param);
+                    document.getElementById("current_account").innerHTML = "Привет, " + main_profile.Login;
                     load_profile_page(main_profile.Login);
-                }
-                else{
+                } else if (status == 401) {
+                    loginRedirect();
+                } else {
                     alert(param + "\n\n" + status);
                 }
             });
+        } catch (e) {
+            loginRedirect();
+        }
+        sendAPIRequest(url + "/api/accounts/access/slaves?master=" + main_account, "GET", function(param, status) {
+            if (status == 200)
+                fill_slave_menu(param, main_account);
+        });
+    }
+
+    function setCurrentAccount(acc, role) {
+        selected_account = acc;
+        selected_role = role;
+        document.getElementById('corp_menu').style.display = 'none';
+
+        sendAPIRequest(url + "/api/accounts/profile?login=" + selected_account, "GET", function(param, status) {
+            if (status == 200) {
+                main_profile = JSON.parse(param);
+                load_profile_page(main_profile.Login);
+            } else {
+                alert(param + "\n\n" + status);
+            }
+        });
+    }
+
+    function fill_full_profile(param) {
+        var prof = {};
+        if (param.length > 0) {
+            prof = JSON.parse(param);
+            selected_acc_role = get_acc_role(prof.User.Role);
+            //result mapping to visual elements
+            document.getElementById("login_name").innerHTML = prof.User.Login + " ";
+            document.getElementById("acc_role").innerHTML = get_acc_role(prof.User.Role).rusname + " ";
+            document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
+            document.getElementById("live_status").innerHTML = prof.User.Status + " ";
+            document.getElementById("current_account_value").innerHTML = prof.User.Cash;
+
+            if (selected_acc_role == ACC_ROLE.CORP) {
+                document.getElementById("current_index").innerHTML = prof.User.Index;
+                document.getElementById("index_points").innerHTML = prof.User.InsurancePoints;
+                document.getElementById("index_label").style.display = "table-row";
+                document.getElementById("index_p_label").style.display = "table-row";
+            }
+
+            if (selected_acc_role == ACC_ROLE.CORP || selected_acc_role == ACC_ROLE.COMPANY) {
+                document.getElementById('corp_menu').style.display = 'block';
+            }
+
+            if (selected_acc_role == ACC_ROLE.PERSON) {
+                document.getElementById("insurance_label").style.display = "table-row";
+                //document.getElementById("index_label").style.display = "none";
+                document.getElementById("insurance").innerHTML = prof.User.Insurance;
+                document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
+            }
+
+            var hist = "<tr><th>Время</th><th>Событие</th></tr>";
+            for (i = 0; i < prof.History.length; i++) {
+                hist += "<tr><td>" + customDateFormat(prof.History[i].Time) + "</td>";
+                hist += "<td>" + prof.History[i].Description + "</td></tr>";
+            }
+            document.getElementById("history").innerHTML = hist;
+        }
+    }
+
+
+    function load_profile_page() {
+        topMenuSwitch(document.getElementById("profile_menu"));
+        document.getElementById("profile_page").style.display = "block";
+
+        sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
+            if (status == 200) fill_full_profile(param);
+            else alert(param + "\n\nStatus " + status);
+        });
+
+        load_slaves();
+        load_masters();
+
+        //get supported insurances (for corps only)
+    }
+
+    function load_masters() {
+        sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status) {
+            if (status == 200) {
+                var mastersList = JSON.parse(param);
+                var headRow = "<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>";
+                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMaster('{0}');\"/></td></tr>";
+                var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
+                if (selected_role.value < ROLE.ADMIN.value)
+                    row = rowNormal;
+
+                var arr = [];
+                for (i = 0; i < mastersList.length; i++) {
+                    var roleRus = get_role(mastersList[i].Role).rusname;
+                    arr[i] = format(row, [mastersList[i].Master, roleRus]);
+                }
+                var page = buildTabs(arr, lines_on_tab, "masters_table", headRow);
+                document.getElementById("masters-list-content").innerHTML = page;
+                var t = document.getElementById("masters_table_0");
+                if (t != null) t.style.display = "block";
+                initTabsControl("masters_table");
+            }
+        });
+    }
+
+
+    function load_slaves() {
+        sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function(param, status) {
+            if (status == 200) {
+                document.getElementById("slaves-list-content").innerHTML = "";
+                var slaveList = JSON.parse(param);
+
+                var head_str = "<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>";
+                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelAccess('{0}');\"/></td></tr>";
+                var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
+                if (selected_role.value < ROLE.ADMIN.value)
+                    row = rowNormal;
+
+                var sstr = [];
+                for (i = 0; i < slaveList.length; i++) {
+                    var roleRus = get_role(slaveList[i].Role).rusname;
+                    sstr[i] = format(row, [slaveList[i].Slave, roleRus]);
+                }
+                var slaveStr = buildTabs(sstr, lines_on_tab, "slaves_table", head_str);
+                document.getElementById("slaves-list-content").innerHTML = slaveStr;
+                var t = document.getElementById("slaves_table_0");
+                if (t != null) t.style.display = "table";
+                initTabsControl("slaves_table");
+
+            }
+        });
+    }
+
+    function cancelAccess(slave) {
+        //TODO вставить диалог
+        var data = JSON.stringify({ "MasterLogin": selected_account, "SlaveLogin": slave, "Role": "None" });
+        sendAPIRequest(url + "/api/accounts/access/set", "POST", function(param, status) {
+            if (selected_account == main_account)
+                window.location.reload(false); //Потому что еще левый список есть
+            load_profile_page();
+        }, data);
+    }
+
+    function cancelMaster(master) {
+        //TODO вставить диалог
+        var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": "None" });
+        sendAPIRequest(url + "/api/accounts/access/set", "POST", function(param, status) {
+            if (main_account == master)
+                window.location.reload(false); //Потому что еще левый список есть
+            load_profile_page();
+        }, data);
+    }
+
+    function load_transactions_page() {
+        topMenuSwitch(document.getElementById("transactions_menu"));
+        document.getElementById("transactions").style.display = "block";
+        document.getElementById("trans_menu_holder").style.display = selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
+
+        load_transactions_table();
+    }
+
+    function load_transactions_table() {
+        document.getElementById("lines_on_tab").value = lines_on_tab;
+        document.getElementById("lines_on_tab").onchange = function() {
+            lines_on_tab = document.getElementById("lines_on_tab").value;
+            //should rebuild transactions table here
+            sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
+                fill_transactions_table(param, status)
+            });
+        }
+        sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
+            fill_transactions_table(param, status);
+        });
+    }
+
+    function sendTransaction(elem) {
+        var user = document.getElementById("user_name_id").value;
+        var sum = document.getElementById("transaction_value_id").value;
+        var comment = document.getElementById("transaction_comment_id").value;
+        var txtField = document.getElementById("transaction_warning");
+        var data = JSON.stringify({ "Sender": selected_account, "Receiver": user, "Amount": sum, "Description": comment });
+
+        sendAPIRequest(url + "/api/transfer", "POST", function(param, status) {
+            if (status == 200) {
+                txtField.innerHTML = "";
+                load_transactions_table();
+            } else
+                txtField.innerHTML = param;
+        }, data);
+    }
+
+    function fill_transactions_table(param, status) {
+        if (status != 200) {
+            document.getElementById("transactions_list").innerHTML = "Error " + status + "\n" + param;
+            return;
         }
 
+        var t_list = JSON.parse(param);
+        var head_str = "<tr><th>Перевел</th><th>Получил</th><th>Время</th><th>Сумма</th><th>Комментарий</th></tr>";
+        var t_str = [];
+        for (i = 0; i < t_list.length; i++) {
+            t_str[i] = "<tr><td>" + t_list[i].Sender
+                + "</td><td>" + t_list[i].Receiver + "</td><td>" + customDateFormat(t_list[i].Time)
+                + "</td><td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
+        }
+        var page_str = buildTabs(t_str, lines_on_tab, "transaction_table", head_str);
+        document.getElementById("transactions_list").innerHTML = page_str;
+        var t = document.getElementById("transaction_table_0");
+        if (t != null) t.style.display = "block";
+        initTabsControl("transaction_table");
+    }
 
-        
-            function insertDocumentToWrapper(wrapper_id, document_href, rq_type){
-                //load sub-page into wrapper
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function()
-                {
-                    if (this.readyState == 4 && this.status == 200) document.getElementById(wrapper_id).innerHTML = xhttp.responseText;
-                };
-                xhttp.open(rq_type, document_href, true);
-                xhttp.setRequestHeader("Authorization", get_auth_tok());
-                xhttp.send();
-            }
+    function load_corp_page() {
+        topMenuSwitch(document.getElementById("corp_menu"));
+        document.getElementById("corp_admin").style.display = 'block';
 
-            function fill_full_profile(param) {
-                var prof = {};
-                if (param.length > 0) {
-                    prof = JSON.parse(param);
-                    selected_acc_role = get_acc_role(prof.User.Role);
-                    //result mapping to visual elements
-                    document.getElementById("login_name").innerHTML = prof.User.Login + " ";
-                    document.getElementById("acc_role").innerHTML = get_acc_role(prof.User.Role).rusname + " ";
-                    document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
-                    document.getElementById("live_status").innerHTML = prof.User.Status + " ";
-                    document.getElementById("current_account_value").innerHTML = prof.User.Cash;
+        load_ins_holders();
 
-                    if (selected_acc_role == ACC_ROLE.CORP) {
-                        document.getElementById("current_index").innerHTML = prof.User.Index;
-                        document.getElementById("index_points").innerHTML = prof.User.InsurancePoints;
-                        document.getElementById("index_label").style.display = "table-row";
-                        document.getElementById("index_p_label").style.display = "table-row";
-                        //document.getElementById("insurance_label").style.display = "none";
-                        document.getElementById("insurances_supported").style.display = "block";
-                    }
+        load_loyalties();
 
-                    if (selected_acc_role == ACC_ROLE.CORP || selected_acc_role == ACC_ROLE.COMPANY) {
-                        document.getElementById('corp_menu').style.display = 'block';
-                    }
+        //payments
+        sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function(param, status) {
+            if (status == 200) {
+                var payments = JSON.parse(param);
+                var head_str = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
+                var l_str = [];
+                for (i = 0; i < payments.length; i++) {
 
-                    if (selected_acc_role == ACC_ROLE.PERSON) {
-                        document.getElementById("insurance_label").style.display = "table-row";
-                        //document.getElementById("index_label").style.display = "none";
-                        document.getElementById("insurance").innerHTML = prof.User.Insurance;
-                        document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
-                    }
-
-                    var hist = "<tr><th>Время</th><th>Событие</th></tr>";
-                    for (i = 0; i < prof.History.length; i++) {
-                        hist += "<tr><td>" + customDateFormat(prof.History[i].Time) + "</td>";
-                        hist += "<td>" + prof.History[i].Description + "</td></tr>";
-                    }
-                    document.getElementById("history").innerHTML = hist;
+                    l_str[i] = "<tr><td>" + payments[i].ReceiverName +
+                        "</td><td>" + payments[i].Amount +
+                        "</td><td>" + customDateFormat(payments[i].LastPaid) + "</td></tr>";
                 }
-            }
+                var page_str = buildTabs(l_str, lines_on_tab, "payments_table", head_str);
+                document.getElementById("payments_list").innerHTML = page_str;
+                var t = document.getElementById("payments_table_0");
+                if (t != null) t.style.display = "block";
 
+                initTabsControl("payments_table");
+            } else alert(param + "\n\nStatus " + status);
+        });
+    }
 
-            function load_profile_page() {
-                topMenuSwitch(document.getElementById("profile_menu"));
-                document.getElementById("profile_page").style.display = "block";
+    function load_ins_holders() {
+        if (corpNames.indexOf(selected_account) == -1) return;
 
-                sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
-                    if (status == 200) fill_full_profile(param);
-                    else alert(param + "\n\nStatus " + status);
-                });
+        document.getElementById("insurance-holder").style.display = 'block';
+        $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
 
-                load_slaves();
-                load_masters();
-                
-                //get supported insurances (for corps only)
-            }
+        sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function(param, status) {
+            $("#insurance-table tbody tr").remove();
+            $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
+            if (status == 200) {
+                var holders = JSON.parse(param);
+                var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelHolder('{1}');\"/></td></tr>";
+                var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
 
-            function load_masters() {
-                sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function (param, status) {
-                    if (status == 200) {
-                        var mastersList = JSON.parse(param);
-                        var headRow = "<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>";
-                        var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMaster('{0}');\"/></td></tr>";
-                        var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
-                        if (selected_role.value < ROLE.ADMIN.value)
-                            row = rowNormal;
+                if (selected_role.value < ROLE.WITHDRAW.value)
+                    row = rowNormal;
 
-                        var arr = [];
-                        for (i = 0; i < mastersList.length; i++) {
-                            var roleRus = get_role(mastersList[i].Role).rusname;
-                            arr[i] = format(row, [mastersList[i].Master, roleRus]);
-                        }
-                        var page = buildTabs(arr, lines_on_tab, "masters_table", headRow);
-                        document.getElementById("masters-list-content").innerHTML = page;
-                        var t = document.getElementById("masters_table_0");
-                        if (t != null) t.style.display = "block";
-                        initTabsControl("masters_table");
-                    }
-                });		
-            }
-
-
-            function load_slaves() {
-                sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function (param, status) {
-                    if (status == 200) {
-                        document.getElementById("slaves-list-content").innerHTML = "";
-                        var slaveList = JSON.parse(param);
-
-                        var head_str = "<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>";
-                        var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelAccess('{0}');\"/></td></tr>";
-                        var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
-                        if (selected_role.value < ROLE.ADMIN.value)
-                            row = rowNormal;
-
-                        var sstr = [];
-                        for (i = 0; i < slaveList.length; i++) {
-                            var roleRus = get_role(slaveList[i].Role).rusname;
-                            sstr[i] = format(row, [slaveList[i].Slave, roleRus]);
-                        }
-                        var slaveStr = buildTabs(sstr, lines_on_tab, "slaves_table", head_str);
-                        document.getElementById("slaves-list-content").innerHTML = slaveStr;
-                        var t = document.getElementById("slaves_table_0");
-                        if (t != null) t.style.display = "table";
-                        initTabsControl("slaves_table");
-
-                    }
-                });
-            }
-
-            function cancelAccess(slave) {
-                //TODO вставить диалог
-                var data = JSON.stringify({ "MasterLogin": selected_account, "SlaveLogin": slave, "Role": "None" });
-                sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-                    if (selected_account == main_account)
-                        window.location.reload(false); //Потому что еще левый список есть
-                    load_profile_page();
-                }, data);
-            }
-
-            function cancelMaster(master) {
-                //TODO вставить диалог
-                var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": "None" });
-                sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-                    if (main_account == master)
-                        window.location.reload(false); //Потому что еще левый список есть
-                    load_profile_page();
-                }, data);
-            }
-
-            function load_transactions_page() {
-                topMenuSwitch(document.getElementById("transactions_menu"));
-                document.getElementById("transactions").style.display = "block";
-                document.getElementById("trans_menu_holder").style.display = selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
-
-                load_transactions_table();
-            }
-
-            function load_transactions_table() {
-                document.getElementById("lines_on_tab").value = lines_on_tab;
-                document.getElementById("lines_on_tab").onchange = function(){
-                    lines_on_tab = document.getElementById("lines_on_tab").value;
-                    //should rebuild transactions table here
-                    sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status){
-                        fill_transactions_table(param, status)});
-                }
-                sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
-                    fill_transactions_table(param, status);});
-            }
-
-            function sendTransaction(elem) {
-                var user = document.getElementById("user_name_id").value;
-                var sum = document.getElementById("transaction_value_id").value;
-                var comment = document.getElementById("transaction_comment_id").value;
-                var txtField = document.getElementById("transaction_warning");
-                var data = JSON.stringify({ "Sender": selected_account, "Receiver": user, "Amount": sum, "Description": comment });
-
-                sendAPIRequest(url + "/api/transfer", "POST", function(param, status) {
-                    if (status == 200) {
-                        txtField.innerHTML = "";
-                        load_transactions_table();
-                    } 
-                    else
-                        txtField.innerHTML = param;
-                }, data);
-            }
-
-            function fill_transactions_table(param, status) {
-                if (status != 200) {
-                    document.getElementById("transactions_list").innerHTML = "Error " + status + "\n" + param;
-                    return;
+                for (i = 0; i < holders.length; i++) {
+                    var newRow = format(row, [holders[i].UserFullname, holders[i].UserLogin, holders[i].InsuranceLevel]);
+                    $('#insurance-table').append(newRow);
                 }
 
-                var t_list = JSON.parse(param);
-                var head_str = "<tr><th>Перевел</th><th>Получил</th><th>Время</th><th>Сумма</th><th>Комментарий</th></tr>";
-                var t_str = [];
-                for (i = 0; i < t_list.length; i++) {
-                    t_str[i] = "<tr><td>" + t_list[i].Sender 
-                    + "</td><td>" + t_list[i].Receiver + "</td><td>" + customDateFormat(t_list[i].Time) 
-                    + "</td><td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
+                if (selected_role.value >= ROLE.WITHDRAW.value) {
+                    $('#insurance-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_insurance_menu();\"/></td><td><select id=\"level-selector\"><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option></td><td></td></tr>");
                 }
-                var page_str = buildTabs(t_str, lines_on_tab, "transaction_table", head_str);
-                document.getElementById("transactions_list").innerHTML = page_str;
-                var t = document.getElementById("transaction_table_0");
-                if(t != null) t.style.display = "block";
-                initTabsControl("transaction_table");
+            } else {
+                document.getElementById("ins-table-warning").innerHTML = param;
             }
+        });
+    }
 
-            function load_corp_page() {
-                topMenuSwitch(document.getElementById("corp_menu"));
-                document.getElementById("corp_admin").style.display = 'block';
+    function load_loyalties() {
+        if (corpNames.indexOf(selected_account) == -1) return;
 
-                load_ins_holders();
+        document.getElementById("loyalty-holder").style.display = 'block';
+        $('#loyalty-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
 
-                //payments
-                sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function(param, status) {
-                    if (status == 200) 
-					{
-                        var payments = JSON.parse(param);
-                        var head_str = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
-						var l_str = [];	
-						for (i = 0; i < payments.length; i++) {
-						    
-						    l_str[i] = "<tr><td>" + payments[i].ReceiverName +
-                                "</td><td>" + payments[i].Amount + 
-                                "</td><td>" + customDateFormat(payments[i].LastPaid) + "</td></tr>";
-						}
-						var page_str = buildTabs(l_str, lines_on_tab, "payments_table", head_str);
-    					document.getElementById("payments_list").innerHTML = page_str;
-    					var t = document.getElementById("payments_table_0");
-    					if(t != null) t.style.display = "block";
+        sendAPIRequest(url + "/api/insurance/loyals", "GET", function(param, status) {
+            $("#loyalty-table tbody tr").remove();
+            $('#loyalty-table').append('<tr><th>Компания</th><th>iD</th></tr>');
+            if (status == 200) {
+                var loyals = JSON.parse(param);
+                var row = "<tr><td>{0}</td><td>{1}</td></tr>";
 
-						initTabsControl("payments_table");
-					}
-                    else alert(param + "\n\nStatus " + status);
-                });				
+                for (i = 0; i < loyals.length; i++) {
+                    if (loyals[i].Insurance != selected_account) continue;
+
+                    var newRow = format(row, [loyals[i].LoyalFullName, loyals[i].LoyalName]);
+                    $('#loyalty-table').append(newRow);
+                }
+            } else {
+                document.getElementById("loyalty-table-warning").innerHTML = param;
             }
+        });
+    }
 
-            function load_ins_holders() {
-                if (corpNames.indexOf(selected_account) == -1) return;
-                
-                document.getElementById("insurance-holder").style.display = 'block';
-                $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
-
-                sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
-                        $("#insurance-table tbody tr").remove();
-                        $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
-                        if (status == 200) {
-                            var holders = JSON.parse(param);
-                            var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelHolder('{1}');\"/></td></tr>";
-                            var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
-
-                            if (selected_role.value < ROLE.WITHDRAW.value)
-                                row = rowNormal;
-
-                            for (i = 0; i < holders.length; i++) {
-                                var newRow = format(row, [holders[i].UserFullname, holders[i].UserLogin, holders[i].InsuranceLevel]);
-                                $('#insurance-table').append(newRow);
-                            }
-
-                            if (selected_role.value >= ROLE.WITHDRAW.value) {
-                                $('#insurance-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_insurance_menu();\"/></td><td><select id=\"level-selector\"><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option></td><td></td></tr>");
-                            }
-                        }
-                        else {
-                            document.getElementById("insurance-table").innerHTML = param;
-                        }
-                });
+    function cancelHolder(holder) {
+        sendAPIRequest(url + "/api/insurance/removeholder?user=" + holder, "POST", function(param, status) {
+            if (status == 200) {
+                load_corp_page();
+            } else {
+                document.getElementById("ins-table-warning").innerHTML = param;
             }
+        });
+    }
 
-            function cancelHolder(holder) {
-                sendAPIRequest(url + "/api/insurance/removeholder?user=" + holder, "POST", function (param, status) {
-                    if (status == 200) {
-                        load_corp_page();
-                    }
-                    else {
-                        document.getElementById("ins_table_warning").innerHTML = param;
-                    }
-                });
-            }
+    function fill_add_insurance_menu() {
+        document.getElementById('ins_form_name').innerHTML = selected_account;
+        var e = document.getElementById('level-selector');
+        document.getElementById('ins_form_level').innerHTML = e.options[e.selectedIndex].value;
+        document.getElementById('add_ins_overlay').style.display = 'flex';
+        document.getElementById("add_ins_warning").innerHTML = "";
+    }
 
-            function fill_add_insurance_menu() {
-                document.getElementById('ins_form_name').innerHTML = selected_account;
-                var e = document.getElementById('level-selector');
-                document.getElementById('ins_form_level').innerHTML = e.options[e.selectedIndex].value;
-                document.getElementById('add_ins_overlay').style.display = 'flex';
-                document.getElementById("add_ins_warning").innerHTML = "";
+    function run_add_insurance() {
+        document.getElementById("add_ins_warning").innerHTML = "";
+        var level = document.getElementById('ins_form_level').innerHTML;
+        var holder = document.getElementById('ins_form_user').value;
+        var pass = document.getElementById('ins_form_pass').value;
+        var data = JSON.stringify({ "Company": selected_account, "Holder": holder, "Password": pass, "Level": level });
+        sendAPIRequest(url + "/api/insurance/changeholder", "POST", function(param, status) {
+            if (status == 200) {
+                hide_add_ins_menu();
+                load_corp_page();
+            } else {
+                document.getElementById("add_ins_warning").innerHTML = param;
             }
+        }, data);
+    }
 
-            function run_add_insurance() {
-                document.getElementById("add_ins_warning").innerHTML = "";
-                var level = document.getElementById('ins_form_level').innerHTML;
-                var holder = document.getElementById('ins_form_user').value;
-                var pass = document.getElementById('ins_form_pass').value;
-                var data = JSON.stringify({ "Company": selected_account, "Holder": holder, "Password": pass, "Level": level });
-                sendAPIRequest(url + "/api/insurance/changeholder", "POST", function (param, status) {
-                    if (status == 200) {
-                        hide_add_ins_menu();
-                        load_corp_page();
-                    }
-                    else {
-                        document.getElementById("add_ins_warning").innerHTML = param;
-                    }
-                }, data);
-            }
+    function hide_add_ins_menu() {
+        document.getElementById('add_ins_overlay').style.display = 'none';
+        document.getElementById('ins_form_pass').value = '';
+        document.getElementById('ins_form_user').value = '';
+    }
 
-            function hide_add_ins_menu() {
-                document.getElementById('add_ins_overlay').style.display = 'none';
-                document.getElementById('ins_form_pass').value = '';
-                document.getElementById('ins_form_user').value = '';
-            }
+    function createHandler(obj, handler) {
+        return function() { handler(obj); }
+    }
 
-            function createHandler(obj, handler) {
-                return function() { handler(obj); }
-            }
+    function topMenuSwitch(e) {
+        $('.top-menu-elem').removeClass('top-menu-selected');
+        e.classList.add('top-menu-selected');
+        $('.page-display').css('display', 'none');
+    }
 
-            function topMenuSwitch(e) {
-                $('.top-menu-elem').removeClass('top-menu-selected');
-                e.classList.add('top-menu-selected');
-                $('.page-display').css('display', 'none');
-            }
-
-            function initUI() {
-                preLoad();
-            }
-
-            function showLeftMenu(x) {
-                if (x) document.getElementById("left_menu").classList.add('mobile-visible');
-                else document.getElementById("left_menu").classList.remove('mobile-visible');
-            }
-    </script>
+    function showLeftMenu(x) {
+        if (x) document.getElementById("left_menu").classList.add('mobile-visible');
+        else document.getElementById("left_menu").classList.remove('mobile-visible');
+    }
+</script>
 </head>
-<body onload="initUI();">
+
+
+<body onload="preLoad();">
 <div id="top_menu" class="top-menu">
     <div id="menu-icon" class="top-menu-elem" onclick="showLeftMenu(true);">&#9776;</div>
     <div id="current_account" class="top-menu-elem greetings">Привет,</div>
@@ -443,11 +443,6 @@
                 <h2>События</h2>
                 <table id="history"></table>
             </div>
-
-            <div id="insurances_supported" style="display: none;">
-                <table id="insurance_supported_list">
-                </table>
-            </div>
         </div>
 
         <!-- Страница Управление -->
@@ -455,15 +450,20 @@
         <div id="corp_admin" class="page-display">
             <div id="insurance-holder" style="display: none;">
                 <h2>Страховки</h2>
+                <p>Перечень лиц, имеющих вашу страховку. При добавлении лиц в список с вас списываются очки страховки. При удалении страховки потраченные очки не возвращаются. </p>
                 <table id="insurance-table"></table>
-                <div id="ins_table_warning" class="warning-text" style="float: left; width: 100%; height: 10%;">
-                </div>
+                <div id="ins-table-warning" class="warning-text"></div>
             </div>
 
-            <div>
-                <div>
-                    <h2>Сотрудники</h2>
-                </div>
+            <div id="loyalty-holder" style="display: none;">
+                <h2>Заведения</h2>
+                <p>Перечень заведений, которые обслуживают вашу страховку. Если вы хотите добавить или удалить какое-то заведение, обратитесь к Администрации.</p>
+                <table id="loyalty-table"></table>
+                <div id="loyalty-table-warning" class="warning-text"></div>
+            </div>
+
+            <div id="emloyee-holder">
+                <h2>Сотрудники</h2>
                 <div id="payments_list"></div>
             </div>
         </div>
@@ -524,9 +524,7 @@
                 </td>
             </tr>
         </table>
-        <div style="float: left; width: 100%; height: 10%;">
-            <span class="warning-text" id="add_ins_warning"></span>
-        </div>
+        <div class="warning-text" id="add_ins_warning"></div>
     </div>
 </div>
 </body>

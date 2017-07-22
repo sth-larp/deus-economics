@@ -310,6 +310,7 @@
     <Compile Include="Logic\Managers\RightsManager.cs" />
     <Compile Include="Logic\Managers\ConstantManager.cs" />
     <Compile Include="Logic\Managers\TransactionsManager.cs" />
+    <Compile Include="Logic\Server\LoyaltyServerData.cs" />
     <Compile Include="Migrations\201706151812158_First.cs" />
     <Compile Include="Migrations\201706151812158_First.Designer.cs">
       <DependentUpon>201706151812158_First.cs</DependentUpon>

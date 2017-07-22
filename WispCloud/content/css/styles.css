@@ -82,6 +82,9 @@ th, td {
 .warning-text {
     font-size: 80%;
     color: crimson;
+    float: left; 
+    width: 100%; 
+    height: 10%;
 }
 
 #content-wrapper {

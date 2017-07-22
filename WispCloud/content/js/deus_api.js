@@ -236,3 +236,15 @@ function initTabsControl(page_id_prefix) {
     document.getElementById(page_id_prefix + "_fw").onclick = createArrowHandler(1);
     document.getElementById(page_id_prefix + "_back").onclick = createArrowHandler(-1);
 }
+
+
+function insertDocumentToWrapper(wrapper_id, document_href, rq_type) {
+    //load sub-page into wrapper
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) document.getElementById(wrapper_id).innerHTML = xhttp.responseText;
+    };
+    xhttp.open(rq_type, document_href, true);
+    xhttp.setRequestHeader("Authorization", get_auth_tok());
+    xhttp.send();
+}
