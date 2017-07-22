@@ -35,7 +35,7 @@
     <tr id="index_p_label" style="display:none;"><td>Очки страховки:</td><td id="index_points"></td></tr>\
     <tr id="insurance_label" style="display:none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>\
     </table>\
-	<div id="slaves_list"><h2>Ваши доступы</h2>\
+	<div id="slaves_list"><h2>Ваши доступы</h2><div id="slaves-list-content"></div>\
 	</div>\
 	<div id="masters_list"><h2>Доверенные лица</h2>\
 	</div>\
@@ -132,9 +132,9 @@
             catch(e) {
                 loginRedirect();
             }
-            sendAPIRequest(url + "/api/accounts/access/slaves?master=" + main_account, "GET", function(param, status) {
+            sendAPIRequest(url + "/api/accounts/access/slaves?master=" + main_account, "GET", function (param, status) {
                 if (status == 200)
-                    fill_slaves(param, main_account);
+                    fill_slave_menu(param, main_account);
             });
         }
 
@@ -273,21 +273,8 @@
                     else alert(param + "\n\nStatus " + status);
                 });
 
-                //get slaves
-                sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function(param, status){
-					var slave_list = JSON.parse(param);
-					var head_str = "<tr><th>Пользователь</th><th>Роль</th></tr>";
-					var s_str = [];	
-					for (i = 0; i < slave_list.length; i++) {
-					    s_str[i] = "<tr><td>" + slave_list[i].Slave +
-                            "</td><td>" + slave_list[i].Role + "</td></tr>";
-					}
-					var slave_str = buildTabs(s_str, lines_on_tab, "slaves_table", head_str);
-					document.getElementById("slaves_list").innerHTML = document.getElementById("slaves_list").innerHTML + slave_str;
-					var t = document.getElementById("slaves_table_0");
-					if(t != null) t.style.display = "table";
-					initTabsControl("slaves_table");
-                });
+                load_slaves();
+                
 				//get masters
                 sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status){
 					var masters_list = JSON.parse(param);
@@ -305,6 +292,44 @@
                 });				
                 //get supported insurances (for corps only)
 
+            }
+
+            function load_slaves() {
+                sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function (param, status) {
+                    if (status == 200) {
+                        var slaveList = JSON.parse(param);
+
+                        var head_str = "<tr><th>Пользователь</th><th>Роль</th><th></th></tr>";
+                        var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelAccess('{0}');\"/></td></tr>";
+                        var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
+                        if (selected_role.value < ROLE.ADMIN.value)
+                            row = rowNormal;
+
+                        var sstr = [];
+                        for (i = 0; i < slaveList.length; i++) {
+                            var roleRus = get_role(slaveList[i].Role).rusname;
+                            sstr[i] = format(row, [slaveList[i].Slave, roleRus]);
+                        }
+                        var slaveStr = buildTabs(sstr, lines_on_tab, "slaves_table", head_str);
+                        document.getElementById("slaves-list-content").innerHTML = slaveStr;
+                        var t = document.getElementById("slaves_table_0");
+                        if (t != null) t.style.display = "table";
+                        initTabsControl("slaves_table");
+
+                    }
+                });
+            }
+
+            function cancelAccess(slave) {
+                //TODO вставить диалог
+                var data = JSON.stringify({ "MasterLogin": selected_account, "SlaveLogin": slave, "Role": "None" });
+                sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
+                    if (status == 200) {
+                        if (selected_account == main_account)
+                            window.location.reload(false);
+                        load_full_profile();
+                    }
+                }, data);
             }
 
             function load_transactions() {

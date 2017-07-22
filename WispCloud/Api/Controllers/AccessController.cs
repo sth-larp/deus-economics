@@ -12,7 +12,7 @@ namespace DeusCloud.Api.Controllers
     [BasicAuth]
     public sealed class AccessController : ApiController
     {
-        /// <summary>Set access roles for master-slave account pair</summary>
+        /// <summary>Установить роли доступа одного аккаунта к другому</summary>
         /// <param name="accessData">Access roles</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>

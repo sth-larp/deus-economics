@@ -137,7 +137,9 @@ namespace DeusCloud.Logic.Managers
             Try.Argument(accessData, nameof(accessData));
 
             var slaveAccount = _userManager.FindById(accessData.SlaveLogin);
-            CheckForAccessOverSlave(slaveAccount, AccountAccessRoles.Admin);
+
+            if(accessData.Role != AccountAccessRoles.None)
+                CheckForAccessOverSlave(slaveAccount, AccountAccessRoles.Admin);
 
             var masterAccount = _userManager.FindById(accessData.MasterLogin);
             Try.NotNull(masterAccount, $"Не найден логин: {accessData.MasterLogin}.");
@@ -145,7 +147,12 @@ namespace DeusCloud.Logic.Managers
             var currentAccess = UserContext.Data.AccountAccesses.
                 Find(accessData.SlaveLogin, accessData.MasterLogin);
 
-            if (currentAccess == null)
+            if (accessData.Role == AccountAccessRoles.None)
+            {
+                UserContext.Data.AccountAccesses.Remove(currentAccess);
+                currentAccess = null;
+            }
+            else if(currentAccess == null)
                 currentAccess = CreateAccountAccess(slaveAccount, masterAccount, accessData.Role);
             else
                 currentAccess.Role = accessData.Role;

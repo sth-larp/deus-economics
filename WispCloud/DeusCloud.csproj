@@ -211,6 +211,7 @@
     <Content Include="content\css\mobile.css" />
     <Content Include="content\css\styles.css" />
     <Content Include="content\css\top-menu.css" />
+    <Content Include="content\image\cross-icon.png" />
     <Content Include="content\js\deus_api.js" />
     <Content Include="content\js\slave_box.js" />
     <Content Include="content\main.html">

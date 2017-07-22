@@ -65,6 +65,11 @@ th, td {
     text-overflow: clip;
 }
 
+.btn-image {
+    cursor:pointer;
+    height: 1.3em;
+}
+
 .custom-button:hover {
     background: #849aaa;
     cursor:pointer;

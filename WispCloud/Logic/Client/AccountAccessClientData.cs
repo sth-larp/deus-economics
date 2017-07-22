@@ -26,7 +26,6 @@ namespace DeusCloud.Logic.Client
         {
             Try.NotEmpty(MasterLogin, $"{nameof(MasterLogin)} cant be empty.");
             Try.NotEmpty(SlaveLogin, $"{nameof(SlaveLogin)} cant be empty.");
-            Try.Condition(Role != null, $"{nameof(Role)} cant be null.");
         }
 
     }

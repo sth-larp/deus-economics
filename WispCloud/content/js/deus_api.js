@@ -39,9 +39,9 @@ function get_acc_role(role) {
 }
 
 function format(source, params) {
-    $.each(params, function (i, n) {
+    $.each(params, function(i, n) {
         source = source.replace(new RegExp("\\{" + i + "\\}", "g"), n);
-    })
+    });
     return source;
 }
 

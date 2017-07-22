@@ -24,7 +24,7 @@ function add_slave_row(acc, roleName, id, box) {
     elem.dataset.role = role.name;
 }
 
-function fill_slaves(json, master) {
+function fill_slave_menu(json, master) {
     var slavebox = document.getElementById("slave_list");
     add_slave_row(master, ROLE.MASTER.name, 333, slavebox);
     $('#slave_btn333').addClass('selected-slave');
