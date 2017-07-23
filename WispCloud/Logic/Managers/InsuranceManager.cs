@@ -16,7 +16,6 @@ namespace DeusCloud.Logic.Managers
 {
     public class InsuranceManager : ContextHolder
     {
-        private UserManager _userManager;
         private RightsManager _rightsManager;
 
         private static string CorpName1 = "JJ";
@@ -35,14 +34,11 @@ namespace DeusCloud.Logic.Managers
 
         public InsuranceManager(UserContext context) : base(context)
         {
-            _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
         }
 
         public List<LoyaltyServerData> GetLoyalties()
         {
-            //_rightsManager.CheckRole(AccountRole.Admin | AccountRole.Master);
-
             var list = UserContext.Data.Loyalties.ToList();
             var newList = new List<LoyaltyServerData>();
 
@@ -68,7 +64,7 @@ namespace DeusCloud.Logic.Managers
             UserContext.AddGameEvent(loyalty.LoyalName, GameEventType.Insurance, 
                 $"{loyalty.LoyalService.Login} перестал обслуживать страховку {loyalty.LoyalName}", true);
 
-            var corp = _userManager.FindById(loyalty.LoyalName);
+            var corp = UserContext.Accounts.Get(loyalty.LoyalName);
             if (corp == null) return;
 
             UserContext.AddGameEvent(corp.Login, GameEventType.Insurance,
@@ -79,8 +75,8 @@ namespace DeusCloud.Logic.Managers
         {
             _rightsManager.CheckRole(AccountRole.Admin);
 
-            var corp = _userManager.FindById(data.LoyalName);
-            Try.NotNull(corp, $"Не найден логин: {corp}");
+            var corp = UserContext.Accounts.GetOrFail(data.LoyalName);//_userManager.FindById(data.LoyalName);
+
             Try.Condition((corp.Role & AccountRole.Company) > 0, 
                 $"{corp} не является организацией типа {AccountRole.Company}");
 
@@ -115,22 +111,23 @@ namespace DeusCloud.Logic.Managers
 
         public List<Loyalty> GetCompanyLoyalties(string login)
         {
-            _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            var acc = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
 
-            return UserContext.Data.Loyalties.Where(x => x.LoyalService.Login == login).ToList();
+            return UserContext.Data.Loyalties.Where(x => x.LoyalService.Login == acc.Login).ToList();
         }
 
         public List<InsuranceHolderServerData> GetInsuranceHolders(string login)
         {
             var ret = new List<InsuranceHolderServerData>();
-            _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
-            Try.Condition(_associations.ContainsKey(login), $"{login} не выпускает страховки");
-            var t = _associations[login];
+            var acc = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            Try.Condition(_associations.ContainsKey(acc.Login), $"{acc.Login} не выпускает страховки");
+
+            var t = _associations[acc.Login];
             var list = UserContext.Data.Accounts.Where(x => x.Insurance == t);
 
             foreach (var user in list.Where(x => !x.InsuranceHidden))
             {
-                var h = new InsuranceHolderServerData(user.Login, login)
+                var h = new InsuranceHolderServerData(user.Login, acc.Login)
                 {
                     InsuranceLevel = user.InsuranceLevel,
                     Insurance = t,
@@ -143,8 +140,7 @@ namespace DeusCloud.Logic.Managers
 
         public void RemoveInsuranceHolder(string user)
         {
-            var userAccount = _userManager.FindById(user);
-            Try.NotNull(userAccount, $"Не найден пользователь {user}");
+            var userAccount = UserContext.Accounts.GetOrFail(user); 
             Try.Condition(userAccount.Insurance != InsuranceType.None, $"У пользователя {user} нет страховки");
 
             var corpAccount = GetIssuerFromType(userAccount.Insurance);
@@ -159,7 +155,7 @@ namespace DeusCloud.Logic.Managers
             userAccount.InsuranceLevel = 1;
             UserContext.Accounts.Update(userAccount);
 
-            UserContext.AddGameEvent(userAccount.Login, GameEventType.Insurance,
+            UserContext.AddGameEvent(userAccount.Login, GameEventType.Insurance, 
                 $"{company} отменила вашу страховку", true);
 
             UserContext.AddGameEvent(company, GameEventType.Insurance,
@@ -168,17 +164,14 @@ namespace DeusCloud.Logic.Managers
 
         public void SetInsuranceHolder(SetInsuranceClientData data)
         {
-            _rightsManager.CheckForAccessOverSlave(data.Company, AccountAccessRoles.Withdraw);
+            var companyAcc = _rightsManager.CheckForAccessOverSlave(data.Company, AccountAccessRoles.Withdraw);
 
-            var userAccount = _userManager.FindById(data.Holder);
-            var pass = _userManager.CheckPassword(userAccount, data.Password);
+            var userAccount = UserContext.Accounts.Get(data.Holder, data.Password);
             var level = data.Level ?? 1;
 
-            Try.Condition(pass, $"Неверный пароль пользователя {data.Holder}");
-            Try.Condition(_associations.ContainsKey(data.Company), 
-                $"{data.Company} не выпускает страховки");
+            Try.Condition(_associations.ContainsKey(companyAcc.Login), $"{companyAcc.Login} не выпускает страховки");
 
-            var t = _associations[data.Company];
+            var t = _associations[companyAcc.Login];
             Try.Condition(CheckInsuranceLevel(level, t), $"Неверный уровень страховки {level}");
 
             SetInsuranceHolder_Checked(userAccount, level, t);
@@ -235,18 +228,15 @@ namespace DeusCloud.Logic.Managers
         {
             _rightsManager.CheckRole(AccountRole.Admin);
 
-            var loserAccount = _userManager.FindById(data.Loser);
-            Try.NotNull(loserAccount, $"Не найден пользователь {data.Loser}");
+            var loserAccount = UserContext.Accounts.GetOrFail(data.Loser);
+            var receiverAccount = UserContext.Accounts.GetOrFail(data.Receiver);
 
             Try.Condition(loserAccount.Insurance != InsuranceType.None, 
-                $"У пользователя {data.Loser} нет страховки");
-
-            var receiverAccount = _userManager.FindById(data.Receiver);
-            Try.NotNull(receiverAccount, $"Не найден пользователь {data.Receiver}");
+                $"У пользователя {loserAccount.Login} нет страховки");
 
             receiverAccount.InsuranceHidden = true;
             SetInsuranceHolder_Checked(receiverAccount, loserAccount.InsuranceLevel, loserAccount.Insurance, true);
-            RemoveInsuranceHolder(data.Loser);
+            RemoveInsuranceHolder(loserAccount.Login);
         }
 
         private bool CheckInsuranceLevel(int level, InsuranceType t)
@@ -268,7 +258,7 @@ namespace DeusCloud.Logic.Managers
         {
             var pair = _associations.FirstOrDefault(x => x.Value == t);
             if (pair.Key == null) return null;
-            return _userManager.FindById(pair.Key);
+            return UserContext.Accounts.GetOrFail(pair.Key);
         }
 
         public void SwitchCycle(SwitchCycleClientData data)
@@ -297,8 +287,8 @@ namespace DeusCloud.Logic.Managers
         {
             foreach (var kv in _associations)
             {
-                var corp = _userManager.FindById(kv.Key);
-                if (corp == null) continue; //Not found in DB
+                var corp = UserContext.Accounts.Get(kv.Key);
+                if (corp == null) continue; //Corp not found in DB
 
                 var holders = GetInsuranceHolders(kv.Key).OrderByDescending(x => x.InsuranceLevel).ToList();
                 foreach (var holder in holders)
@@ -314,7 +304,7 @@ namespace DeusCloud.Logic.Managers
                     }
                     else
                     {
-                        var userAccount = _userManager.FindById(holder.UserLogin);
+                        var userAccount = UserContext.Accounts.GetOrFail(holder.UserLogin); 
 
                         RemoveInsuranceHolder_Checked(userAccount, corp.Login);
                     }
@@ -326,7 +316,7 @@ namespace DeusCloud.Logic.Managers
         {
             foreach (var pair in _associations)
             {
-                var corp = _userManager.FindById(pair.Key);
+                var corp = UserContext.Accounts.Get(pair.Key); 
                 if (corp == null) continue; //Not found in DB
 
                 var cIndex = data.Indexes.ToList().FindIndex(x => x.Key == pair.Key);

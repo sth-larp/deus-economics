@@ -16,14 +16,12 @@ namespace DeusCloud.Logic.Managers
 {
     public sealed class TransactionsManager : ContextHolder
     {
-        private UserManager _userManager;
         private RightsManager _rightsManager;
         private ConstantManager _constantManager;
         private InsuranceManager _insuranceManager;
 
         public TransactionsManager(UserContext context) : base(context)
         {
-            _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
             _constantManager = new ConstantManager(UserContext);
             _insuranceManager = new InsuranceManager(UserContext);
@@ -31,11 +29,8 @@ namespace DeusCloud.Logic.Managers
 
         public void Transfer(TransferClientData data)
         {
-            var receiverAcc = _userManager.FindById(data.Receiver);
-            Try.NotNull(receiverAcc, $"Не найден пользователь {data.Receiver}.");
-
-            var senderAcc = _userManager.FindById(data.Sender);
-            Try.NotNull(senderAcc, $"Не найден пользователь {data.Sender}.");
+            var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver); 
+            var senderAcc = UserContext.Accounts.GetOrFail(data.Sender);
 
             _rightsManager.CheckForAccessOverSlave(senderAcc, AccountAccessRoles.Withdraw);
             data.Description = data.Description ?? "";
@@ -76,8 +71,7 @@ namespace DeusCloud.Logic.Managers
             var receiverAcc = UserContext.Accounts.Get(data.Receiver, data.ReceiverPass);
             Try.NotNull(receiverAcc, $"Неверное имя или пароль {data.Receiver}.");
 
-            var sellerAcc = _userManager.FindById(data.Seller);
-            Try.NotNull(sellerAcc, $"Не найден пользователь {data.Seller}.");
+            var sellerAcc = UserContext.Accounts.GetOrFail(data.Seller);
 
             _rightsManager.CheckForAccessOverSlave(sellerAcc, AccountAccessRoles.Withdraw);
             data.Description = data.Description ?? "";
@@ -108,15 +102,15 @@ namespace DeusCloud.Logic.Managers
 
         public float GetTax(string sender, string receiver)
         {
-            var receiverAcc = _userManager.FindById(receiver);
-            Try.NotNull(receiverAcc, $"Не найден пользователь {receiver}.");
+            var receiverAcc = UserContext.Accounts.GetOrFail(receiver);
+
             Try.Condition((receiverAcc.Role & AccountRole.Person) > 0, 
                 $"Пользователь {receiver} - не персона");
 
-            var senderAcc = _userManager.FindById(sender);
-            Try.NotNull(senderAcc, $"Не найден пользователь {sender}.");
+            var senderAcc = UserContext.Accounts.GetOrFail(sender); 
+
             Try.Condition((senderAcc.Role & AccountRole.Person) > 0,
-                $"Пользователь {sender} - не персона");
+                $"Счет {sender} не является личным");
             _rightsManager.CheckForAccessOverSlave(senderAcc, AccountAccessRoles.Read);
 
             return GetC2CTax(senderAcc, receiverAcc);
@@ -131,7 +125,7 @@ namespace DeusCloud.Logic.Managers
             var tax = GetC2CTax(sender, receiver);
             if (tax > 0)
             {
-                var master = _userManager.FindById("master");
+                var master = UserContext.Accounts.GetOrFail("master");
                 var t = new Transaction(sender, master, data.Amount * tax);
                 t.Comment = $"Налог на транзакции физлиц в размере {tax * 100}%";
                 t.Type = TransactionType.Tax;
@@ -162,7 +156,7 @@ namespace DeusCloud.Logic.Managers
 
             if (discount == 0)
             {
-                var master = _userManager.FindById("master"); //UserContext.MasterAcc
+                var master = UserContext.Accounts.GetOrFail("master");
                 var t = new Transaction(receiver, master, data.Amount * 0.5f);
                 t.Comment = $"Налог на доходные предприятия в размере 50%";
                 t.Type = TransactionType.Tax;
@@ -186,16 +180,15 @@ namespace DeusCloud.Logic.Managers
 
         public List<Transaction> GetHistory(string login, int take, int skip)
         {
-            Try.NotEmpty(login, $"Поле {nameof(login)} не должно быть пустым");
+            var user = UserContext.Accounts.GetOrFail(login);
+
             Try.Condition(skip >= 0, $"Поле {nameof(skip)} не должно быть отрицательным");
             Try.Condition(take >= 0, $"Поле {nameof(take)} не должно быть отрицательным");
 
-            _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            _rightsManager.CheckForAccessOverSlave(user, AccountAccessRoles.Read);
 
             var ret = UserContext.Data.Transactions
-                .Where(x => x.Receiver == login || x.Sender == login)
-                .OrderByDescending(x => x.Time)
-                .Skip(skip).Take(take);
+                .Where(x => x.Receiver == user.Login || x.Sender == user.Login).OrderByDescending(x => x.Time).Skip(skip).Take(take);
             return ret.ToList();
         }
     }

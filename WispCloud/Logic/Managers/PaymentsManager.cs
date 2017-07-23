@@ -5,31 +5,24 @@ using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
-using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
-using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers
 {
     public class PaymentsManager : ContextHolder
     {
-        private UserManager _userManager;
         private RightsManager _rightsManager;
-        private ConstantManager _constantManager;
 
         public PaymentsManager(UserContext context) : base(context)
         {
-            _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
-            _constantManager = new ConstantManager(UserContext);
         }
 
         public List<Payment> GetPayments(string login)
         {
-            _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
-            var ret = UserContext.Data.Payments.Where(
-                x => x.Receiver == login || x.Employer == login);
+            var acc = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            var ret = UserContext.Data.Payments.Where(x => x.Receiver == acc.Login || x.Employer == acc.Login);
             return ret.ToList();
         }
 
@@ -42,10 +35,9 @@ namespace DeusCloud.Logic.Managers
         public Payment NewPayment(PaymentClientData data)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
-            //_rightsManager.CheckForAccessOverSlave(data.Sender, AccountAccessRoles.Withdraw);
 
-            var senderAcc = _userManager.FindById(data.Sender);
-            var receiverAcc = _userManager.FindById(data.Receiver);
+            var senderAcc = UserContext.Accounts.GetOrFail(data.Sender);
+            var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver);
 
             var payment = new Payment(senderAcc, receiverAcc, data.Amount);
             UserContext.Data.Payments.Add(payment);
@@ -57,7 +49,9 @@ namespace DeusCloud.Logic.Managers
         public Payment EditPayment(int id, PaymentClientData data)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
-            //_rightsManager.CheckForAccessOverSlave(data.Sender, AccountAccessRoles.Withdraw);
+
+            var senderAcc = UserContext.Accounts.GetOrFail(data.Sender);
+            var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver);
 
             Payment ret = null;
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
@@ -65,12 +59,11 @@ namespace DeusCloud.Logic.Managers
                 UserContext.Data.BeginFastSave();
 
                 ret = UserContext.Data.Payments.Find(id);
-                Try.NotNull(ret, $"Can't find payment with id: {id}");
+                Try.NotNull(ret, $"Не удается найти зарплату с Id: {id}");
 
-                ret.Employer = data.Sender;
-                ret.Receiver = data.Receiver;
+                ret.Employer = senderAcc.Login;
+                ret.Receiver = receiverAcc.Login;
                 ret.Amount = data.Amount;
-
 
                 UserContext.Data.SaveChanges();
                 dbTransact.Commit();
@@ -83,8 +76,7 @@ namespace DeusCloud.Logic.Managers
             _rightsManager.CheckRole(AccountRole.Admin);
 
             var payment = UserContext.Data.Payments.Find(id);
-            Try.NotNull(payment, $"Can't find payment with id: {id}");
-            //_rightsManager.CheckForAccessOverSlave(payment.Employer, AccountAccessRoles.Withdraw);
+            Try.NotNull(payment, $"Не удается найти зарплату с Id: {id}");
 
             UserContext.Data.Payments.Remove(payment);
             UserContext.Data.SaveChanges();
@@ -116,7 +108,6 @@ namespace DeusCloud.Logic.Managers
             pay.ReceiverAccount.Cash += pay.Amount;
             pay.LastPaid = DateTime.Now;
 
-            //UserContext.Accounts.Update(pay.EmployerAccount);
             UserContext.Accounts.Update(pay.ReceiverAccount);
 
             var transaction = new Transaction(pay.EmployerAccount, pay.ReceiverAccount, pay.Amount);

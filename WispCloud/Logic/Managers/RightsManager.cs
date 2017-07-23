@@ -14,7 +14,6 @@ namespace DeusCloud.Logic.Managers
 {
     public sealed class RightsManager : ContextHolder
     {
-        private UserManager _userManager;
         static string NotEnoughRightsMessageText { get; }
 
         static string NotEnoughPrivilegeText { get; }
@@ -27,10 +26,8 @@ namespace DeusCloud.Logic.Managers
             UserBlockedMessageText = "Ваш аккаунт заблокирован;";
         }
 
-        public RightsManager(UserContext context)
-            : base(context)
+        public RightsManager(UserContext context): base(context)
         {
-            _userManager = new UserManager(UserContext);
         }
 
         public void CheckRole(AccountRole role)
@@ -45,9 +42,8 @@ namespace DeusCloud.Logic.Managers
 
         public Account CheckForAccessOverSlave(string slave, AccountAccessRoles roles)
         {
-            var slaveAccount = _userManager.FindById(slave);
-            Try.NotNull(slaveAccount, $"Не найден логин: {slave}.");
-            
+            var slaveAccount = UserContext.Accounts.GetOrFail(slave); //_userManager.FindById(slave);
+           
             //Admin can do anything
             return CheckForAccessOverSlave(slaveAccount, roles);
         }
@@ -75,14 +71,13 @@ namespace DeusCloud.Logic.Managers
         {
             Try.Argument(clientData, nameof(clientData));
             CheckRole(AccountRole.Admin);
-                
-            var editAccount = _userManager.FindById(clientData.Login);
-            Try.NotNull(editAccount, $"Не найден логин: {clientData.Login}.");
+
+            var editAccount = UserContext.Accounts.GetOrFail(clientData.Login);
 
             if (clientData.Role != null)
             {
                 editAccount.Role = clientData.Role.Value;
-                UserContext.AddGameEvent(editAccount.Login, GameEventType.Rights, $"Изменен тип аккаунта");
+                UserContext.AddGameEvent(editAccount.Login, GameEventType.Rights, $"Изменен тип счета");
             }
 
             if (clientData.Status != null)
@@ -94,24 +89,6 @@ namespace DeusCloud.Logic.Managers
             if (!String.IsNullOrEmpty(clientData.Email))
                 editAccount.Email = clientData.Email;
 
-            //if (clientData.Insurance != null)
-            //{
-            //    Try.Condition(clientData.Insurance == InsuranceType.None || (editAccount.Role & AccountRole.Person) > 0, 
-            //        $"Страховку можно дать только персоне: {clientData.Login}.");
-            //    Try.Condition(clientData.InsuranceLevel != null, $"Не задан уровень страховки");
-            //
-            //    editAccount.Insurance = clientData.Insurance.Value;
-            //}
-
-            //if (clientData.InsuranceLevel != null)
-            //{
-            //    Try.Condition((IsCorporate(editAccount.Insurance) && clientData.InsuranceLevel <= 3) 
-            //        || (editAccount.Insurance == InsuranceType.Govt && clientData.InsuranceLevel <= 2)
-            //        || clientData.InsuranceLevel == 1,
-            //        $"Неверное значение уровня. 1-3 для корпораций, 1-2 для правительства, 1 в прочих случаях: {clientData.InsuranceLevel}");
-            //    editAccount.InsuranceLevel = clientData.InsuranceLevel.Value;
-            //}
-
             UserContext.Accounts.Update(editAccount);
             return editAccount;
         }
@@ -120,8 +97,7 @@ namespace DeusCloud.Logic.Managers
         {
             CheckRole(AccountRole.Admin);
 
-            var editAccount = _userManager.FindById(data.Login);
-            Try.NotNull(editAccount, $"Не найден логин: {data.Login}.");
+            var editAccount = UserContext.Accounts.GetOrFail(data.Login);
 
             editAccount.Index = data.Index;
             editAccount.InsurancePoints = data.InsurancePoints;
@@ -136,17 +112,13 @@ namespace DeusCloud.Logic.Managers
         {
             Try.Argument(accessData, nameof(accessData));
 
-            var slaveAccount = _userManager.FindById(accessData.SlaveLogin);
-            Try.NotNull(slaveAccount, $"Не найден логин: {accessData.SlaveLogin}.");
+            var slaveAccount = UserContext.Accounts.GetOrFail(accessData.SlaveLogin);
+            var masterAccount = UserContext.Accounts.GetOrFail(accessData.MasterLogin);
 
             if (accessData.Role != AccountAccessRoles.None)
                 CheckForAccessOverSlave(slaveAccount, AccountAccessRoles.Admin);
 
-            var masterAccount = _userManager.FindById(accessData.MasterLogin);
-            Try.NotNull(masterAccount, $"Не найден логин: {accessData.MasterLogin}.");
-
-            var currentAccess = UserContext.Data.AccountAccesses.
-                Find(accessData.SlaveLogin, accessData.MasterLogin);
+            var currentAccess = UserContext.Data.AccountAccesses.Find(slaveAccount.Login, masterAccount.Login);
 
             if (accessData.Role == AccountAccessRoles.None && currentAccess == null)
                 return null;
@@ -177,25 +149,25 @@ namespace DeusCloud.Logic.Managers
         private void SetAccessChangeGameEvents(Account slave, Account master)
         {
             UserContext.AddGameEvent(slave.Login, GameEventType.Rights,
-                $"Изменен доступ для пользователя {master.Login}");
+                $"Изменен доступ {master.Login} к вашему счету");
 
 
             UserContext.AddGameEvent(master.Login, GameEventType.Rights,
-                $"Изменен доступ над пользователем {slave.Login}");
+                $"Изменен доступ над счетом {slave.Login}");
         }
 
         public List<AccountAccess> GetAccessMasters(string slave)
         {
-            CheckForAccessOverSlave(slave, AccountAccessRoles.Read);
+            var acc = CheckForAccessOverSlave(slave, AccountAccessRoles.Read);
 
-            return UserContext.Data.AccountAccesses.Where(x => x.Slave == slave).ToList();
+            return UserContext.Data.AccountAccesses.Where(x => x.Slave == acc.Login).ToList();
         }
 
         public List<AccountAccess> GetAccessSlaves(string master)
         {
-            CheckForAccessOverSlave(master, AccountAccessRoles.Read);
+            var acc = CheckForAccessOverSlave(master, AccountAccessRoles.Read);
 
-            return UserContext.Data.AccountAccesses.Where(x => x.Master == master).ToList();
+            return UserContext.Data.AccountAccesses.Where(x => x.Master == acc.Login).ToList();
         }
     }
 

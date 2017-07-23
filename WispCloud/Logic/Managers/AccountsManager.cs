@@ -70,20 +70,19 @@ namespace DeusCloud.Logic.Managers
 
         public void ChangePassword(ChangePasswordClientData clientData)
         {
-            var account = _userManager.FindById(clientData.Login);
-            Try.NotNull(account, $"Cant find account with login: {clientData.Login}.");
+            var account = GetOrFail(clientData.Login);
 
             IdentityResult result;
-            if (clientData.Login != UserContext.CurrentUser.Login)
+            if (account.Login != UserContext.CurrentUser.Login)
             {
                 //Only Administrators can change user account password
                 _rightsManager.CheckRole(AccountRole.Admin);
 
-                result = _userManager.NewPassword(clientData.Login, clientData.NewPassword);
+                result = _userManager.NewPassword(account.Login, clientData.NewPassword);
             }
             else
             {
-                result = _userManager.ChangePassword(clientData.Login, clientData.CurrentPassword,
+                result = _userManager.ChangePassword(account.Login, clientData.CurrentPassword,
                     clientData.NewPassword);
             }
 
@@ -100,12 +99,24 @@ namespace DeusCloud.Logic.Managers
 
         public Account Get(string login)
         {
-            return _userManager.FindById(login);
+            var account = _userManager.FindById(login);
+            if (account == null)
+                account = UserContext.Data.Accounts.FirstOrDefault(x => x.Email == login);
+            return account;
+            //return _userManager.FindById(login);
+        }
+
+        public Account GetOrFail(string login)
+        {
+            var account = Get(login);
+            Try.NotNull(account, $"Не найден счет {login}");
+            return account;
         }
 
         public Account Get(string login, string password)
         {
-            return _userManager.Find(login, password);
+            var account = Get(login);
+            return _userManager.Find(account.Login, password);
         }
 
         public void Update(Account account)

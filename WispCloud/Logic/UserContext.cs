@@ -16,18 +16,6 @@ namespace DeusCloud.Logic
         public static string DefaultConnectionStringName { get; }
         public static ConnectionMapping SignalRConnectionMapping { get; private set; }
 
-        private static Account _masterAcc;
-
-        public Account MasterAcc
-        {
-            get
-            {
-                if (_masterAcc == null)
-                    _masterAcc = new UserManager(this).FindById("master");
-                return _masterAcc;
-            }
-        }
-
         static UserContext()
         {
             DefaultConnectionStringName = "DeusMaster";

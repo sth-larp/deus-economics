@@ -13,7 +13,6 @@ namespace DeusCloud.Logic.Managers
 {
     public class ConstantManager : ContextHolder
     {
-        private UserManager _userManager;
         private RightsManager _rightsManager;
         private InsuranceManager _insuranceManager;
 
@@ -21,7 +20,6 @@ namespace DeusCloud.Logic.Managers
 
         public ConstantManager(UserContext context) : base(context)
         {
-            _userManager = new UserManager(UserContext);
             _rightsManager = new RightsManager(UserContext);
             _insuranceManager = new InsuranceManager(UserContext);
 
