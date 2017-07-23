@@ -178,20 +178,26 @@
     function cancelAccess(slave) {
         //TODO вставить диалог
         var data = JSON.stringify({ "MasterLogin": selected_account, "SlaveLogin": slave, "Role": "None" });
-        sendAPIRequest(url + "/api/accounts/access/set", "POST", function(param, status) {
-            if (selected_account == main_account)
-                window.location.reload(false); //Потому что еще левый список есть
-            load_profile_page();
+        sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
+            if (status == httpOK)
+                //if (selected_account == main_account) //    window.location.reload(false); //Потому что еще левый список есть //load_profile_page();
+                load_slaves();
+            else
+                fillError("slaves-table-warning", param, status);
         }, data);
     }
 
     function cancelMaster(master) {
         //TODO вставить диалог
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": "None" });
-        sendAPIRequest(url + "/api/accounts/access/set", "POST", function(param, status) {
-            if (main_account == master)
-                window.location.reload(false); //Потому что еще левый список есть
-            load_profile_page();
+        sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
+            if (status == httpOK) {
+                if (main_account == master)
+                    window.location.reload(false); //Потому что еще левый список есть
+                load_masters();
+            }
+            else
+                fillError("masters-table-warning", param, status);
         }, data);
     }
 
