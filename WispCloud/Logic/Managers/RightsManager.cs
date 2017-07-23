@@ -23,7 +23,7 @@ namespace DeusCloud.Logic.Managers
         static RightsManager()
         {
             NotEnoughPrivilegeText = "Недостаточно прав на аккаунт данного пользователя;";
-            NotEnoughRightsMessageText = "Недостаточно прав;";
+            NotEnoughRightsMessageText = "Недостаточно прав для данного запроса;";
             UserBlockedMessageText = "Ваш аккаунт заблокирован;";
         }
 
@@ -137,8 +137,9 @@ namespace DeusCloud.Logic.Managers
             Try.Argument(accessData, nameof(accessData));
 
             var slaveAccount = _userManager.FindById(accessData.SlaveLogin);
+            Try.NotNull(slaveAccount, $"Не найден логин: {accessData.SlaveLogin}.");
 
-            if(accessData.Role != AccountAccessRoles.None)
+            if (accessData.Role != AccountAccessRoles.None)
                 CheckForAccessOverSlave(slaveAccount, AccountAccessRoles.Admin);
 
             var masterAccount = _userManager.FindById(accessData.MasterLogin);
@@ -146,6 +147,9 @@ namespace DeusCloud.Logic.Managers
 
             var currentAccess = UserContext.Data.AccountAccesses.
                 Find(accessData.SlaveLogin, accessData.MasterLogin);
+
+            if (accessData.Role == AccountAccessRoles.None && currentAccess == null)
+                return null;
 
             if (accessData.Role == AccountAccessRoles.None)
             {

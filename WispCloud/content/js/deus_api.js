@@ -248,3 +248,9 @@ function insertDocumentToWrapper(wrapper_id, document_href, rq_type) {
     xhttp.setRequestHeader("Authorization", get_auth_tok());
     xhttp.send();
 }
+
+function fillError(elem, body, status) {
+    if (status == 0) body = "Сервер не отвечает";
+    var txt = "Ошибка " + status + ", " + body;
+    document.getElementById(elem).innerHTML = txt;
+}

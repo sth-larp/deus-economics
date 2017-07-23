@@ -64,7 +64,7 @@ namespace DeusCloud.Data
             {
                 var sqlException = (lastException as SqlException);
                 if (sqlException.Number == 2627)
-                    throw new DeusDuplicateException("Primary keys have not been managed appropriately across the topology", false);
+                    throw new DeusDuplicateException("Попытка добавить элемент с существующим первичными ключом (ключами)", false);
             }
 
             return lastException;

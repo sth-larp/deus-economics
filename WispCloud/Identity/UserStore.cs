@@ -26,7 +26,7 @@ namespace DeusCloud.Identity
         {
             var existingAccount = await FindByIdAsync(user.Login);
             if (existingAccount != null)
-                throw new DeusDuplicateException("This login is already in use");
+                throw new DeusDuplicateException("Этот логин уже есть");
 
             UserContext.Data.Accounts.Add(user);
             await UserContext.Data.SaveChangesAsync();

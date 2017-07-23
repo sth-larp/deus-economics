@@ -19,6 +19,7 @@
     var main_profile = {}
     var lines_on_tab = 20;
     var corpNames = ['Serenity', 'Panam', 'JJ', 'Govt'];
+    var httpOK = 200; //For errors debugging
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -29,23 +30,19 @@
             selected_account = main_account;
 
             sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param, status) {
-                if (status == 200) {
+                if (status == httpOK) {
                     main_profile = JSON.parse(param);
                     document.getElementById("current_account").innerHTML = "Привет, " + main_profile.Login;
                     load_profile_page(main_profile.Login);
                 } else if (status == 401) {
                     loginRedirect();
                 } else {
-                    alert(param + "\n\n" + status);
+                    alert("Ошибка " + status + "\n" + param);
                 }
             });
         } catch (e) {
             loginRedirect();
         }
-        sendAPIRequest(url + "/api/accounts/access/slaves?master=" + main_account, "GET", function(param, status) {
-            if (status == 200)
-                fill_slave_menu(param, main_account);
-        });
     }
 
     function setCurrentAccount(acc, role) {
@@ -54,7 +51,7 @@
         document.getElementById('corp_menu').style.display = 'none';
 
         sendAPIRequest(url + "/api/accounts/profile?login=" + selected_account, "GET", function(param, status) {
-            if (status == 200) {
+            if (status == httpOK) {
                 main_profile = JSON.parse(param);
                 load_profile_page(main_profile.Login);
             } else {
@@ -108,8 +105,10 @@
         document.getElementById("profile_page").style.display = "block";
 
         sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
-            if (status == 200) fill_full_profile(param);
-            else alert(param + "\n\nStatus " + status);
+            if (status == httpOK)
+                fill_full_profile(param);
+            else
+                fillError("history-warning", param, status);
         });
 
         load_slaves();
@@ -119,7 +118,7 @@
     function load_masters() {
         sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status) {
             $("#masters-table tbody tr").remove();
-            if (status == 200) {
+            if (status == httpOK) {
                 var masters = JSON.parse(param);
                 $('#masters-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
 
@@ -138,7 +137,7 @@
                     $('#masters-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_master_menu();\"/></td><td></td><td></td></tr>");
             }
             else {
-                document.getElementById("masters-table-warning").innerHTML = param;
+                fillError("masters-table-warning", param, status);
             }
         });
     }
@@ -148,7 +147,10 @@
         sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function(param, status) {
             $("#slaves-table tbody tr").remove();
             
-            if (status == 200) {
+            if (status == httpOK) {
+                if (selected_account == main_account)
+                    fill_slave_menu(param, main_account);
+
                 var slaves = JSON.parse(param);
                 var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelAccess('{0}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
@@ -166,7 +168,9 @@
                 }
             }
             else {
-                document.getElementById("slaves-table-warning").innerHTML = param;
+                fillError("slaves-table-warning", param, status);
+                if (selected_account == main_account)
+                    fillError("leftmenu-warning", param, status);
             }
         });
     }
@@ -196,10 +200,10 @@
         document.getElementById("transactions").style.display = "block";
         document.getElementById("trans_menu_holder").style.display = selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
 
-        load_transactions_table();
+        load_transactions();
     }
 
-    function load_transactions_table() {
+    function load_transactions() {
         document.getElementById("lines_on_tab").value = lines_on_tab;
         document.getElementById("lines_on_tab").onchange = function() {
             lines_on_tab = document.getElementById("lines_on_tab").value;
@@ -208,8 +212,11 @@
                 fill_transactions_table(param, status)
             });
         }
-        sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
-            fill_transactions_table(param, status);
+        sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function (param, status) {
+            if (status == httpOK)
+                fill_transactions_table(param, status);
+            else
+                fillError("transactions-warning", param, status);
         });
     }
 
@@ -217,24 +224,18 @@
         var user = document.getElementById("user_name_id").value;
         var sum = document.getElementById("transaction_value_id").value;
         var comment = document.getElementById("transaction_comment_id").value;
-        var txtField = document.getElementById("transaction_warning");
         var data = JSON.stringify({ "Sender": selected_account, "Receiver": user, "Amount": sum, "Description": comment });
 
         sendAPIRequest(url + "/api/transfer", "POST", function(param, status) {
-            if (status == 200) {
-                txtField.innerHTML = "";
-                load_transactions_table();
+            if (status == httpOK) {
+                document.getElementById("send-tran-warning").innerHTML = "";
+                load_transactions();
             } else
-                txtField.innerHTML = param;
+                fillError("send-tran-warning", param, status);
         }, data);
     }
 
-    function fill_transactions_table(param, status) {
-        if (status != 200) {
-            document.getElementById("transactions_list").innerHTML = "Error " + status + "\n" + param;
-            return;
-        }
-
+    function fill_transactions_table(param) {
         var t_list = JSON.parse(param);
         var head_str = "<tr><th>Перевел</th><th>Получил</th><th>Время</th><th>Сумма</th><th>Комментарий</th></tr>";
         var t_str = [];
@@ -260,7 +261,7 @@
 
         //payments
         sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function(param, status) {
-            if (status == 200) {
+            if (status == httpOK) {
                 var payments = JSON.parse(param);
                 var head_str = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
                 var l_str = [];
@@ -270,13 +271,15 @@
                         "</td><td>" + payments[i].Amount +
                         "</td><td>" + customDateFormat(payments[i].LastPaid) + "</td></tr>";
                 }
-                var page_str = buildTabs(l_str, lines_on_tab, "payments_table", head_str);
+                var page_str = buildTabs(l_str, lines_on_tab, "payments-table", head_str);
                 document.getElementById("payments_list").innerHTML = page_str;
-                var t = document.getElementById("payments_table_0");
+                var t = document.getElementById("payments-table_0");
                 if (t != null) t.style.display = "block";
 
-                initTabsControl("payments_table");
-            } else alert(param + "\n\nStatus " + status);
+                initTabsControl("payments-table");
+            }
+            else
+                fillError("payments-warning", param, status);
         });
     }
 
@@ -289,7 +292,7 @@
         sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function(param, status) {
             $("#insurance-table tbody tr").remove();
             $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
-            if (status == 200) {
+            if (status == httpOK) {
                 var holders = JSON.parse(param);
                 var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelHolder('{1}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
@@ -320,7 +323,7 @@
         sendAPIRequest(url + "/api/insurance/loyals", "GET", function(param, status) {
             $("#loyalty-table tbody tr").remove();
             $('#loyalty-table').append('<tr><th>Компания</th><th>iD</th></tr>');
-            if (status == 200) {
+            if (status == httpOK) {
                 var loyals = JSON.parse(param);
                 var row = "<tr><td>{0}</td><td>{1}</td></tr>";
 
@@ -338,7 +341,7 @@
 
     function cancelHolder(holder) {
         sendAPIRequest(url + "/api/insurance/removeholder?user=" + holder, "POST", function(param, status) {
-            if (status == 200) {
+            if (status == httpOK) {
                 load_corp_page();
             } else {
                 document.getElementById("ins-table-warning").innerHTML = param;
@@ -367,7 +370,7 @@
         var pass = document.getElementById('ins_form_pass').value;
         var data = JSON.stringify({ "Company": selected_account, "Holder": holder, "Password": pass, "Level": level });
         sendAPIRequest(url + "/api/insurance/changeholder", "POST", function(param, status) {
-            if (status == 200) {
+            if (status == httpOK) {
                 hide_add_ins_menu();
                 load_corp_page();
             } else {
@@ -382,7 +385,7 @@
         var role = document.getElementById('master_form_role').value;
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": role });
         sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-            if (status == 200) {
+            if (status == httpOK) {
                 hide_add_master_menu();
                 load_profile_page();
             } else {
@@ -421,6 +424,7 @@
 
 
 <body onload="preLoad();">
+
 <div id="top_menu" class="top-menu">
     <div id="menu-icon" class="top-menu-elem" onclick="showLeftMenu(true);">&#9776;</div>
     <div id="current_account" class="top-menu-elem greetings">Привет,</div>
@@ -429,11 +433,13 @@
     <div id="transactions_menu" class="top-menu-elem" onclick="load_transactions_page();">Переводы</div>
     <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
 </div>
-        <div id="left_menu" class="left-menu">
-            <div id="slave_list" class="slave-list">
-                <div class="slave-menu-head">Ваши счета</div>
-            </div>
-        </div>
+
+<div id="left_menu" class="left-menu">
+    <div class="slave-menu-head">Ваши счета</div>
+    <div id="slave-list">
+    <div class="warning-text" id="leftmenu-warning"></div>
+    </div>
+</div>
 
 <div id="content-wrapper">
     <div id="content-preceder"></div>
@@ -471,6 +477,7 @@
             <div>
                 <h2>События</h2>
                 <table id="history"></table>
+                <div class="warning-text" id="history-warning"></div>
             </div>
         </div>
 
@@ -481,19 +488,20 @@
                 <h2>Страховки</h2>
                 <p>Перечень лиц, имеющих вашу страховку. При добавлении лиц в список с вас списываются очки страховки. При удалении страховки потраченные очки не возвращаются. </p>
                 <table id="insurance-table"></table>
-                <div id="ins-table-warning" class="warning-text"></div>
+                <div class="warning-text" id="ins-table-warning"></div>
             </div>
 
             <div id="loyalty-holder" style="display: none;">
                 <h2>Заведения</h2>
                 <p>Перечень заведений, которые обслуживают вашу страховку. Если вы хотите добавить или удалить какое-то заведение, обратитесь к Администрации.</p>
                 <table id="loyalty-table"></table>
-                <div id="loyalty-table-warning" class="warning-text"></div>
+                <div class="warning-text" id="loyalty-table-warning"></div>
             </div>
 
             <div id="emloyee-holder">
                 <h2>Сотрудники</h2>
                 <div id="payments_list"></div>
+                <div class="warning-text" id="payments-warning"></div>
             </div>
         </div>
 
@@ -508,27 +516,26 @@
                         <tr><td>Сумма</td><td><input type="text" id="transaction_value_id" name="transaction_value" value="0"/></td></tr>
                         <tr><td>Комментарий</td><td><input type="text" id="transaction_comment_id" name="transaction_comment" value="Frontend"/></td></tr>
                         <tr><td colspan=2><input type="button" class="custom-button smaller" name="send" value="Отправить" onClick="sendTransaction();"/></td></tr>
-                        <tr><td colspan=2><label class="warning_text" id="transaction_warning"></label></td></tr>
                     </table>
                 </form>
+                <div class="warning-text" id="send-tran-warning"></div>
             </div>
             <div>
-                <div>
-                    <h2>История операций</h2>
-                    <div style="display: none;">
-                        <span>Количество строк на странице</span>
-                        <select id="lines_on_tab">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                    </div>
+                <h2>История операций</h2>
+                <div style="display: none;">
+                    <span>Количество строк на странице</span>
+                    <select id="lines_on_tab">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
                 </div>
                 <div id="transactions_list">
                 </div>
+                <div class="warning-text" id="transactions-warning"></div>
             </div>
         </div>
 
@@ -557,26 +564,26 @@
     </div>
 </div>
 
-    <div id="add_master_overlay" class="disabling-div">
-        <div style="float: left; margin: 0 auto;">
-            <p>Вы можете дать любому пользователю права на использование вашего счета</p>
-            <p>Чтение: возможность просматривать любую информацию, но не менять ее</p>
-            <p>Снятие: возможность делать переводы, выдавать страховки</p>
-            <p>Админ: возможность, помимо переводов, управлять правами доступа</p>
-            <table>
-                <tr><td>Права:</td><td><select id="master_form_role"><option value="Read">Чтение</option><option value="Withdraw">Снятие</option><option value="Admin">Админ</option></select></td></tr>
-                <tr><td>Логин:</td><td><input id="master_form_user" type="text" value=""/></td></tr>
-                <tr>
-                    <td>
-                        <input type="button" class="custom-button smaller" value="Отменить" onclick="hide_add_master_menu();"/>
-                    </td>
-                    <td>
-                        <input type="button" class="custom-button smaller" value="Принять" onclick="run_add_master();"/>
-                    </td>
-                </tr>
-            </table>
-            <div class="warning-text" id="add_master_warning"></div>
-        </div>
+<div id="add_master_overlay" class="disabling-div">
+    <div style="float: left; margin: 0 auto;">
+        <p>Вы можете дать любому пользователю права на использование вашего счета</p>
+        <p>Чтение: возможность просматривать любую информацию, но не менять ее</p>
+        <p>Снятие: возможность делать переводы, выдавать страховки</p>
+        <p>Админ: возможность, помимо переводов, управлять правами доступа</p>
+        <table>
+            <tr><td>Права:</td><td><select id="master_form_role"><option value="Read">Чтение</option><option value="Withdraw">Снятие</option><option value="Admin">Админ</option></select></td></tr>
+            <tr><td>Логин:</td><td><input id="master_form_user" type="text" value=""/></td></tr>
+            <tr>
+                <td>
+                    <input type="button" class="custom-button smaller" value="Отменить" onclick="hide_add_master_menu();"/>
+                </td>
+                <td>
+                    <input type="button" class="custom-button smaller" value="Принять" onclick="run_add_master();"/>
+                </td>
+            </tr>
+        </table>
+        <div class="warning-text" id="add_master_warning"></div>
     </div>
+</div>
 </body>
 </html>

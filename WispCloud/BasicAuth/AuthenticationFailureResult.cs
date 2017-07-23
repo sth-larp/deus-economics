@@ -29,7 +29,7 @@ namespace DeusCloud.BasicAuth
 
         private HttpResponseMessage Execute()
         {
-            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            var response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
             response.RequestMessage = Request;
             response.ReasonPhrase = ReasonPhrase;
             return response;

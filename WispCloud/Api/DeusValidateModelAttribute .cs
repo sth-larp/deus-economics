@@ -60,7 +60,7 @@ namespace DeusCloud.Api
                 {
                     var expected = (exception is DeusException ? (exception as DeusException).Expected : false);
                     string message = exception.ContainsPath()
-                        ? $"Validate error; Path: '{exception.GetOrCreatePath()}';" : "Validate error;";
+                        ? $"Ошибка валидации: Path: '{exception.GetOrCreatePath()}';" : "Ошибка валидации:";
 
                     throw new DeusException(message, exception, expected);
                 }

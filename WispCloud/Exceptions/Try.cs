@@ -7,12 +7,12 @@ namespace DeusCloud.Exceptions
         public static void Argument(object obj, string paramName, bool expected = true)
         {
             if (obj == null)
-                throw new DeusException($"{paramName} cant be null;", expected);
+                throw new DeusException($"Поле {paramName} не должно быть пустым;", expected);
         }
         public static void ArgumentStr(string str, string paramName, bool expected = true)
         {
             if (string.IsNullOrEmpty(str))
-                throw new DeusException($"{paramName} cant be empty or null;", expected);
+                throw new DeusException($"Поле {paramName} не должно быть пустым", expected);
         }
 
         public static void Null(object obj, string message, bool expected = true)
