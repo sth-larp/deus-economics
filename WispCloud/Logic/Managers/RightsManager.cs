@@ -89,6 +89,9 @@ namespace DeusCloud.Logic.Managers
             if (!String.IsNullOrEmpty(clientData.Email))
                 editAccount.Email = clientData.Email;
 
+            if (!String.IsNullOrEmpty(clientData.Alias))
+                editAccount.Alias = clientData.Alias;
+
             UserContext.Accounts.Update(editAccount);
             return editAccount;
         }

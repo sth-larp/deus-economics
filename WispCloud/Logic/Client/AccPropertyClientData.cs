@@ -10,6 +10,7 @@ namespace DeusCloud.Logic.Client
         public string Login { get; set; }
         public string Fullname { get; set; }
         public string Email { get; set; }
+        public string Alias { get; set; }
         public AccountRole? Role { get; set; }
         public AccountStatus? Status { get; set; }
 
