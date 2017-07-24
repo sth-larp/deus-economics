@@ -130,7 +130,7 @@
                 var masters = JSON.parse(param);
                 $('#masters-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
 
-                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMaster('{0}');\"/></td></tr>";
+                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMasterDialog('{0}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
                 if (selected_role.value < ROLE.ADMIN.value)
                     row = rowNormal;
@@ -160,7 +160,7 @@
                     fill_slave_menu(param, main_account);
 
                 var slaves = JSON.parse(param);
-                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelAccess('{0}');\"/></td></tr>";
+                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelSlaveDialog('{0}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
 
                 if (selected_role.value < ROLE.ADMIN.value)
@@ -198,29 +198,41 @@
         initTabsControl("history-table");
     }
 
-    function cancelAccess(slave) {
-        //TODO вставить диалог
+    function cancelSlaveDialog(slave) {
+        document.getElementById('rem_slave_user').innerHTML = slave;
+        document.getElementById('remove_slave_overlay').style.display = 'flex';
+    }
+
+    function cancelSlave() {
+        var slave = document.getElementById('rem_slave_user').innerHTML;
         var data = JSON.stringify({ "MasterLogin": selected_account, "SlaveLogin": slave, "Role": "None" });
         sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-            if (status == httpOK)
+            if (status == httpOK) {
                 //if (selected_account == main_account) //    window.location.reload(false); //Потому что еще левый список есть //load_profile_page();
                 load_slaves();
-            else
-                fillError("slaves-table-warning", param, status);
+                hide_dialog();
+            } else
+                fillError("rem_slave_warning", param, status);
         }, data);
     }
 
-    function cancelMaster(master) {
-        //TODO вставить диалог
+    function cancelMasterDialog(master) {
+        document.getElementById('rem_master_user').innerHTML = master;
+        document.getElementById('remove_master_overlay').style.display = 'flex';
+    }
+
+    function cancelMaster() {
+        var master = document.getElementById('rem_master_user').innerHTML;
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": "None" });
         sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
             if (status == httpOK) {
                 if (main_account == master)
                     window.location.reload(false); //Потому что еще левый список есть
+                hide_dialog();
                 load_masters();
             }
             else
-                fillError("masters-table-warning", param, status);
+                fillError("rem_master_warning", param, status);
         }, data);
     }
 
@@ -237,7 +249,7 @@
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": role });
         sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
             if (status == httpOK) {
-                hide_add_master_menu();
+                hide_dialog();
                 load_profile_page();
             } else {
                 document.getElementById("add_master_warning").innerHTML = param;
@@ -245,9 +257,10 @@
         }, data);
     }
 
-    function hide_add_master_menu() {
-        document.getElementById('add_master_overlay').style.display = 'none';
-        document.getElementById('master_form_user').value = '';
+    function hide_dialog() {
+        $('.clear-onexit').html('');
+        $('.clear-onexit').val('');
+        $('.disabling-div').css('display','none');
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -297,7 +310,7 @@
             $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
             if (status == httpOK) {
                 var holders = JSON.parse(param);
-                var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelHolder('{1}');\"/></td></tr>";
+                var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelInsuranceDialog('{1}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
 
                 if (selected_role.value < ROLE.WITHDRAW.value)
@@ -342,12 +355,19 @@
         });
     }
 
-    function cancelHolder(holder) {
+    function cancelInsuranceDialog(holder) {
+        document.getElementById('rem_ins_user').innerHTML = holder;
+        document.getElementById('remove_ins_overlay').style.display = 'flex';
+    }
+
+    function cancelInsurance() {
+        var holder = document.getElementById('rem_ins_user').innerHTML;
         sendAPIRequest(url + "/api/insurance/removeholder?user=" + holder, "POST", function (param, status) {
             if (status == httpOK) {
                 load_corp_page();
+                hide_dialog();
             } else {
-                document.getElementById("ins-table-warning").innerHTML = param;
+                document.getElementById("remove_ins_warning").innerHTML = param;
             }
         });
     }
@@ -368,7 +388,7 @@
         var data = JSON.stringify({ "Company": selected_account, "Holder": holder, "Password": pass, "Level": level });
         sendAPIRequest(url + "/api/insurance/changeholder", "POST", function (param, status) {
             if (status == httpOK) {
-                hide_add_ins_menu();
+                hide_dialog();
                 load_corp_page();
             } else {
                 document.getElementById("add_ins_warning").innerHTML = param;
@@ -592,18 +612,18 @@
         <table>
             <tr><td>Страховка:</td><td id="ins_form_name" value="">#CORP</td></tr>
             <tr><td>Уровень:</td><td id="ins_form_level" value=""></td></tr>
-            <tr><td>Логин:</td><td><input id="ins_form_user" type="text" value=""/></td></tr>
-            <tr><td>Пароль:</td><td><input id="ins_form_pass" type="password" value=""/></td></tr>
+            <tr><td>Логин:</td><td><input id="ins_form_user" class="clear-onexit" type="text" value=""/></td></tr>
+            <tr><td>Пароль:</td><td><input id="ins_form_pass" class="clear-onexit" type="password" value=""/></td></tr>
             <tr>
                 <td>
-                    <input type="button" class="custom-button smaller" value="Отменить" onclick="hide_add_ins_menu();"/>
+                    <input type="button" class="custom-button smaller" value="Отменить" onclick="hide_dialog();"/>
                 </td>
                 <td>
                     <input type="button" class="custom-button smaller" value="Принять" onclick="run_add_insurance();"/>
                 </td>
             </tr>
         </table>
-        <div class="warning-text" id="add_ins_warning"></div>
+        <div class="warning-text clear-onexit" id="add_ins_warning"></div>
     </div>
 </div>
 
@@ -615,18 +635,72 @@
         <p>Админ: возможность, помимо переводов, управлять правами доступа</p>
         <table>
             <tr><td>Права:</td><td><select id="master_form_role"><option value="Read">Чтение</option><option value="Withdraw">Снятие</option><option value="Admin">Админ</option></select></td></tr>
-            <tr><td>Логин:</td><td><input id="master_form_user" type="text" value=""/></td></tr>
+            <tr><td>Логин:</td><td><input id="master_form_user" class="clear-onexit" type="text" value=""/></td></tr>
             <tr>
                 <td>
-                    <input type="button" class="custom-button smaller" value="Отменить" onclick="hide_add_master_menu();"/>
+                    <input type="button" class="custom-button smaller" value="Отменить" onclick="hide_dialog();"/>
                 </td>
                 <td>
                     <input type="button" class="custom-button smaller" value="Принять" onclick="run_add_master();"/>
                 </td>
             </tr>
         </table>
-        <div class="warning-text" id="add_master_warning"></div>
+        <div class="warning-text clear-onexit" id="add_master_warning"></div>
     </div>
 </div>
+
+<div id="remove_master_overlay" class="disabling-div">
+    <div style="float: left; margin: 0 auto;">
+        <p>Вы действительно хотите отменить доступ пользователя <label id="rem_master_user"></label>?
+        </p>
+        <table style="width: 30%;">
+            <tr>
+                <td>
+                    <input type="button" class="custom-button smaller" value="Нет" onclick="hide_dialog();"/>
+                </td>
+                <td>
+                    <input type="button" class="custom-button smaller" value="Да" onclick="cancelMaster();"/>
+                </td>
+            </tr>
+        </table>
+        <div class="warning-text clear-onexit" id="remove_master_warning"></div>
+    </div>
+</div>
+
+<div id="remove_slave_overlay" class="disabling-div">
+    <div style="float: left; margin: 0 auto;">
+        <p>Вы действительно хотите отменить доступ к пользователю <label id="rem_slave_user"></label>?
+        </p>
+        <p>Самостоятельно вернуть доступ у вас не получится</p>
+        <table style="width: 30%;">
+            <tr>
+                <td>
+                    <input type="button" class="custom-button smaller" value="Нет" onclick="hide_dialog();"/>
+                </td>
+                <td>
+                    <input type="button" class="custom-button smaller" value="Да" onclick="cancelSlave();"/>
+                </td>
+            </tr>
+        </table>
+        <div class="warning-text clear-onexit" id="remove_slave_warning"></div>
+    </div>
+</div>
+
+    <div id="remove_ins_overlay" class="disabling-div">
+        <div style="float: left; margin: 0 auto;">
+            <p>Вы действительно хотите отменить страховку пользователя <label id="rem_ins_user"></label>?</p>
+            <table style="width: 30%;">
+                <tr>
+                    <td>
+                        <input type="button" class="custom-button smaller" value="Нет" onclick="hide_dialog();" />
+                    </td>
+                    <td>
+                        <input type="button" class="custom-button smaller" value="Да" onclick="cancelInsurance();" />
+                    </td>
+                </tr>
+            </table>
+            <div class="warning-text clear-onexit" id="remove_ins_warning"></div>
+        </div>
+    </div>
 </body>
 </html>

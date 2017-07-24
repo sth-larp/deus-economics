@@ -187,21 +187,23 @@ function formatDate(date, format, utc) {
     return format;
 };
 
-function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str) {
+function buildTabs(elements, perPage, prefix, head) {
     var result = "<div class=\"table-nav-wrapper\">";
-    var page_links = "";
+    var links = "";
     //count of pages
-    for (offs = 0; offs * lines_per_page < elements_list.length; offs++) {
-        result = result + "<table id = '" + page_id_prefix + "_" + offs + "' style='display: none'>" + header_str;
-        var tmp_limit = lines_per_page;
-        for (i = 0; i < tmp_limit; i++) if (offs * lines_per_page + i < elements_list.length) result = result + elements_list[offs * lines_per_page + i];
+    for (offs = 0; offs * perPage < elements.length; offs++) {
+        result = result + "<table id = '" + prefix + "_" + offs + "' style='display: none'>" + head;
+        var tmp_limit = perPage;
+        for (i = 0; i < tmp_limit; i++)
+            if (offs * perPage + i < elements.length)
+                result = result + elements[offs * perPage + i];
         result = result + "</table>";
-        page_links = page_links + " |<span id='" + page_id_prefix + "_page_" + offs + "'> " + (offs + 1) + "</span>";
+        links = links + " |<span id='" + prefix + "_page_" + offs + "'> " + (offs + 1) + "</span>";
     }
     //change_page_buttons
-    result = result + "<div class=\"table-nav\"><span id='" + page_id_prefix + "_bookmark' style='display:none'>0</span>";
-    result = result + "<span id='" + page_id_prefix + "_maxpage' style='display:none'>" + offs + "</span>"
-    result = result + "<span id='" + page_id_prefix + "_back'><< Назад </span>" + page_links + "<span id='" + page_id_prefix + "_fw'> | Вперед >></span></div></div>";
+    result = result + "<div class=\"table-nav\"><span id='" + prefix + "_bookmark' style='display:none'>0</span>";
+    result = result + "<span id='" + prefix + "_maxpage' style='display:none'>" + offs + "</span>"
+    result = result + "<span id='" + prefix + "_back'><< Назад </span>" + links + "<span id='" + prefix + "_fw'> | Вперед >></span></div></div>";
     return result;
 }
 
