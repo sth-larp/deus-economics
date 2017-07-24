@@ -170,7 +170,16 @@ namespace DeusCloud.Logic.Managers
         {
             var acc = CheckForAccessOverSlave(master, AccountAccessRoles.Read);
 
-            return UserContext.Data.AccountAccesses.Where(x => x.Master == acc.Login).ToList();
+            if(acc.Role != AccountRole.Admin)
+                return UserContext.Data.AccountAccesses.Where(x => x.Master == acc.Login).ToList();
+
+            //Говнокод
+            var companies = UserContext.Data.Accounts.Where(x => x.Role == AccountRole.Company
+                                                                 || x.Role == AccountRole.Corp
+                                                                 || x.Role == AccountRole.Govt).ToList();
+
+            var accesses = companies.Select(x => new AccountAccess(x.Login, acc.Login, AccountAccessRoles.Admin)).ToList();
+            return accesses;
         }
     }
 

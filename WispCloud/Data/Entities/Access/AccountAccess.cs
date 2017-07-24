@@ -38,6 +38,15 @@ namespace DeusCloud.Data.Entities.Access
             Role = roles;
         }
 
+
+        //Для говнокода в GetAccessSlaves(string master)
+        public AccountAccess(string slave, string master, AccountAccessRoles roles)
+        {
+            Master = master;
+            Slave = slave;
+            Role = roles;
+        }
+
     }
 
 }

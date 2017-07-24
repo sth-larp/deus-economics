@@ -62,13 +62,13 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.SaveChanges();
 
             UserContext.AddGameEvent(loyalty.LoyalName, GameEventType.Insurance, 
-                $"{loyalty.LoyalService.Login} перестал обслуживать страховку {loyalty.LoyalName}", true);
+                $"{loyalty.LoyalService.Login} перестал обслуживать страховку {loyalty.Insurance}", true);
 
             var corp = UserContext.Accounts.Get(loyalty.LoyalName);
             if (corp == null) return;
 
             UserContext.AddGameEvent(corp.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.Login} перестал обслуживать страховку {loyalty.LoyalName}");
+                $"{loyalty.LoyalService.Login} перестал обслуживать страховку {loyalty.Insurance}");
         }
 
         public Loyalty NewLoyalty(Loyalty data)
@@ -92,10 +92,10 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.SaveChanges();
 
             UserContext.AddGameEvent(loyalty.LoyalService.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.Login} начал обслуживать страховку {loyalty.LoyalName}", true);
+                $"{loyalty.LoyalService.Login} начал обслуживать страховку {loyalty.Insurance}", true);
 
             UserContext.AddGameEvent(corp.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.Login} начал обслуживать страховку {loyalty.LoyalName}");
+                $"{loyalty.LoyalService.Login} начал обслуживать страховку {loyalty.Insurance}");
 
             return loyalty;
         }

@@ -38,7 +38,8 @@ namespace DeusCloud.Logic.Managers
             data.Description = data.Description ?? "";
 
             var trList = new List<Transaction>();
-                
+            
+            //Разные виды налогообложения    
             if (receiverAcc.Role == AccountRole.Person && senderAcc.Role == AccountRole.Person)
                 trList = P2PTransfer(senderAcc, receiverAcc, data);
             else if(receiverAcc.Role == AccountRole.Company && senderAcc.Role == AccountRole.Person)
@@ -48,6 +49,7 @@ namespace DeusCloud.Logic.Managers
             else
                 trList = B2BTransfer(senderAcc, receiverAcc, data);
 
+            //Анонимные транзакции
             if(data.Receiver == receiverAcc.Alias && receiverAcc.Role == AccountRole.Person)
                 trList.ForEach(x => {
                     if(x.ReceiverAccount.Login == receiverAcc.Login)
