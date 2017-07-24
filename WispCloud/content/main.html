@@ -74,6 +74,10 @@
             document.getElementById("live_status").innerHTML = prof.User.Status + " ";
             document.getElementById("current_account_value").innerHTML = prof.User.Cash;
 
+            document.getElementById("insurance_label").style.display = "none";
+            document.getElementById("index_label").style.display = "none";
+            document.getElementById("index_p_label").style.display = "none";
+
             if (selected_acc_role == ACC_ROLE.CORP) {
                 document.getElementById("current_index").innerHTML = prof.User.Index;
                 document.getElementById("index_points").innerHTML = prof.User.InsurancePoints;
@@ -465,8 +469,8 @@
                 <tr><td>Статус:</td><td id="live_status"></td></tr>
                 <tr><td>Кредиты:</td><td id="current_account_value"></td></tr>
                 <tr id="index_label" style="display: none;"><td>Индекс:</td><td id="current_index"></td></tr>
-                <tr id="index_p_label" style="display: none;"><td>Очки страховки:</td><td id="index_points"></td></tr>\
-                <tr id="insurance_label" style="display: none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>\
+                <tr id="index_p_label" style="display: none;"><td>Очки страховки:</td><td id="index_points"></td></tr>
+                <tr id="insurance_label" style="display: none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>
             </table>
 
             <div id="slaves_list">
