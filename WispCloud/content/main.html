@@ -23,7 +23,10 @@
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
-    //check if login is not set, return to login page
+    // Навигация левого меню
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
     function preLoad() {
         try {
             main_account = get_auth_tok_user(); //Временно, пока не получили истиный логин
@@ -61,6 +64,26 @@
         });
     }
 
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Страница профиля
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    
+    function load_profile_page() {
+        topMenuSwitch(document.getElementById("profile_menu"));
+        document.getElementById("profile_page").style.display = "block";
+
+        sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
+            if (status == httpOK)
+                fill_full_profile(param);
+            else
+                fillError("history-warning", param, status);
+        });
+
+        load_slaves();
+        load_masters();
+    }
+
     function fill_full_profile(param) {
         var prof = {};
         if (param.length > 0) {
@@ -96,29 +119,8 @@
                 document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
             }
 
-            var hist = "<tr><th>Время</th><th>Событие</th></tr>";
-            for (i = 0; i < prof.History.length; i++) {
-                hist += "<tr><td>" + customDateFormat(prof.History[i].Time) + "</td>";
-                hist += "<td>" + prof.History[i].Description + "</td></tr>";
-            }
-            document.getElementById("history").innerHTML = hist;
+            fill_history_table(prof);
         }
-    }
-
-
-    function load_profile_page() {
-        topMenuSwitch(document.getElementById("profile_menu"));
-        document.getElementById("profile_page").style.display = "block";
-
-        sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
-            if (status == httpOK)
-                fill_full_profile(param);
-            else
-                fillError("history-warning", param, status);
-        });
-
-        load_slaves();
-        load_masters();
     }
 
     function load_masters() {
@@ -181,6 +183,21 @@
         });
     }
 
+    function fill_history_table(param) {
+        var headRow = "<tr><th>Время</th><th>Событие</th></tr>";
+        var row = "<tr><td>{0}</td><td>{1}</td></tr>";
+        var rows = [];
+        for (i = 0; i < param.History.length; i++) {
+            var date = customDateFormat(param.History[i].Time);
+            rows[i] = format(row, [date, param.History[i].Description]);
+        }
+        var pageStr = buildTabs(rows, lines_on_tab, "history-table", headRow);
+        document.getElementById("history-list").innerHTML = pageStr;
+        var t = document.getElementById("history-table_0");
+        if (t != null) t.style.display = "block";
+        initTabsControl("history-table");
+    }
+
     function cancelAccess(slave) {
         //TODO вставить диалог
         var data = JSON.stringify({ "MasterLogin": selected_account, "SlaveLogin": slave, "Role": "None" });
@@ -207,61 +224,35 @@
         }, data);
     }
 
-    function load_transactions_page() {
-        topMenuSwitch(document.getElementById("transactions_menu"));
-        document.getElementById("transactions").style.display = "block";
-        document.getElementById("trans_menu_holder").style.display = selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
-
-        load_transactions();
+    function fill_add_master_menu() {
+        document.getElementById('master_form_user').value = "";
+        document.getElementById('add_master_overlay').style.display = 'flex';
+        document.getElementById('add_master_warning').innerHTML = "";
     }
 
-    function load_transactions() {
-        document.getElementById("lines_on_tab").value = lines_on_tab;
-        document.getElementById("lines_on_tab").onchange = function() {
-            lines_on_tab = document.getElementById("lines_on_tab").value;
-            //should rebuild transactions table here
-            sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
-                fill_transactions_table(param, status)
-            });
-        }
-        sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function (param, status) {
-            if (status == httpOK)
-                fill_transactions_table(param, status);
-            else
-                fillError("transactions-warning", param, status);
-        });
-    }
-
-    function sendTransaction(elem) {
-        var user = document.getElementById("user_name_id").value;
-        var sum = document.getElementById("transaction_value_id").value;
-        var comment = document.getElementById("transaction_comment_id").value;
-        var data = JSON.stringify({ "Sender": selected_account, "Receiver": user, "Amount": sum, "Description": comment });
-
-        sendAPIRequest(url + "/api/transfer", "POST", function(param, status) {
+    function run_add_master() {
+        document.getElementById("add_master_warning").innerHTML = "";
+        var master = document.getElementById('master_form_user').value;
+        var role = document.getElementById('master_form_role').value;
+        var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": role });
+        sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
             if (status == httpOK) {
-                document.getElementById("send-tran-warning").innerHTML = "";
-                load_transactions();
-            } else
-                fillError("send-tran-warning", param, status);
+                hide_add_master_menu();
+                load_profile_page();
+            } else {
+                document.getElementById("add_master_warning").innerHTML = param;
+            }
         }, data);
     }
 
-    function fill_transactions_table(param) {
-        var t_list = JSON.parse(param);
-        var head_str = "<tr><th>Перевел</th><th>Получил</th><th>Время</th><th>Сумма</th><th>Комментарий</th></tr>";
-        var t_str = [];
-        for (i = 0; i < t_list.length; i++) {
-            t_str[i] = "<tr><td>" + t_list[i].Sender
-                + "</td><td>" + t_list[i].Receiver + "</td><td>" + customDateFormat(t_list[i].Time)
-                + "</td><td>" + t_list[i].Amount + "</td><td>" + t_list[i].Comment + "</td></tr>";
-        }
-        var page_str = buildTabs(t_str, lines_on_tab, "transaction_table", head_str);
-        document.getElementById("transactions_list").innerHTML = page_str;
-        var t = document.getElementById("transaction_table_0");
-        if (t != null) t.style.display = "block";
-        initTabsControl("transaction_table");
+    function hide_add_master_menu() {
+        document.getElementById('add_master_overlay').style.display = 'none';
+        document.getElementById('master_form_user').value = '';
     }
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Страница Управления
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     function load_corp_page() {
         topMenuSwitch(document.getElementById("corp_menu"));
@@ -272,7 +263,7 @@
         load_loyalties();
 
         //payments
-        sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function(param, status) {
+        sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function (param, status) {
             if (status == httpOK) {
                 var payments = JSON.parse(param);
                 var head_str = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
@@ -301,7 +292,7 @@
         document.getElementById("insurance-holder").style.display = 'block';
         $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
 
-        sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function(param, status) {
+        sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
             $("#insurance-table tbody tr").remove();
             $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
             if (status == httpOK) {
@@ -332,7 +323,7 @@
         document.getElementById("loyalty-holder").style.display = 'block';
         $('#loyalty-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
 
-        sendAPIRequest(url + "/api/insurance/loyals", "GET", function(param, status) {
+        sendAPIRequest(url + "/api/insurance/loyals", "GET", function (param, status) {
             $("#loyalty-table tbody tr").remove();
             $('#loyalty-table').append('<tr><th>Компания</th><th>iD</th></tr>');
             if (status == httpOK) {
@@ -352,7 +343,7 @@
     }
 
     function cancelHolder(holder) {
-        sendAPIRequest(url + "/api/insurance/removeholder?user=" + holder, "POST", function(param, status) {
+        sendAPIRequest(url + "/api/insurance/removeholder?user=" + holder, "POST", function (param, status) {
             if (status == httpOK) {
                 load_corp_page();
             } else {
@@ -369,39 +360,18 @@
         document.getElementById('add_ins_warning').innerHTML = "";
     }
 
-    function fill_add_master_menu() {
-        document.getElementById('master_form_user').value = "";
-        document.getElementById('add_master_overlay').style.display = 'flex';
-        document.getElementById('add_master_warning').innerHTML = "";
-    }
-
     function run_add_insurance() {
         document.getElementById("add_ins_warning").innerHTML = "";
         var level = document.getElementById('ins_form_level').innerHTML;
         var holder = document.getElementById('ins_form_user').value;
         var pass = document.getElementById('ins_form_pass').value;
         var data = JSON.stringify({ "Company": selected_account, "Holder": holder, "Password": pass, "Level": level });
-        sendAPIRequest(url + "/api/insurance/changeholder", "POST", function(param, status) {
+        sendAPIRequest(url + "/api/insurance/changeholder", "POST", function (param, status) {
             if (status == httpOK) {
                 hide_add_ins_menu();
                 load_corp_page();
             } else {
                 document.getElementById("add_ins_warning").innerHTML = param;
-            }
-        }, data);
-    }
-
-    function run_add_master() {
-        document.getElementById("add_master_warning").innerHTML = "";
-        var master = document.getElementById('master_form_user').value;
-        var role = document.getElementById('master_form_role').value;
-        var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": role });
-        sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-            if (status == httpOK) {
-                hide_add_master_menu();
-                load_profile_page();
-            } else {
-                document.getElementById("add_master_warning").innerHTML = param;
             }
         }, data);
     }
@@ -412,11 +382,71 @@
         document.getElementById('ins_form_user').value = '';
     }
 
-    function hide_add_master_menu() {
-        document.getElementById('add_master_overlay').style.display = 'none';
-        document.getElementById('master_form_user').value = '';
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Страница Транзакций
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    function load_transactions_page() {
+        topMenuSwitch(document.getElementById("transactions_menu"));
+        document.getElementById("transactions").style.display = "block";
+        document.getElementById("trans_menu_holder").style.display = selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
+
+        load_transactions();
     }
 
+    function load_transactions() {
+        document.getElementById("lines_on_tab").value = lines_on_tab;
+        document.getElementById("lines_on_tab").onchange = function() {
+            lines_on_tab = document.getElementById("lines_on_tab").value;
+
+            //should rebuild transactions table here
+            sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
+                if (status == httpOK)
+                    fill_transactions_table(param, status);
+                else
+                    fillError("transactions-warning", param, status);
+            });
+        }
+        sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function (param, status) {
+            if (status == httpOK)
+                fill_transactions_table(param, status);
+            else
+                fillError("transactions-warning", param, status);
+        });
+    }
+
+    function sendTransaction() {
+        var user = document.getElementById("user_name_id").value;
+        var sum = document.getElementById("transaction_value_id").value;
+        var comment = document.getElementById("transaction_comment_id").value;
+        var data = JSON.stringify({ "Sender": selected_account, "Receiver": user, "Amount": sum, "Description": comment });
+
+        sendAPIRequest(url + "/api/transfer", "POST", function(param, status) {
+            if (status == httpOK) {
+                document.getElementById("send-tran-warning").innerHTML = "";
+                load_transactions();
+            } else
+                fillError("send-tran-warning", param, status);
+        }, data);
+    }
+
+    function fill_transactions_table(param) {
+        var tList = JSON.parse(param);
+        var headRow = "<tr><th>Перевел</th><th>Получил</th><th>Время</th><th>Сумма</th><th>Комментарий</th></tr>";
+        var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>";
+        var rows = [];
+        for (i = 0; i < tList.length; i++) {
+            var date = customDateFormat(tList[i].Time);
+            rows[i] = format(row, [tList[i].Sender, tList[i].Receiver, date, tList[i].Amount, tList[i].Comment]); 
+        }
+        var pageStr = buildTabs(rows, lines_on_tab, "transaction_table", headRow);
+        document.getElementById("transactions_list").innerHTML = pageStr;
+        var t = document.getElementById("transaction_table_0");
+        if (t != null) t.style.display = "block";
+        initTabsControl("transaction_table");
+    }
+    
     function createHandler(obj, handler) {
         return function() { handler(obj); }
     }
@@ -489,7 +519,7 @@
 
             <div>
                 <h2>События</h2>
-                <table id="history"></table>
+                <div id="history-list"></div>
                 <div class="warning-text" id="history-warning"></div>
             </div>
         </div>

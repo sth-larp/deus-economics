@@ -196,7 +196,7 @@ function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str) {
         var tmp_limit = lines_per_page;
         for (i = 0; i < tmp_limit; i++) if (offs * lines_per_page + i < elements_list.length) result = result + elements_list[offs * lines_per_page + i];
         result = result + "</table>";
-        page_links = page_links + "<span id='" + page_id_prefix + "_page_" + offs + "'>| " + (offs + 1) + "</span>";
+        page_links = page_links + " |<span id='" + page_id_prefix + "_page_" + offs + "'> " + (offs + 1) + "</span>";
     }
     //change_page_buttons
     result = result + "<div class=\"table-nav\"><span id='" + page_id_prefix + "_bookmark' style='display:none'>0</span>";
@@ -204,37 +204,46 @@ function buildTabs(elements_list, lines_per_page, page_id_prefix, header_str) {
     result = result + "<span id='" + page_id_prefix + "_back'><< Назад </span>" + page_links + "<span id='" + page_id_prefix + "_fw'> | Вперед >></span></div></div>";
     return result;
 }
-function initTabsControl(page_id_prefix) {
-    var max_page = parseInt(document.getElementById(page_id_prefix + "_maxpage").innerHTML);
-    var tab_name = "";
-    function createPageHandler(page_number) {
+
+function initTabsControl(prefix) {
+    var maxPage = parseInt(document.getElementById(prefix + "_maxpage").innerHTML);
+
+    function switchTabs(oldPage, newPage) {
+        document.getElementById(prefix + "_" + oldPage).style.display = "none";
+        document.getElementById(prefix + "_" + newPage).style.display = "block";
+        document.getElementById(prefix + "_bookmark").innerHTML = newPage;
+
+        document.getElementById(prefix + "_page_" + oldPage).classList.remove("nav-select");
+        document.getElementById(prefix + "_page_" + newPage).classList.add("nav-select");
+    }
+
+    function createPageHandler(pageNumber) {
         return function () {
-            //for(j = 0; j < max_page; j++) document.getElementById(page_id_prefix + "_" + j).style.display = "none";
-            document.getElementById(page_id_prefix + "_" + parseInt(document.getElementById(page_id_prefix + "_bookmark").innerHTML)).style.display = "none";
-            document.getElementById(page_id_prefix + "_" + page_number).style.display = "block";
-            document.getElementById(page_id_prefix + "_bookmark").innerHTML = page_number;
+            var curPage = parseInt(document.getElementById(prefix + "_bookmark").innerHTML);
+            switchTabs(curPage, pageNumber);
         }
     }
     function createArrowHandler(direction) {
         return function () {
-            var cur_page = parseInt(document.getElementById(page_id_prefix + "_bookmark").innerHTML);
-            var new_page = cur_page + direction;
-            if ((new_page >= 0 && new_page < max_page)) {
-                document.getElementById(page_id_prefix + "_bookmark").innerHTML = new_page;
-                document.getElementById(page_id_prefix + "_" + cur_page).style.display = "none";
-                document.getElementById(page_id_prefix + "_" + new_page).style.display = "block";
+            var curPage = parseInt(document.getElementById(prefix + "_bookmark").innerHTML);
+            var newPage = curPage + direction;
+            if ((newPage >= 0 && newPage < maxPage)) {
+                switchTabs(curPage, newPage);
             }
         }
     }
-    for (var i = 0; i < max_page; i++) {
-        tab_button_name = page_id_prefix + "_page_" + i;
-        document.getElementById(tab_button_name).style.cursor = "pointer";
-        document.getElementById(tab_button_name).onclick = createPageHandler(i);
+    for (var i = 0; i < maxPage; i++) {
+        var buttonName = prefix + "_page_" + i;
+        document.getElementById(buttonName).style.cursor = "pointer";
+        document.getElementById(buttonName).onclick = createPageHandler(i);
     }
-    document.getElementById(page_id_prefix + "_fw").style.cursor = "pointer";
-    document.getElementById(page_id_prefix + "_back").style.cursor = "pointer";
-    document.getElementById(page_id_prefix + "_fw").onclick = createArrowHandler(1);
-    document.getElementById(page_id_prefix + "_back").onclick = createArrowHandler(-1);
+
+    switchTabs(0, 0);
+
+    document.getElementById(prefix + "_fw").style.cursor = "pointer";
+    document.getElementById(prefix + "_back").style.cursor = "pointer";
+    document.getElementById(prefix + "_fw").onclick = createArrowHandler(1);
+    document.getElementById(prefix + "_back").onclick = createArrowHandler(-1);
 }
 
 

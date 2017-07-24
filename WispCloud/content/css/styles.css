@@ -49,6 +49,12 @@ th, td {
     display: table;
 }
 
+.nav-select {
+    color: #fff;
+    font-weight: bold;
+    font-size: 120%;
+}
+
 .custom-button {
     display: block;
     float: none;
@@ -107,7 +113,7 @@ th, td {
 #content-body {
   position: relative;
   top: 0px;
-  left: 220px;
+  left: 230px;
   right: 0;
   width: 70%;
   padding: 0 10px 0 10px;    
