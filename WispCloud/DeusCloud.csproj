@@ -242,6 +242,9 @@
     <EmbeddedResource Include="Migrations\201707181153134_Emails.resx">
       <DependentUpon>201707181153134_Emails.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707241802056_Alias.resx">
+      <DependentUpon>201707241802056_Alias.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\CommonPrefixProvider .cs" />
@@ -374,6 +377,10 @@
     <Compile Include="Migrations\201707181153134_Emails.cs" />
     <Compile Include="Migrations\201707181153134_Emails.Designer.cs">
       <DependentUpon>201707181153134_Emails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201707241802056_Alias.cs" />
+    <Compile Include="Migrations\201707241802056_Alias.Designer.cs">
+      <DependentUpon>201707241802056_Alias.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

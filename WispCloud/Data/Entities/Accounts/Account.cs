@@ -40,6 +40,10 @@ namespace DeusCloud.Data.Entities.Accounts
         [StringLength(80)]
         public string Email { get; set; }
 
+        [Index("IX_Alias", IsUnique = true)]
+        [StringLength(20)]
+        public string Alias { get; set; }
+
         [Required]
         [JsonIgnore]
         public Guid TokenSalt { get; set; }

@@ -55,5 +55,14 @@ namespace DeusCloud.Data.Entities.Transactions
             Amount = amount;
             Time = DateTime.Now;
         }
+
+        public void HideIfRequired()
+        {
+            if ((Type & TransactionType.Anonymous) > 0)
+            {
+                Receiver = ReceiverAccount.Alias;
+                Comment = Comment + " (анонимно)";
+            }
+        } 
     }
 }

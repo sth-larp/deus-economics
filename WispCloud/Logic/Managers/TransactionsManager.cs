@@ -29,8 +29,10 @@ namespace DeusCloud.Logic.Managers
 
         public void Transfer(TransferClientData data)
         {
-            var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver); 
-            var senderAcc = UserContext.Accounts.GetOrFail(data.Sender);
+            var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver, true); //Разрешен Alias
+            var senderAcc = UserContext.Accounts.GetOrFail(data.Sender); 
+
+            Try.Condition(receiverAcc.Login != senderAcc.Login, "Нельзя переводить самому себе");
 
             _rightsManager.CheckForAccessOverSlave(senderAcc, AccountAccessRoles.Withdraw);
             data.Description = data.Description ?? "";
@@ -38,13 +40,19 @@ namespace DeusCloud.Logic.Managers
             var trList = new List<Transaction>();
                 
             if (receiverAcc.Role == AccountRole.Person && senderAcc.Role == AccountRole.Person)
-                trList = C2CTransfer(senderAcc, receiverAcc, data);
+                trList = P2PTransfer(senderAcc, receiverAcc, data);
             else if(receiverAcc.Role == AccountRole.Company && senderAcc.Role == AccountRole.Person)
-                trList = C2BTransfer(senderAcc, receiverAcc, data);
+                trList = P2BTransfer(senderAcc, receiverAcc, data);
             else if (receiverAcc.Role == AccountRole.Corp && senderAcc.Role == AccountRole.Person)
-                trList = C2BTransfer(senderAcc, receiverAcc, data);
+                trList = P2BTransfer(senderAcc, receiverAcc, data);
             else
                 trList = B2BTransfer(senderAcc, receiverAcc, data);
+
+            if(data.Receiver == receiverAcc.Alias && receiverAcc.Role == AccountRole.Person)
+                trList.ForEach(x => {
+                    if(x.ReceiverAccount.Login == receiverAcc.Login)
+                        x.Type |= TransactionType.Anonymous;
+                });
 
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
@@ -68,9 +76,7 @@ namespace DeusCloud.Logic.Managers
 
         public void Implant(ImplantClientData data)
         {
-            var receiverAcc = UserContext.Accounts.Get(data.Receiver, data.ReceiverPass);
-            Try.NotNull(receiverAcc, $"Неверное имя или пароль {data.Receiver}.");
-
+            var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver, data.ReceiverPass);
             var sellerAcc = UserContext.Accounts.GetOrFail(data.Seller);
 
             _rightsManager.CheckForAccessOverSlave(sellerAcc, AccountAccessRoles.Withdraw);
@@ -83,7 +89,7 @@ namespace DeusCloud.Logic.Managers
             var tranData = new TransferClientData(sellerAcc.Login, receiverAcc.Login, data.Price);
             tranData.Description = data.Description;
 
-            var trList = C2BTransfer(receiverAcc, sellerAcc, tranData);
+            var trList = P2BTransfer(receiverAcc, sellerAcc, tranData);
 
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
@@ -118,7 +124,7 @@ namespace DeusCloud.Logic.Managers
 
         //Транзакции между физлицами
         //Налог платит отправитель в зависимости от разницы страховок
-        private List<Transaction> C2CTransfer(Account sender, Account receiver, TransferClientData data)
+        private List<Transaction> P2PTransfer(Account sender, Account receiver, TransferClientData data)
         {
             Try.Condition(sender.Cash >= data.Amount, $"Недостаточно средств");
             var ret = new List<Transaction>();
@@ -133,6 +139,7 @@ namespace DeusCloud.Logic.Managers
             }
             var transaction = new Transaction(sender, receiver, data.Amount * (1 - tax));
             transaction.Comment = data.Description;
+
             ret.Add(transaction);
             return ret;
         }
@@ -146,7 +153,7 @@ namespace DeusCloud.Logic.Managers
 
         //Транзакции юрлицам, налог платит получатель
         //Работают страховки
-        private List<Transaction> C2BTransfer(Account sender, Account receiver, TransferClientData data)
+        private List<Transaction> P2BTransfer(Account sender, Account receiver, TransferClientData data)
         {
             var ret = new List<Transaction>();
             var level = _insuranceManager.CheckLoyaltyLevel(sender, receiver);
@@ -188,7 +195,10 @@ namespace DeusCloud.Logic.Managers
             _rightsManager.CheckForAccessOverSlave(user, AccountAccessRoles.Read);
 
             var ret = UserContext.Data.Transactions
-                .Where(x => x.Receiver == user.Login || x.Sender == user.Login).OrderByDescending(x => x.Time).Skip(skip).Take(take);
+                .Where(x => x.Receiver == user.Login || x.Sender == user.Login)
+                .OrderByDescending(x => x.Time).Skip(skip).Take(take).ToList();
+
+            ret.ForEach(x =>{ x.HideIfRequired(); });
             return ret.ToList();
         }
     }

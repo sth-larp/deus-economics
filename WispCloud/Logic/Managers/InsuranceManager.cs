@@ -166,7 +166,7 @@ namespace DeusCloud.Logic.Managers
         {
             var companyAcc = _rightsManager.CheckForAccessOverSlave(data.Company, AccountAccessRoles.Withdraw);
 
-            var userAccount = UserContext.Accounts.Get(data.Holder, data.Password);
+            var userAccount = UserContext.Accounts.GetOrFail(data.Holder, data.Password);
             var level = data.Level ?? 1;
 
             Try.Condition(_associations.ContainsKey(companyAcc.Login), $"{companyAcc.Login} не выпускает страховки");

@@ -10,7 +10,7 @@ namespace DeusCloud.Data.Entities.Transactions
         None = 0,
         Normal = 1,
         Tax = 2,
-        Hidden = 4,
+        Anonymous = 4,
         Payment = 8,
         Insurance = 16,
     }

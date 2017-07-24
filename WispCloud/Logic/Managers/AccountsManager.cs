@@ -97,26 +97,31 @@ namespace DeusCloud.Logic.Managers
             return _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
         }
 
-        public Account Get(string login)
+        public Account Get(string login, bool allowAlias = false)
         {
             var account = _userManager.FindById(login);
             if (account == null)
                 account = UserContext.Data.Accounts.FirstOrDefault(x => x.Email == login);
+            if (allowAlias && account == null)
+                account = UserContext.Data.Accounts.FirstOrDefault(x => x.Alias == login);
             return account;
             //return _userManager.FindById(login);
         }
 
-        public Account GetOrFail(string login)
+        public Account GetOrFail(string login, bool allowAlias = false)
         {
-            var account = Get(login);
+            var account = Get(login, allowAlias);
             Try.NotNull(account, $"Не найден счет {login}");
             return account;
         }
 
-        public Account Get(string login, string password)
+        public Account GetOrFail(string login, string password)
         {
             var account = Get(login);
-            return _userManager.Find(account.Login, password);
+            if (account != null) 
+                account = _userManager.Find(account.Login, password);
+            Try.NotNull(account, $"Неверное имя или пароль {login}");
+            return account;
         }
 
         public void Update(Account account)
