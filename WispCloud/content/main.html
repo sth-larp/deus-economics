@@ -130,14 +130,14 @@
                 var masters = JSON.parse(param);
                 $('#masters-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
 
-                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMasterDialog('{0}');\"/></td></tr>";
+                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMasterDialog('{2}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
                 if (selected_role.value < ROLE.ADMIN.value)
                     row = rowNormal;
 
                 for (i = 0; i < masters.length; i++) {
                     var roleRus = get_role(masters[i].Role).rusname;
-                    var newRow = format(row, [masters[i].Master, roleRus]);
+                    var newRow = format(row, [masters[i].MasterFullname, roleRus, masters[i].Master]);
                     $('#masters-table').append(newRow);
                 }
 
@@ -160,7 +160,7 @@
                     fill_slave_menu(param, main_account);
 
                 var slaves = JSON.parse(param);
-                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelSlaveDialog('{0}');\"/></td></tr>";
+                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelSlaveDialog('{2}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
 
                 if (selected_role.value < ROLE.ADMIN.value)
@@ -171,7 +171,7 @@
 
                 for (i = 0; i < slaves.length; i++) {
                     var roleRus = get_role(slaves[i].Role).rusname;
-                    var newRow = format(row, [slaves[i].Slave, roleRus]);
+                    var newRow = format(row, [slaves[i].SlaveFullname, roleRus, slaves[i].Slave]);
                     $('#slaves-table').append(newRow);
                 }
             }

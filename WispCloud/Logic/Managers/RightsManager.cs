@@ -178,7 +178,7 @@ namespace DeusCloud.Logic.Managers
                                                                  || x.Role == AccountRole.Corp
                                                                  || x.Role == AccountRole.Govt).ToList();
 
-            var accesses = companies.Select(x => new AccountAccess(x.Login, acc.Login, AccountAccessRoles.Admin)).ToList();
+            var accesses = companies.Select(x => new AccountAccess(x, acc)).ToList();
             return accesses;
         }
     }

@@ -16,6 +16,9 @@ namespace DeusCloud.Data.Entities.Access
         [ForeignKey("Slave")]
         public virtual Account SlaveAccount { get; protected set; }
 
+        [NotMapped]
+        public virtual string SlaveFullname { get { return $"{SlaveAccount.Fullname} ({Slave})"; } }
+
         [Key, Column(Order = 1)]
         [Index]
         public string Master { get; protected set; }
@@ -23,6 +26,9 @@ namespace DeusCloud.Data.Entities.Access
         [JsonIgnore]
         [ForeignKey("Master")]
         public virtual Account MasterAccount { get; protected set; }
+
+        [NotMapped]
+        public virtual string MasterFullname { get { return $"{MasterAccount.Fullname} ({Master})"; } }
 
         [Required]
         public AccountAccessRoles Role { get; set; }
@@ -40,11 +46,13 @@ namespace DeusCloud.Data.Entities.Access
 
 
         //Для говнокода в GetAccessSlaves(string master)
-        public AccountAccess(string slave, string master, AccountAccessRoles roles)
+        public AccountAccess(Account slave, Account master)
         {
-            Master = master;
-            Slave = slave;
-            Role = roles;
+            MasterAccount = master;
+            Master = master.Login;
+            SlaveAccount = slave;
+            Slave = slave.Login;
+            Role = AccountAccessRoles.Admin;
         }
 
     }
