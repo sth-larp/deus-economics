@@ -231,6 +231,9 @@ namespace DeusCloud.Logic.Managers
             var loserAccount = UserContext.Accounts.GetOrFail(data.Loser);
             var receiverAccount = UserContext.Accounts.GetOrFail(data.Receiver);
 
+            Try.Condition(receiverAccount.EffectiveLevel <= loserAccount.EffectiveLevel, 
+                "Ваша страховка лучше, чем у жертвы");
+
             Try.Condition(loserAccount.Insurance != InsuranceType.None, 
                 $"У пользователя {loserAccount.Login} нет страховки");
 

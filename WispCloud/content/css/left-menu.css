@@ -8,8 +8,6 @@
     min-width: 220px;
     max-width: 220px;
 
-    height: 100vh;
-
     font-family: play;
     font-size: 100%;
     color: #CCE3F4;
@@ -30,8 +28,9 @@
 }
 
 .slave-menu-elem {
-    line-height: 35px; /* provides vert-align */
-    vertical-align: top;
+    min-height: 45px; /* provides vert-align */
+    display: flex;
+    align-items: center;
     margin: 1px 20px 10px 30px;
     font-size: 100%;
 }
@@ -46,6 +45,7 @@
 }
 
 .selected-slave:before {
-    content:"\2192\0020";
+    content:"\2192\0020\0020";
     color: #849aaa;
+    white-space: pre;
 }

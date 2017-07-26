@@ -88,17 +88,19 @@ namespace DeusCloud.Logic.Managers
             Try.Condition(receiverAcc.Role == AccountRole.Person, $"Получать импланты может только персона");
             Try.Condition(sellerAcc.Index >= data.Index, $"Недостаточно индекса");
             
-            var tranData = new TransferClientData(sellerAcc.Login, receiverAcc.Login, data.Price);
-            tranData.Description = data.Description;
-
-            var trList = P2BTransfer(receiverAcc, sellerAcc, tranData);
-
-            using (var dbTransact = UserContext.Data.Database.BeginTransaction())
+            if (data.Price > 0)
             {
-                UserContext.Data.BeginFastSave();
-                trList.ForEach(TransactiontoDb);
-                sellerAcc.Index -= data.Index;
-                dbTransact.Commit();
+                var tranData = new TransferClientData(sellerAcc.Login, receiverAcc.Login, data.Price);
+                tranData.Description = data.Description;
+                var trList = P2BTransfer(receiverAcc, sellerAcc, tranData);
+
+                using (var dbTransact = UserContext.Data.Database.BeginTransaction())
+                {
+                    UserContext.Data.BeginFastSave();
+                    trList.ForEach(TransactiontoDb);
+                    sellerAcc.Index -= data.Index;
+                    dbTransact.Commit();
+                }
             }
 
             UserContext.AddGameEvent(sellerAcc.Login, GameEventType.Index, 

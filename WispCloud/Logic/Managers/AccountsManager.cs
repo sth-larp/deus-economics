@@ -29,6 +29,14 @@ namespace DeusCloud.Logic.Managers
             _constantManager = new ConstantManager(UserContext);
         }
 
+        private Dictionary<string, string> _regAlias = new Dictionary<string, string>
+        {
+            {"johnsoncorp","JJ"},
+            {"kintsugicorp","Serenity"},
+            {"panamcorp","Panam"},
+            {"sungov","Govt"},
+        };
+
         public Account Registration(RegistrationClientData clientData)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
@@ -50,7 +58,10 @@ namespace DeusCloud.Logic.Managers
 
             if (!String.IsNullOrEmpty(clientData.Workplace) && clientData.SalaryLevel != null)
             {
-                var workPlace = _userManager.FindById(clientData.Workplace);
+                if (_regAlias.ContainsKey(clientData.Workplace))
+                    clientData.Workplace = _regAlias[clientData.Workplace];
+
+                var workPlace = Get(clientData.Workplace);
                 if (workPlace == null)
                 {
                     UserContext.AddGameEvent(clientData.Login, GameEventType.None, 
@@ -99,6 +110,8 @@ namespace DeusCloud.Logic.Managers
 
         public Account Get(string login, bool allowAlias = false)
         {
+            if (String.IsNullOrEmpty(login)) return null;
+
             var account = _userManager.FindById(login);
             if (account == null)
                 account = UserContext.Data.Accounts.FirstOrDefault(x => x.Email == login);
@@ -142,7 +155,9 @@ namespace DeusCloud.Logic.Managers
         {
             var user = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
             var data = new FullAccountServerData(user);
-            data.History = UserContext.Data.GameEvents.Where(x => x.User == user.Login).ToList();
+            data.History = UserContext.Data.GameEvents
+                .Where(x => x.User == user.Login)
+                .OrderByDescending(x => x.Time).ToList();
             return data;
         }
     }
