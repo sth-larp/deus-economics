@@ -21,11 +21,12 @@ namespace DeusCloud.Logic.Managers
         private static string CorpName1 = "JJ";
         private static string CorpName2 = "Serenity";
         private static string CorpName3 = "Panam";
+        private static string GovName = "Govt";
 
         private static Dictionary<string, InsuranceType> _associations = 
             new Dictionary<string, InsuranceType>
         {
-            {"govt", InsuranceType.Govt },
+            {GovName, InsuranceType.Govt },
             {CorpName1, InsuranceType.JJ},
             {CorpName2, InsuranceType.Serenity},
             {CorpName3, InsuranceType.Panam},

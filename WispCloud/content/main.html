@@ -18,7 +18,7 @@
     var selected_acc_role = ACC_ROLE.PERSON;
     var main_profile = {}
     var lines_on_tab = 20;
-    var corpNames = ['Serenity', 'Panam', 'JJ', 'Govt'];
+    var corpNames = ['Serenity', 'Panam', 'JJ', 'Govt', 'admin'];
     var httpOK = 200; //For errors debugging
 
 
@@ -101,14 +101,17 @@
             document.getElementById("index_label").style.display = "none";
             document.getElementById("index_p_label").style.display = "none";
 
+            document.getElementById("current_index").innerHTML = prof.User.Index;
+            document.getElementById("index_points").innerHTML = prof.User.InsurancePoints;
             if (selected_acc_role == ACC_ROLE.CORP) {
-                document.getElementById("current_index").innerHTML = prof.User.Index;
-                document.getElementById("index_points").innerHTML = prof.User.InsurancePoints;
                 document.getElementById("index_label").style.display = "table-row";
+            }
+            if (selected_acc_role == ACC_ROLE.CORP || selected_acc_role == ACC_ROLE.GOVT) {
                 document.getElementById("index_p_label").style.display = "table-row";
             }
 
-            if (selected_acc_role == ACC_ROLE.CORP || selected_acc_role == ACC_ROLE.COMPANY) {
+            if (selected_acc_role == ACC_ROLE.CORP || selected_acc_role == ACC_ROLE.COMPANY
+                || selected_acc_role == ACC_ROLE.GOVT || selected_acc_role == ACC_ROLE.ADMIN) {
                 document.getElementById('corp_menu').style.display = 'block';
             }
 
@@ -331,22 +334,23 @@
     }
 
     function load_loyalties() {
-        if (corpNames.indexOf(selected_account) == -1) return;
+        //if (corpNames.indexOf(selected_account) == -1) return;
 
         document.getElementById("loyalty-holder").style.display = 'block';
-        $('#loyalty-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
 
         sendAPIRequest(url + "/api/insurance/loyals", "GET", function (param, status) {
             $("#loyalty-table tbody tr").remove();
-            $('#loyalty-table').append('<tr><th>Компания</th><th>iD</th></tr>');
+            $('#loyalty-table').append('<tr><th>Страховка</th><th>Компания</th><th>iD</th></tr>');
             if (status == httpOK) {
                 var loyals = JSON.parse(param);
-                var row = "<tr><td>{0}</td><td>{1}</td></tr>";
+                var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
 
                 for (i = 0; i < loyals.length; i++) {
-                    if (loyals[i].Insurance != selected_account) continue;
+                    if (loyals[i].Insurance != selected_account
+                        && loyals[i].LoyalName != selected_account)
+                        continue;
 
-                    var newRow = format(row, [loyals[i].LoyalFullName, loyals[i].LoyalName]);
+                    var newRow = format(row, [loyals[i].Insurance, loyals[i].LoyalFullName, loyals[i].LoyalName]);
                     $('#loyalty-table').append(newRow);
                 }
             } else {
@@ -555,8 +559,8 @@
             </div>
 
             <div id="loyalty-holder" style="display: none;">
-                <h2>Заведения</h2>
-                <p>Перечень заведений, которые обслуживают вашу страховку. Если вы хотите добавить или удалить какое-то заведение, обратитесь к Администрации.</p>
+                <h2>Обслуживание страховок</h2>
+                <p>Перечень заведений, которые обслуживают вашу страховку, а также страховок, которые обслуживает ваше заведение. Если вы хотите поменять этот список, обратитесь к Администрации.</p>
                 <table id="loyalty-table"></table>
                 <div class="warning-text" id="loyalty-table-warning"></div>
             </div>
