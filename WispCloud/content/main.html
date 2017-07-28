@@ -60,7 +60,7 @@
                 main_profile = JSON.parse(param);
                 load_profile_page(main_profile.Login);
             } else {
-                alert(param + "\n\n" + status);
+                alert("Ошибка " + status + "\n" + param);
             }
         });
     }
@@ -74,15 +74,9 @@
         topMenuSwitch(document.getElementById("profile_menu"));
         document.getElementById("profile_page").style.display = "block";
 
-        document.getElementById("history-warning").innerHTML = spinner;
-
-        sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
-            if (status == httpOK) {
-                document.getElementById("history-warning").innerHTML = '';
+        sendAPIRequestWarned(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function (param, status) {
                 fill_full_profile(param);
-            } else
-                fillError("history-warning", param, status);
-        });
+        }, "history-warning");
 
         load_slaves();
         load_masters();
@@ -132,33 +126,25 @@
     }
 
     function load_masters() {
-        document.getElementById("masters-table-warning").innerHTML = spinner;
-        sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status) {
+        sendAPIRequestWarned(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function (param, status) {
             $("#masters-table tbody tr").remove();
-            if (status == httpOK) {
-                document.getElementById("masters-table-warning").innerHTML = '';
+            var masters = JSON.parse(param);
+            $('#masters-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
 
-                var masters = JSON.parse(param);
-                $('#masters-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
+            var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMasterDialog('{2}');\"/></td></tr>";
+            var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
+            if (selected_role.value < ROLE.ADMIN.value)
+                row = rowNormal;
 
-                var row = "<tr><td>{0}</td><td>{1}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelMasterDialog('{2}');\"/></td></tr>";
-                var rowNormal = "<tr><td>{0}</td><td>{1}</td><td></td></tr>";
-                if (selected_role.value < ROLE.ADMIN.value)
-                    row = rowNormal;
-
-                for (i = 0; i < masters.length; i++) {
-                    var roleRus = get_role(masters[i].Role).rusname;
-                    var newRow = format(row, [masters[i].MasterFullname, roleRus, masters[i].Master]);
-                    $('#masters-table').append(newRow);
-                }
-
-                if(selected_role.value >= ROLE.ADMIN.value)
-                    $('#masters-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_master_menu();\"/></td><td></td><td></td></tr>");
+            for (i = 0; i < masters.length; i++) {
+                var roleRus = get_role(masters[i].Role).rusname;
+                var newRow = format(row, [masters[i].MasterFullname, roleRus, masters[i].Master]);
+                $('#masters-table').append(newRow);
             }
-            else {
-                fillError("masters-table-warning", param, status);
-            }
-        });
+
+            if(selected_role.value >= ROLE.ADMIN.value)
+                $('#masters-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_master_menu();\"/></td><td></td><td></td></tr>");
+        }, "masters-table-warning");
     }
 
 
@@ -220,14 +206,11 @@
     function cancelSlave() {
         var slave = document.getElementById('rem_slave_user').innerHTML;
         var data = JSON.stringify({ "MasterLogin": selected_account, "SlaveLogin": slave, "Role": "None" });
-        sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-            if (status == httpOK) {
+        sendAPIRequestWarned(url + "/api/accounts/access/set", "POST", function (param, status) {
                 //if (selected_account == main_account) //    window.location.reload(false); //Потому что еще левый список есть //load_profile_page();
                 load_slaves();
                 hide_dialog();
-            } else
-                fillError("rem_slave_warning", param, status);
-        }, data);
+        }, "rem_slave_warning", data);
     }
 
     function cancelMasterDialog(master) {
@@ -237,20 +220,14 @@
 
     function cancelMaster() {
         var master = document.getElementById('rem_master_user').innerHTML;
-
-        document.getElementById("rem_master_warning").innerHTML = spinner;
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": "None" });
-        sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-            if (status == httpOK) {
-                document.getElementById("rem_master_warning").innerHTML = '';
+
+        sendAPIRequestWarned(url + "/api/accounts/access/set", "POST", function (param, status) {
                 if (main_account == master)
                     window.location.reload(false); //Потому что еще левый список есть
                 hide_dialog();
                 load_masters();
-            }
-            else
-                fillError("rem_master_warning", param, status);
-        }, data);
+        }, "rem_master_warning", data);
     }
 
     function fill_add_master_menu() {
@@ -260,20 +237,14 @@
     }
 
     function run_add_master() {
-        document.getElementById("add_master_warning").innerHTML = spinner;
         var master = document.getElementById('master_form_user').value;
         var role = document.getElementById('master_form_role').value;
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": role });
-        sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
-            if (status == httpOK) {
-                document.getElementById("add_master_warning").innerHTML = '';
+        sendAPIRequestWarned(url + "/api/accounts/access/set", "POST", function (param, status) {
                 hide_dialog();
                 load_profile_page();
-            }
-            else {
-                fillError('add_master_warning', param, status);
-            }
-        }, data);
+
+        }, 'add_master_warning', data);
     }
 
     function hide_dialog() {
@@ -299,30 +270,22 @@
     }
 
     function load_payments() {
-        document.getElementById("payments-warning").innerHTML = spinner;
+        sendAPIRequestWarned(url + "/api/payments/list?login=" + selected_account, "GET", function (param, status) {
+            var payments = JSON.parse(param).sort(paymentSort);
+            var headStr = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
+            var rows = [];
 
-        sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function (param, status) {
-            if (status == httpOK) {
-                document.getElementById("payments-warning").innerHTML = '';
-
-                var payments = JSON.parse(param).sort(paymentSort);
-                var headStr = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
-                var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
-                var rows = [];
-                for (i = 0; i < payments.length; i++) {
-                    var date = customDateFormat(payments[i].LastPaid);
-                    rows[i] = format(row, [payments[i].ReceiverName, payments[i].Amount, date]);
-                }
-                var page = buildTabs(rows, lines_on_tab, "payments-table", headStr);
-                document.getElementById("payments_list").innerHTML = page;
-                var t = document.getElementById("payments-table_0");
-                if (t != null) t.style.display = "block";
-
-                initTabsControl("payments-table");
+            for (i = 0; i < payments.length; i++) {
+                var date = customDateFormat(payments[i].LastPaid);
+                rows[i] = format(row, [payments[i].ReceiverName, payments[i].Amount, date]);
             }
-            else
-                fillError("payments-warning", param, status);
-        });
+            var page = buildTabs(rows, lines_on_tab, "payments-table", headStr);
+            document.getElementById("payments_list").innerHTML = page;
+            var t = document.getElementById("payments-table_0");
+            if (t != null) t.style.display = "block";
+            initTabsControl("payments-table");
+        }, "payments-warning");
     }
 
     function load_ins_holders() {
@@ -333,32 +296,26 @@
 
         document.getElementById("insurance-holder").style.display = 'block';
         $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
-        document.getElementById("ins-table-warning").innerHTML = spinner;
 
-        sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
+        sendAPIRequestWarned(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
             $("#insurance-table tbody tr").remove();
             $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
-            if (status == httpOK) {
-                document.getElementById("ins-table-warning").innerHTML = "";
-                var holders = JSON.parse(param);
-                var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelInsuranceDialog('{1}');\"/></td></tr>";
-                var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
+            var holders = JSON.parse(param);
+            var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelInsuranceDialog('{1}');\"/></td></tr>";
+            var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
 
-                if (selected_role.value < ROLE.WITHDRAW.value)
-                    row = rowNormal;
+            if (selected_role.value < ROLE.WITHDRAW.value)
+                row = rowNormal;
 
-                for (i = 0; i < holders.length; i++) {
-                    var newRow = format(row, [holders[i].UserFullname, holders[i].UserLogin, holders[i].InsuranceLevel]);
-                    $('#insurance-table').append(newRow);
-                }
-
-                if (selected_role.value >= ROLE.WITHDRAW.value) {
-                    $('#insurance-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_insurance_menu();\"/></td><td><select id=\"level-selector\"><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option></td><td></td></tr>");
-                }
-            } else {
-                fillError("ins-table-warning", param, status);
+            for (i = 0; i < holders.length; i++) {
+                var newRow = format(row, [holders[i].UserFullname, holders[i].UserLogin, holders[i].InsuranceLevel]);
+                $('#insurance-table').append(newRow);
             }
-        });
+
+            if (selected_role.value >= ROLE.WITHDRAW.value) {
+                $('#insurance-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_insurance_menu();\"/></td><td><select id=\"level-selector\"><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option></td><td></td></tr>");
+            }
+        }, "ins-table-warning");
     }
 
     function load_loyalties() {
@@ -367,26 +324,21 @@
         document.getElementById("loyalty-holder").style.display = 'block';
         document.getElementById("loyalty-table-warning").innerHTML = spinner;
 
-        sendAPIRequest(url + "/api/insurance/loyals", "GET", function (param, status) {
+        sendAPIRequestWarned(url + "/api/insurance/loyals", "GET", function (param, status) {
             $("#loyalty-table tbody tr").remove();
             $('#loyalty-table').append('<tr><th>Страховка</th><th>Компания</th><th>iD</th></tr>');
-            if (status == httpOK) {
-                document.getElementById("loyalty-table-warning").innerHTML = '';
-                var loyals = JSON.parse(param);
-                var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
+            var loyals = JSON.parse(param);
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
 
-                for (i = 0; i < loyals.length; i++) {
-                    if (loyals[i].Insurance != selected_account
-                        && loyals[i].LoyalName != selected_account)
-                        continue;
+            for (i = 0; i < loyals.length; i++) {
+                if (loyals[i].Insurance != selected_account
+                    && loyals[i].LoyalName != selected_account)
+                    continue;
 
-                    var newRow = format(row, [loyals[i].Insurance, loyals[i].LoyalFullName, loyals[i].LoyalName]);
-                    $('#loyalty-table').append(newRow);
-                }
-            } else {
-                fillError("loyalty-table-warning", param, status);
+                var newRow = format(row, [loyals[i].Insurance, loyals[i].LoyalFullName, loyals[i].LoyalName]);
+                $('#loyalty-table').append(newRow);
             }
-        });
+        }, "loyalty-table-warning");
     }
 
     function cancelInsuranceDialog(holder) {
@@ -396,14 +348,10 @@
 
     function cancelInsurance() {
         var holder = document.getElementById('rem_ins_user').innerHTML;
-        sendAPIRequest(url + "/api/insurance/removeholder?user=" + holder, "POST", function (param, status) {
-            if (status == httpOK) {
-                load_corp_page();
-                hide_dialog();
-            } else {
-                document.getElementById("remove_ins_warning").innerHTML = param;
-            }
-        });
+        sendAPIRequestWarned(url + "/api/insurance/removeholder?user=" + holder, "POST", function (param, status) {
+            load_corp_page();
+            hide_dialog();
+        }, "remove_ins_warning");
     }
 
     function fill_add_insurance_menu() {
@@ -415,19 +363,16 @@
     }
 
     function run_add_insurance() {
-        document.getElementById("add_ins_warning").innerHTML = "";
         var level = document.getElementById('ins_form_level').innerHTML;
         var holder = document.getElementById('ins_form_user').value;
         var pass = document.getElementById('ins_form_pass').value;
         var data = JSON.stringify({ "Company": selected_account, "Holder": holder, "Password": pass, "Level": level });
-        sendAPIRequest(url + "/api/insurance/changeholder", "POST", function (param, status) {
-            if (status == httpOK) {
+
+        sendAPIRequestWarned(url + "/api/insurance/changeholder", "POST", function (param, status) {
                 hide_dialog();
                 load_corp_page();
-            } else {
-                document.getElementById("add_ins_warning").innerHTML = param;
-            }
-        }, data);
+
+        }, "add_ins_warning", data);
     }
 
     function hide_add_ins_menu() {
@@ -450,24 +395,9 @@
     }
 
     function load_transactions() {
-        document.getElementById("lines_on_tab").value = lines_on_tab;
-        document.getElementById("lines_on_tab").onchange = function() {
-            lines_on_tab = document.getElementById("lines_on_tab").value;
-
-            //should rebuild transactions table here
-            sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function(param, status) {
-                if (status == httpOK)
-                    fill_transactions_table(param, status);
-                else
-                    fillError("transactions-warning", param, status);
-            });
-        }
-        sendAPIRequest(url + "/api/transactions?login=" + selected_account, "GET", function (param, status) {
-            if (status == httpOK)
-                fill_transactions_table(param, status);
-            else
-                fillError("transactions-warning", param, status);
-        });
+        sendAPIRequestWarned(url + "/api/transactions?login=" + selected_account, "GET", function (param, status) {
+            fill_transactions_table(param, status);
+        }, "transactions-warning");
     }
 
     function sendTransaction() {

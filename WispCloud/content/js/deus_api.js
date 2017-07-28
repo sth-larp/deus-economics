@@ -73,6 +73,21 @@ function sendAPIRequest(func_url, type, callback, data) {
     xhttp.send(data);
 }
 
+function sendAPIRequestWarned(func_url, type, callback, warner, data) {
+    //send async API reqest, on responce proceed by callbakc function
+    document.getElementById(warner).innerHTML = spinner;
+
+    sendAPIRequest(func_url, type, function(param, status) {
+        if (status == 200) {
+            document.getElementById(warner).innerHTML = '';
+            callback(param);
+        } else
+            fillError(warner, param, status);
+    }, data);
+
+    
+}
+
 function save_auth_tok(user, pass) {
     var cookieValue = 'Basic ' + btoa(user + ':' + pass);
     var myDate = new Date();
