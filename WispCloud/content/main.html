@@ -126,8 +126,9 @@
     }
 
     function load_masters() {
+        $("#masters-table tbody tr").remove();
+
         sendAPIRequestWarned(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function (param, status) {
-            $("#masters-table tbody tr").remove();
             var masters = JSON.parse(param);
             $('#masters-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
 
@@ -150,9 +151,9 @@
 
     function load_slaves() {
         document.getElementById("slaves-table-warning").innerHTML = spinner;
+        $("#slaves-table tbody tr").remove();
 
         sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function(param, status) {
-            $("#slaves-table tbody tr").remove();
             
             if (status == httpOK) {
                 document.getElementById("slaves-table-warning").innerHTML = '';
@@ -295,10 +296,9 @@
         }
 
         document.getElementById("insurance-holder").style.display = 'block';
-        $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
+        $("#insurance-table tbody tr").remove();
 
         sendAPIRequestWarned(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
-            $("#insurance-table tbody tr").remove();
             $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
             var holders = JSON.parse(param);
             var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelInsuranceDialog('{1}');\"/></td></tr>";
@@ -322,10 +322,9 @@
         //if (corpNames.indexOf(selected_account) == -1) return;
 
         document.getElementById("loyalty-holder").style.display = 'block';
-        document.getElementById("loyalty-table-warning").innerHTML = spinner;
+        $("#loyalty-table tbody tr").remove();
 
         sendAPIRequestWarned(url + "/api/insurance/loyals", "GET", function (param, status) {
-            $("#loyalty-table tbody tr").remove();
             $('#loyalty-table').append('<tr><th>Страховка</th><th>Компания</th><th>iD</th></tr>');
             var loyals = JSON.parse(param);
             var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
