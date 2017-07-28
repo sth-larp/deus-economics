@@ -36,7 +36,8 @@
                     main_profile = JSON.parse(param);
                     main_account = main_profile.Login;
                     selected_account = main_account;
-                    document.getElementById("current_account").innerHTML = "Привет, " + main_profile.Login;
+                    document.getElementById("current_account").innerHTML = main_profile.Fullname.substring(0, 20);
+                    document.getElementById("current_account_credit").innerHTML = Math.round(main_profile.Cash);
                     load_profile_page(main_profile.Login);
                 } else if (status == 401) {
                     loginRedirect();
@@ -73,10 +74,13 @@
         topMenuSwitch(document.getElementById("profile_menu"));
         document.getElementById("profile_page").style.display = "block";
 
+        document.getElementById("history-warning").innerHTML = spinner;
+
         sendAPIRequest(url + "/api/accounts/fullprofile?login=" + selected_account, "GET", function(param, status) {
-            if (status == httpOK)
+            if (status == httpOK) {
+                document.getElementById("history-warning").innerHTML = '';
                 fill_full_profile(param);
-            else
+            } else
                 fillError("history-warning", param, status);
         });
 
@@ -96,6 +100,7 @@
             document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
             document.getElementById("live_status").innerHTML = prof.User.Status + " ";
             document.getElementById("current_account_value").innerHTML = prof.User.Cash;
+            document.getElementById("current_account_credit").innerHTML = prof.User.Cash;
 
             document.getElementById("insurance_label").style.display = "none";
             document.getElementById("index_label").style.display = "none";
@@ -127,9 +132,12 @@
     }
 
     function load_masters() {
+        document.getElementById("masters-table-warning").innerHTML = spinner;
         sendAPIRequest(url + "/api/accounts/access/masters?slave=" + selected_account, "GET", function(param, status) {
             $("#masters-table tbody tr").remove();
             if (status == httpOK) {
+                document.getElementById("masters-table-warning").innerHTML = '';
+
                 var masters = JSON.parse(param);
                 $('#masters-table').append('<tr><th>Пользователь</th><th colspan=2>Роль</th></tr>');
 
@@ -155,10 +163,13 @@
 
 
     function load_slaves() {
+        document.getElementById("slaves-table-warning").innerHTML = spinner;
+
         sendAPIRequest(url + "/api/accounts/access/slaves?master=" + selected_account, "GET", function(param, status) {
             $("#slaves-table tbody tr").remove();
             
             if (status == httpOK) {
+                document.getElementById("slaves-table-warning").innerHTML = '';
                 if (selected_account == main_account)
                     fill_slave_menu(param, main_account);
 
@@ -226,9 +237,12 @@
 
     function cancelMaster() {
         var master = document.getElementById('rem_master_user').innerHTML;
+
+        document.getElementById("rem_master_warning").innerHTML = spinner;
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": "None" });
         sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
             if (status == httpOK) {
+                document.getElementById("rem_master_warning").innerHTML = '';
                 if (main_account == master)
                     window.location.reload(false); //Потому что еще левый список есть
                 hide_dialog();
@@ -246,16 +260,18 @@
     }
 
     function run_add_master() {
-        document.getElementById("add_master_warning").innerHTML = "";
+        document.getElementById("add_master_warning").innerHTML = spinner;
         var master = document.getElementById('master_form_user').value;
         var role = document.getElementById('master_form_role').value;
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": role });
         sendAPIRequest(url + "/api/accounts/access/set", "POST", function (param, status) {
             if (status == httpOK) {
+                document.getElementById("add_master_warning").innerHTML = '';
                 hide_dialog();
                 load_profile_page();
-            } else {
-                document.getElementById("add_master_warning").innerHTML = param;
+            }
+            else {
+                fillError('add_master_warning', param, status);
             }
         }, data);
     }
@@ -278,20 +294,27 @@
 
         load_loyalties();
 
-        //payments
+        load_payments();
+
+    }
+
+    function load_payments() {
+        document.getElementById("payments-warning").innerHTML = spinner;
+
         sendAPIRequest(url + "/api/payments/list?login=" + selected_account, "GET", function (param, status) {
             if (status == httpOK) {
-                var payments = JSON.parse(param);
-                var head_str = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
-                var l_str = [];
-                for (i = 0; i < payments.length; i++) {
+                document.getElementById("payments-warning").innerHTML = '';
 
-                    l_str[i] = "<tr><td>" + payments[i].ReceiverName +
-                        "</td><td>" + payments[i].Amount +
-                        "</td><td>" + customDateFormat(payments[i].LastPaid) + "</td></tr>";
+                var payments = JSON.parse(param).sort(paymentSort);
+                var headStr = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
+                var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
+                var rows = [];
+                for (i = 0; i < payments.length; i++) {
+                    var date = customDateFormat(payments[i].LastPaid);
+                    rows[i] = format(row, [payments[i].ReceiverName, payments[i].Amount, date]);
                 }
-                var page_str = buildTabs(l_str, lines_on_tab, "payments-table", head_str);
-                document.getElementById("payments_list").innerHTML = page_str;
+                var page = buildTabs(rows, lines_on_tab, "payments-table", headStr);
+                document.getElementById("payments_list").innerHTML = page;
                 var t = document.getElementById("payments-table_0");
                 if (t != null) t.style.display = "block";
 
@@ -303,15 +326,20 @@
     }
 
     function load_ins_holders() {
-        if (corpNames.indexOf(selected_account) == -1) return;
+        if (corpNames.indexOf(selected_account) == -1) {
+            document.getElementById("insurance-holder").style.display = 'none';
+            return;
+        }
 
         document.getElementById("insurance-holder").style.display = 'block';
         $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th></tr>');
+        document.getElementById("ins-table-warning").innerHTML = spinner;
 
         sendAPIRequest(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
             $("#insurance-table tbody tr").remove();
             $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
             if (status == httpOK) {
+                document.getElementById("ins-table-warning").innerHTML = "";
                 var holders = JSON.parse(param);
                 var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelInsuranceDialog('{1}');\"/></td></tr>";
                 var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
@@ -328,7 +356,7 @@
                     $('#insurance-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_insurance_menu();\"/></td><td><select id=\"level-selector\"><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option></td><td></td></tr>");
                 }
             } else {
-                document.getElementById("ins-table-warning").innerHTML = param;
+                fillError("ins-table-warning", param, status);
             }
         });
     }
@@ -337,11 +365,13 @@
         //if (corpNames.indexOf(selected_account) == -1) return;
 
         document.getElementById("loyalty-holder").style.display = 'block';
+        document.getElementById("loyalty-table-warning").innerHTML = spinner;
 
         sendAPIRequest(url + "/api/insurance/loyals", "GET", function (param, status) {
             $("#loyalty-table tbody tr").remove();
             $('#loyalty-table').append('<tr><th>Страховка</th><th>Компания</th><th>iD</th></tr>');
             if (status == httpOK) {
+                document.getElementById("loyalty-table-warning").innerHTML = '';
                 var loyals = JSON.parse(param);
                 var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
 
@@ -354,7 +384,7 @@
                     $('#loyalty-table').append(newRow);
                 }
             } else {
-                document.getElementById("loyalty-table-warning").innerHTML = param;
+                fillError("loyalty-table-warning", param, status);
             }
         });
     }
@@ -448,6 +478,7 @@
 
         sendAPIRequest(url + "/api/transfer", "POST", function(param, status) {
             if (status == httpOK) {
+                document.getElementById("current_account_credit").innerHTML = Math.round(param);
                 document.getElementById("send-tran-warning").innerHTML = "";
                 load_transactions();
             } else
@@ -493,12 +524,19 @@
 
 <div id="top_menu" class="top-menu">
     <div id="menu-icon" class="top-menu-elem" onclick="showLeftMenu(true);">&#9776;</div>
-    <div id="current_account" class="top-menu-elem greetings">Привет,</div>
+    <div class="top-menu-elem greetings">
+        Привет, <span id="current_account"></span>
+    </div>
     <div id="profile_menu" class="top-menu-elem top-menu-selected" onclick="load_profile_page();">Профиль</div>
     <div id="corp_menu" class="top-menu-elem" style="display: none;" onclick="load_corp_page();">Управление</div>
     <div id="transactions_menu" class="top-menu-elem" onclick="load_transactions_page();">Переводы</div>
     <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
 </div>
+
+<div id="short-info">
+    На счету: <span id="current_account_credit"></span> кр.
+</div>
+
 
 <div id="left_menu" class="left-menu">
     <div class="slave-menu-head">Ваши счета</div>
@@ -516,7 +554,7 @@
         <div id="profile_page" class="page-display">
             <h2>Профиль</h2>
             <table class="narrow">
-                <tr><td>Логин:</td><td id="login_name"></td></tr>
+                <tr><td>AliceID:</td><td id="login_name"></td></tr>
                 <tr><td>Полное имя:</td><td id="full_name"></td></tr>
                 <tr><td>Email:</td><td id="email"></td></tr>
                 <tr><td>Тип:</td><td id="acc_role"></td></tr>

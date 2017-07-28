@@ -27,7 +27,7 @@ namespace DeusCloud.Logic.Managers
             _insuranceManager = new InsuranceManager(UserContext);
         }
 
-        public void Transfer(TransferClientData data)
+        public float Transfer(TransferClientData data)
         {
             var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver, true); //Разрешен Alias
             var senderAcc = UserContext.Accounts.GetOrFail(data.Sender); 
@@ -62,6 +62,7 @@ namespace DeusCloud.Logic.Managers
                 trList.ForEach(TransactiontoDb);
                 dbTransact.Commit();
             }
+            return senderAcc.Cash;
         }
 
         private void TransactiontoDb(Transaction t)

@@ -136,7 +136,7 @@ namespace DeusCloud.Logic.Managers
                 };
                 ret.Add(h);
             }
-            return ret;
+            return ret.OrderBy(x => x.UserFullname).ToList();
         }
 
         public void RemoveInsuranceHolder(string user)
@@ -168,11 +168,11 @@ namespace DeusCloud.Logic.Managers
             var companyAcc = _rightsManager.CheckForAccessOverSlave(data.Company, AccountAccessRoles.Withdraw);
 
             var userAccount = UserContext.Accounts.GetOrFail(data.Holder, data.Password);
-            var level = data.Level ?? 1;
 
             Try.Condition(_associations.ContainsKey(companyAcc.Login), $"{companyAcc.Login} не выпускает страховки");
-
             var t = _associations[companyAcc.Login];
+
+            var level = data.Level ?? 0; //t.SetLevel()
             Try.Condition(CheckInsuranceLevel(level, t), $"Неверный уровень страховки {level}");
 
             SetInsuranceHolder_Checked(userAccount, level, t);

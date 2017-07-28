@@ -204,9 +204,6 @@
     <EmbeddedResource Include="Migrations\201706181543291_Fullname-Not-Required.resx">
       <DependentUpon>201706181543291_Fullname-Not-Required.cs</DependentUpon>
     </EmbeddedResource>
-    <Content Include="content\corp_admin.html">
-      <BrowseToURL>~/corp_admin.html</BrowseToURL>
-    </Content>
     <Content Include="content\css\left-menu.css" />
     <Content Include="content\css\mobile.css" />
     <Content Include="content\css\styles.css" />
@@ -219,12 +216,6 @@
     </Content>
     <Content Include="content\login.html">
       <BrowseToURL>~/login.html</BrowseToURL>
-    </Content>
-    <Content Include="content\profile_page.html">
-      <BrowseToURL>~/profile_page.html</BrowseToURL>
-    </Content>
-    <Content Include="content\transactions.html">
-      <BrowseToURL>~/transactions.html</BrowseToURL>
     </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>

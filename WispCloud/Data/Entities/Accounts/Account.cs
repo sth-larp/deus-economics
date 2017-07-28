@@ -11,23 +11,10 @@ namespace DeusCloud.Data.Entities.Accounts
 {
     public class Account : IUser
     {
-        //[NotMapped]
-        //public UserSettings Settings { get; set; }
-
-        //[JsonIgnore]
-        //[Browsable(false)]
-        //[EditorBrowsable(EditorBrowsableState.Never)]
-        //public string SettingsJson
-        //{
-        //    get { return WispJsonSerializer.SerializeToJsonString(Settings); }
-        //    set { Settings = WispJsonSerializer.DeserializeJson<UserSettings>(value); }
-        //}
-
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [StringLength(250)]
         public string Login { get; protected set; }
-
 
         [Required]
         [JsonIgnore]
@@ -90,11 +77,14 @@ namespace DeusCloud.Data.Entities.Accounts
         [DefaultValue(1)]
         public int InsuranceLevel { get; set; }
 
+
         public Account()
         {
+            Alias = Guid.NewGuid().ToString().Substring(0, 5);
+            Email = Guid.NewGuid().ToString().Replace("-", string.Empty).Substring(0, 8);
         }
 
-        public Account(string login, AccountRole role)
+        public Account(string login, AccountRole role) : this()
         {
             Status = AccountStatus.Active;
             Login = login;

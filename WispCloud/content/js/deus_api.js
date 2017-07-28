@@ -4,6 +4,8 @@ var url = "https://alice.digital/econ";
 
 var cookieId = 'local_arm_id';
 
+var spinner = '<img src="./image/spinner.gif" class="spinner"/>';
+
 var ROLE = {
     NONE: { value: 0, name: "None", rusname: "Нет" },
     READ: { value: 1, name: "Read", rusname: "Просмотр" },
@@ -20,6 +22,12 @@ var ACC_ROLE = {
     CORP: { value: 8, name: "Corp", rusname: "Корпорация" },
     GOVT: { value: 16, name: "Govt", rusname: "Правительство" },
     COMPANY: { value: 32, name: "Company", rusname: "Компания" }
+};
+
+function paymentSort(a, b) {
+    if (a.ReceiverName < b.ReceiverName) return -1;
+    if (a.ReceiverName > b.ReceiverName) return 1;
+    return 0;
 };
 
 function get_role(role) {

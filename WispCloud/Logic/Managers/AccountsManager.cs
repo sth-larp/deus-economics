@@ -41,11 +41,18 @@ namespace DeusCloud.Logic.Managers
         {
             _rightsManager.CheckRole(AccountRole.Admin);
 
+            var existing = Get(clientData.Login);
+            if (existing != null)
+                return UpdateExisting(existing, clientData);
+
             var role = clientData.Role ?? AccountRole.Person;
             var newUser = new Account(clientData.Login, role);
            
             newUser.Fullname = clientData.Fullname ?? "Нет имени";
-            newUser.Email = clientData.Email ?? "";
+
+            if(!String.IsNullOrEmpty(clientData.Email))
+                newUser.Email = clientData.Email;
+
             newUser.Cash = clientData.Cash ?? 0;
             newUser.Insurance = clientData.Insurance ?? InsuranceType.None;
             newUser.InsuranceLevel = newUser.Insurance.SetLevel(clientData.InsuranceLevel);
@@ -62,6 +69,8 @@ namespace DeusCloud.Logic.Managers
                     clientData.Workplace = _regAlias[clientData.Workplace];
 
                 var workPlace = Get(clientData.Workplace);
+                Try.NotNull(workPlace, $"Не удалось добавить место работы {clientData.Workplace}, счет {clientData.Login}");
+
                 if (workPlace == null)
                 {
                     UserContext.AddGameEvent(clientData.Login, GameEventType.None, 
@@ -78,6 +87,52 @@ namespace DeusCloud.Logic.Managers
 
             return newUser;
         }
+
+        public Account UpdateExisting(Account user, RegistrationClientData clientData)
+        {
+            user.Fullname = clientData.Fullname ?? user.Fullname;
+
+            if (!String.IsNullOrEmpty(clientData.Email))
+                user.Email = clientData.Email;
+
+            user.Cash = clientData.Cash ?? user.Cash;
+            user.Insurance = clientData.Insurance ?? user.Insurance;
+
+            if(clientData.InsuranceLevel != null)
+                user.InsuranceLevel = user.Insurance.SetLevel(clientData.InsuranceLevel);
+
+            if (clientData.Password != null)
+                _userManager.NewPassword(user.Login, clientData.Password);
+
+            UserContext.AddGameEvent(clientData.Login, GameEventType.None, $"Аккаунт изменен при импорте Join");
+
+            if (!String.IsNullOrEmpty(clientData.Workplace) && clientData.SalaryLevel != null)
+            {
+                if (_regAlias.ContainsKey(clientData.Workplace))
+                    clientData.Workplace = _regAlias[clientData.Workplace];
+
+                var workPlace = Get(clientData.Workplace);
+                Try.NotNull(workPlace, $"Не удалось добавить место работы {clientData.Workplace}, счет {clientData.Login}");
+                if (workPlace == null)
+                {
+                    UserContext.AddGameEvent(clientData.Login, GameEventType.None,
+                        $"Не удалось добавить место работы {clientData.Workplace}");
+                }
+                else
+                {
+                    var oldPayments = UserContext.Data.Payments.Where(x => x.Receiver == user.Login).ToList();
+                    oldPayments.ForEach(x => UserContext.Data.Payments.Remove(x));
+
+                    var salary = _constantManager.GetSalary(clientData.SalaryLevel.Value);
+                    var payment = new Payment(workPlace, user, salary);
+                    UserContext.Data.Payments.Add(payment);
+                    UserContext.Data.SaveChanges();
+                }
+            }
+
+            return user;
+        }
+
 
         public void ChangePassword(ChangePasswordClientData clientData)
         {

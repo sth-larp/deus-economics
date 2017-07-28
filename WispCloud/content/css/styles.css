@@ -102,6 +102,26 @@ th, td {
   z-index: 100;
 }
 
+#short-info {
+    display: inline-block; 
+
+    position: absolute;
+    top: 95px;
+    right: 20px;
+
+    font-family: play;
+    font-size: 100%;
+    color: #C1C1C0;
+
+    padding: 10px 20px;
+    margin-top: 5px;
+    z-index: 10000;
+    
+    border-top: thin solid #444;
+    overflow-y: auto;
+    background: rgba(44, 44, 44, 0.5);
+}
+
 #content-preceder {
   position: relative;
   top: 0;
@@ -161,6 +181,12 @@ th, td {
     display: none ; 
     z-index: 99999;
     background: #111;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    margin-left: 20px;
 }
 
 

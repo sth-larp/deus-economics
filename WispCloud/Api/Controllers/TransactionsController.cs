@@ -21,10 +21,10 @@ namespace DeusCloud.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
         [Route("transfer")]
+        [ResponseType(typeof(float))]
         public IHttpActionResult Transfer(TransferClientData data)
         {
-            UserContext.Transactions.Transfer(data);
-            return Ok();
+            return Ok(UserContext.Transactions.Transfer(data));
         }
 
         /// <summary>Купить имплант со списанием индекса</summary>
