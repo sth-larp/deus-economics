@@ -6,9 +6,11 @@ using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
+using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
 using DeusCloud.Logic.Server;
+using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers
 {
@@ -57,44 +59,44 @@ namespace DeusCloud.Logic.Managers
             var loyalty = UserContext.Data.Loyalties.Find(id);
             Try.NotNull(loyalty, $"Can't find insurance loyalty relation with id: {id}");
 
+            UserContext.AddGameEvent(loyalty.LoyalName, GameEventType.Insurance,
+                $"Вы перестали обслуживать страховку {loyalty.Insurance}", true);
+
+            var issuerAcc = GetIssuerFromType(loyalty.Insurance);
+            UserContext.AddGameEvent(issuerAcc.Login, GameEventType.Insurance,
+                 $"{loyalty.LoyalService.DisplayName} больше не обслуживает вашу страховку", true);
+
             UserContext.Data.Loyalties.Remove(loyalty);
             UserContext.Data.SaveChanges();
-
-            UserContext.AddGameEvent(loyalty.LoyalName, GameEventType.Insurance, 
-                $"{loyalty.LoyalService.DisplayName} перестал обслуживать страховку {loyalty.Insurance}", true);
-
-            var corp = UserContext.Accounts.Get(loyalty.LoyalName);
-            if (corp == null) return;
-
-            UserContext.AddGameEvent(corp.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.DisplayName} перестал обслуживать страховку {loyalty.Insurance}");
         }
 
         public Loyalty NewLoyalty(Loyalty data)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
 
-            var corp = UserContext.Accounts.GetOrFail(data.LoyalName);//_userManager.FindById(data.LoyalName);
+            var loyalAcc = UserContext.Accounts.GetOrFail(data.LoyalName);//_userManager.FindById(data.LoyalName);
 
-            Try.Condition((corp.Role & AccountRole.Company) > 0, 
-                $"{corp} не является организацией типа {AccountRole.Company}");
+            Try.Condition(loyalAcc.Role == AccountRole.Company || loyalAcc.Role == AccountRole.Corp, 
+                $"{loyalAcc.Login} не является компанией");
 
             var check = UserContext.Data.Loyalties.Where(x =>
-                x.LoyalName == corp.Login && x.Insurance == data.Insurance);
+                x.LoyalName == loyalAcc.Login && x.Insurance == data.Insurance);
             Try.Condition(!check.Any(), $"Компания уже обслуживает данную страховку");
             Try.Condition(data.MinLevel < 4 && data.MinLevel > 0, $"Значения MinLevel разрешены в диапазоне [1:3]");
 
-            var loyalty = new Loyalty(corp, data.Insurance);
+            var loyalty = new Loyalty(loyalAcc, data.Insurance);
             loyalty.MinLevel = data.MinLevel;
 
             UserContext.Data.Loyalties.Add(loyalty);
             UserContext.Data.SaveChanges();
 
-            UserContext.AddGameEvent(loyalty.LoyalService.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.DisplayName} начал обслуживать страховку {loyalty.Insurance}", true);
+            var issuerAcc = GetIssuerFromType(data.Insurance);
 
-            UserContext.AddGameEvent(corp.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.DisplayName} начал обслуживать страховку {loyalty.Insurance}");
+            UserContext.AddGameEvent(issuerAcc.Login, GameEventType.Insurance,
+                $"Вашу страховку теперь обслуживает {loyalAcc.DisplayName}", true);
+
+            UserContext.AddGameEvent(loyalAcc.Login, GameEventType.Insurance,
+                $"Вы начали обслуживать страховку {loyalty.Insurance}", true);
 
             return loyalty;
         }
@@ -158,7 +160,7 @@ namespace DeusCloud.Logic.Managers
                 $"{companyAccount.DisplayName} отменила вашу страховку", true);
 
             UserContext.AddGameEvent(companyAccount.Login, GameEventType.Insurance,
-                $"Отменена страховка {userAccount.DisplayName}");
+                $"Отменена страховка {userAccount.DisplayName}", true);
         }
 
         public void SetInsuranceHolder(SetInsuranceClientData data)
