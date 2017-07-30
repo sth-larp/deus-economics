@@ -19,6 +19,8 @@ namespace DeusCloud.Logic.Client
         public InsuranceType? Insurance;
         public int? InsuranceLevel { get; set; }
 
+        public string ParentID { get; set; }
+
         public AccountRole? Role { get; set; }
         public string Alias { get; set; }
 

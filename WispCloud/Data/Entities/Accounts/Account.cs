@@ -20,6 +20,8 @@ namespace DeusCloud.Data.Entities.Accounts
         [JsonIgnore]
         public string PasswordHash { get; set; }
 
+        public string ParentID { get; set; }
+
         //[StringLength(80)]
         public string Fullname { get; set; }
 

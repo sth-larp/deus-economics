@@ -144,8 +144,8 @@ namespace DeusCloud.Logic.Managers
             if(acc.Role != AccountRole.Admin && acc.Role != AccountRole.Master)
                 return UserContext.Data.AccountAccesses.Where(x => x.Master == acc.Login).ToList();
 
-            //Говнокод
-            var companies = UserContext.Data.Accounts.Where(x => x.Role.IsCompany()).ToList();
+            //Говнокод для админа
+            var companies = UserContext.Data.Accounts.ToList().Where(x => x.Role.IsCompany()).ToList();
 
             var accesses = companies.Select(x => new AccountAccess(x, acc)
             {

@@ -79,30 +79,37 @@ namespace DeusCloud.Logic.Managers
         {
             var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver, data.ReceiverPass);
             var sellerAcc = UserContext.Accounts.GetOrFail(data.Seller);
+            var parentAcc = UserContext.Accounts.Get(sellerAcc.ParentID) ?? sellerAcc;
 
             _rightsManager.CheckForAccessOverSlave(sellerAcc, AccountAccessRoles.Withdraw);
             data.Description = data.Description ?? "";
 
-            Try.Condition(sellerAcc.Role == AccountRole.Corp, $"Продавать импланты может только корпорация");
+            Try.Condition(parentAcc.Role == AccountRole.Corp, $"Продавать импланты может только корпорация");
             Try.Condition(receiverAcc.Role == AccountRole.Person, $"Получать импланты может только персона");
-            Try.Condition(sellerAcc.Index >= data.Index, $"Недостаточно индекса");
+            Try.Condition(parentAcc.Index >= data.Index, $"Недостаточно индекса");
+
+            var trList = new List<Transaction>();
             
             if (data.Price > 0)
             {
                 var tranData = new TransferClientData(sellerAcc.Login, receiverAcc.Login, data.Price);
                 tranData.Description = data.Description;
-                var trList = P2BTransfer(receiverAcc, sellerAcc, tranData);
-
-                using (var dbTransact = UserContext.Data.Database.BeginTransaction())
-                {
-                    UserContext.Data.BeginFastSave();
-                    trList.ForEach(TransactiontoDb);
-                    sellerAcc.Index -= data.Index;
-                    dbTransact.Commit();
-                }
+                trList = P2BTransfer(receiverAcc, sellerAcc, tranData);
             }
 
-            UserContext.AddGameEvent(sellerAcc.Login, GameEventType.Index, 
+            using (var dbTransact = UserContext.Data.Database.BeginTransaction())
+            {
+                UserContext.Data.BeginFastSave();
+                trList.ForEach(TransactiontoDb);
+                parentAcc.Index -= data.Index;
+                dbTransact.Commit();
+            }
+
+            if(parentAcc != sellerAcc)
+                UserContext.AddGameEvent(parentAcc.Login, GameEventType.Index, 
+                    $"Имплант за {data.Index} индекса установлен магазином {sellerAcc.Fullname}", true);
+
+            UserContext.AddGameEvent(sellerAcc.Login, GameEventType.Index,
                 $"Имплант за {data.Index} индекса установлен {receiverAcc.Fullname}", true);
 
             UserContext.AddGameEvent(receiverAcc.Login, GameEventType.Index,

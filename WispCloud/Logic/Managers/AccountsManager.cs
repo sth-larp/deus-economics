@@ -78,6 +78,9 @@ namespace DeusCloud.Logic.Managers
             if (!String.IsNullOrEmpty(data.Email))
                 editAccount.Email = data.Email;
 
+            if (!String.IsNullOrEmpty(data.ParentID))
+                editAccount.ParentID = data.ParentID;
+
             if (!String.IsNullOrEmpty(data.Alias))
                 editAccount.Alias = data.Alias;
 
@@ -161,7 +164,15 @@ namespace DeusCloud.Logic.Managers
 
         public Account GetProfile(string login)
         {
-            return _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            var acc = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            if (acc.Role.IsCompany())
+            {
+                var parent = Get(acc.ParentID);
+                if (parent != null)
+                    acc.Index = parent.Index;
+            }
+            return acc;
+            //DON'T SAVE DATA!!!
         }
 
         public Account Get(string login, bool allowAlias = false)
@@ -208,7 +219,7 @@ namespace DeusCloud.Logic.Managers
 
         public FullAccountServerData GetFullProfile(string login)
         {
-            var user = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            var user = GetProfile(login);
             var data = new FullAccountServerData(user);
             data.History = UserContext.Data.GameEvents
                 .Where(x => x.User == user.Login)
