@@ -90,13 +90,15 @@
             //result mapping to visual elements
             document.getElementById("login_name").innerHTML = prof.User.Login + " ";
             document.getElementById("email").innerHTML = prof.User.Email + " ";
+            document.getElementById("alias").innerHTML = prof.User.Alias + " ";
             document.getElementById("acc_role").innerHTML = get_acc_role(prof.User.Role).rusname + " ";
             document.getElementById("full_name").innerHTML = prof.User.Fullname + " ";
             document.getElementById("live_status").innerHTML = prof.User.Status + " ";
             document.getElementById("current_account_value").innerHTML = prof.User.Cash;
             document.getElementById("current_account_credit").innerHTML = prof.User.Cash;
 
-            document.getElementById("insurance_label").style.display = "none";
+            $('.company-invisible').css("display", "none");
+
             document.getElementById("index_label").style.display = "none";
             document.getElementById("index_p_label").style.display = "none";
 
@@ -115,7 +117,8 @@
             }
 
             if (selected_acc_role == ACC_ROLE.PERSON) {
-                document.getElementById("insurance_label").style.display = "table-row";
+                $('.company-invisible').css("display", "table-row");
+
                 //document.getElementById("index_label").style.display = "none";
                 document.getElementById("insurance").innerHTML = prof.User.Insurance;
                 document.getElementById("insurance_level").innerHTML = prof.User.InsuranceLevel;
@@ -498,13 +501,14 @@
             <table class="narrow">
                 <tr><td>AliceID:</td><td id="login_name"></td></tr>
                 <tr><td>Полное имя:</td><td id="full_name"></td></tr>
-                <tr><td>Email:</td><td id="email"></td></tr>
+                <tr class="company-invisible" title="Левая часть email@alice.digital может использоваться для аутентификации"><td>Email:</td><td id="email"></td></tr>
+                <tr class="company-invisible" title="Ваш alias для анонимных переводов. Если отправитель вводит алиас вместо получателя, получатель остается анонимным для отправителя"><td>Alias:</td><td id="alias"></td></tr>
                 <tr><td>Тип:</td><td id="acc_role"></td></tr>
                 <tr><td>Статус:</td><td id="live_status"></td></tr>
                 <tr><td>Кредиты:</td><td id="current_account_value"></td></tr>
                 <tr id="index_label" style="display: none;"><td>Индекс:</td><td id="current_index"></td></tr>
                 <tr id="index_p_label" style="display: none;"><td>Очки страховки:</td><td id="index_points"></td></tr>
-                <tr id="insurance_label" style="display: none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>
+                <tr class="company-invisible" style="display: none;"><td>Страховка:</td><td><span id="insurance"></span>(<span id="insurance_level"></span>)</td></tr>
             </table>
 
             <div id="slaves_list">
@@ -557,6 +561,7 @@
         <div id="transactions" class="page-display">
             <div id="trans_menu_holder">
                 <h2>Выполнить перевод</h2>
+                <p>В поле "кому" можно вводить AliceID, левую часть почты @alice.digital или алиас (см профиль), если получатель захотел остаться анонимным </p>
                 <form id="new_transaction" action="">
                     <table class="clear-table">
                         <tr><td>Кому</td><td><input type="text" id="user_name_id" name="user_name" value="master"/></td></tr>
@@ -570,6 +575,7 @@
 
             <div id ="salary-holder" style="display: none;">
                 <h2>Зарплаты</h2>
+                <p>Зарплата выплачивается вам в начале каждого цикла</p>
                 <table id="salary-list"></table>
                 <div class="warning-text" id="salary-warning"></div>
             </div>

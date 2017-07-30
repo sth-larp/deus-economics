@@ -15,4 +15,15 @@ namespace DeusCloud.Data.Entities.Accounts
         Govt = 16,
         Company = 32,
     }
+
+    public static class AccountRoleExtensions
+    {
+        public static bool IsCompany(this AccountRole role)
+        {
+            if (role == AccountRole.Company || role == AccountRole.Govt || role == AccountRole.Corp)
+                return true;
+            return false;
+
+        }
+    }
 }

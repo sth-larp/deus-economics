@@ -41,21 +41,6 @@ namespace DeusCloud.Api.Controllers
             return Ok();
         }
 
-        /// <summary>Get P2P tax value</summary>
-        /// <param name="sender">Sender account</param>
-        /// <param name="receiver">Receiver account</param>
-        /// <response code="200">OK</response>
-        /// <response code="400">Bad request</response>
-        /// <response code="401">Unauthorized</response>
-        /// <response code="500">Internal Server Error</response>
-        [HttpGet]
-        [Route("tax")]
-        [ResponseType(typeof(float))]
-        public IHttpActionResult GetTax(string sender, string receiver)
-        {
-            return Ok(UserContext.Transactions.GetTax(sender, receiver));
-        }
-
         /// <summary>Obtain transaction history</summary>
         /// <param name="login">Account name</param>
         /// <param name="take">Number of transactions (optional)</param>

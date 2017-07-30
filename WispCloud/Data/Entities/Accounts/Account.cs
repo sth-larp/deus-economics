@@ -53,6 +53,7 @@ namespace DeusCloud.Data.Entities.Accounts
             {
                 if (Insurance == InsuranceType.None) return 0;
                 if (Insurance == InsuranceType.SuperVip) return 3;
+                if (Insurance == InsuranceType.Govt) return InsuranceLevel == 1 ? 0: 2;
                 return InsuranceLevel;
             }
         }

@@ -42,9 +42,7 @@ namespace DeusCloud.Logic.Managers
             //Разные виды налогообложения    
             if (receiverAcc.Role == AccountRole.Person && senderAcc.Role == AccountRole.Person)
                 trList = P2PTransfer(senderAcc, receiverAcc, data);
-            else if(receiverAcc.Role == AccountRole.Company && senderAcc.Role == AccountRole.Person)
-                trList = P2BTransfer(senderAcc, receiverAcc, data);
-            else if (receiverAcc.Role == AccountRole.Corp && senderAcc.Role == AccountRole.Person)
+            else if(receiverAcc.Role.IsCompany() && senderAcc.Role == AccountRole.Person)
                 trList = P2BTransfer(senderAcc, receiverAcc, data);
             else
                 trList = B2BTransfer(senderAcc, receiverAcc, data);
@@ -111,29 +109,14 @@ namespace DeusCloud.Logic.Managers
                 $"Получен имплант от {sellerAcc.Fullname}", true);
         }
 
-        public float GetTax(string sender, string receiver)
-        {
-            var receiverAcc = UserContext.Accounts.GetOrFail(receiver);
-
-            Try.Condition((receiverAcc.Role & AccountRole.Person) > 0, 
-                $"Пользователь {receiver} - не персона");
-
-            var senderAcc = UserContext.Accounts.GetOrFail(sender); 
-
-            Try.Condition((senderAcc.Role & AccountRole.Person) > 0,
-                $"Счет {sender} не является личным");
-            _rightsManager.CheckForAccessOverSlave(senderAcc, AccountAccessRoles.Read);
-
-            return GetC2CTax(senderAcc, receiverAcc);
-        }
-
+        
         //Транзакции между физлицами
         //Налог платит отправитель в зависимости от разницы страховок
         private List<Transaction> P2PTransfer(Account sender, Account receiver, TransferClientData data)
         {
             Try.Condition(sender.Cash >= data.Amount, $"Недостаточно средств");
             var ret = new List<Transaction>();
-            var tax = GetC2CTax(sender, receiver);
+            var tax = GetP2pTax(sender, receiver);
             if (tax > 0)
             {
                 var master = UserContext.Accounts.GetOrFail("master");
@@ -149,10 +132,10 @@ namespace DeusCloud.Logic.Managers
             return ret;
         }
 
-        private float GetC2CTax(Account sender, Account receiver)
+        private float GetP2pTax(Account sender, Account receiver)
         {
             var diff = Math.Max(0, receiver.EffectiveLevel - sender.EffectiveLevel);
-            var tax = diff * 0.25f;
+            var tax = UserContext.Constants.GetDiscount(diff);
             return tax;
         }
 
@@ -161,7 +144,7 @@ namespace DeusCloud.Logic.Managers
         private List<Transaction> P2BTransfer(Account sender, Account receiver, TransferClientData data)
         {
             var ret = new List<Transaction>();
-            var level = _insuranceManager.CheckLoyaltyLevel(sender, receiver);
+            var level = _insuranceManager.CheckInsuranceGrade(sender, receiver);
             var discount = _constantManager.GetDiscount(level);
 
             Try.Condition(sender.Cash >= data.Amount * (1 - discount), $"Недостаточно средств");

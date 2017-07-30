@@ -76,8 +76,7 @@ namespace DeusCloud.Logic.Managers
 
             var loyalAcc = UserContext.Accounts.GetOrFail(data.LoyalName);//_userManager.FindById(data.LoyalName);
 
-            Try.Condition(loyalAcc.Role == AccountRole.Company || loyalAcc.Role == AccountRole.Corp, 
-                $"{loyalAcc.Login} не является компанией");
+            Try.Condition(loyalAcc.Role.IsCompany(), $"{loyalAcc.Login} не является компанией");
 
             var check = UserContext.Data.Loyalties.Where(x =>
                 x.LoyalName == loyalAcc.Login && x.Insurance == data.Insurance);
@@ -101,10 +100,11 @@ namespace DeusCloud.Logic.Managers
             return loyalty;
         }
 
-        public int CheckLoyaltyLevel(Account person, Account service)
+        public int CheckInsuranceGrade(Account person, Account service)
         {
             var check = UserContext.Data.Loyalties.Where(x =>
                 x.LoyalName == service.Login && x.Insurance == person.Insurance);
+
             if (check.Any())
                 return person.EffectiveLevel;
             return 0;
