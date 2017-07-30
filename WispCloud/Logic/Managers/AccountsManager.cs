@@ -117,11 +117,16 @@ namespace DeusCloud.Logic.Managers
             }
 
             var oldPayments = UserContext.Data.Payments.Where(x => x.Receiver == acc.Login).ToList();
-            oldPayments.ForEach(x => UserContext.Data.Payments.Remove(x));
+            oldPayments.ForEach(x =>
+            {
+                UserContext.Data.Payments.Remove(x);
+                UserContext.Payments.LogPaymentEvent(x, true);
+            });
 
             var salary = _constantManager.GetSalary(data.SalaryLevel.Value);
             var payment = new Payment(workPlace, acc, salary);
             UserContext.Data.Payments.Add(payment);
+            UserContext.Payments.LogPaymentEvent(payment);
 
             if (data.IsAdmin == true)
             {

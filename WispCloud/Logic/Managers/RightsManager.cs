@@ -77,7 +77,8 @@ namespace DeusCloud.Logic.Managers
             editAccount.InsurancePoints = data.InsurancePoints;
             UserContext.Accounts.Update(editAccount);
 
-            UserContext.AddGameEvent(editAccount.Login, GameEventType.Index, $"Задан новый индекс {data.Index}");
+            UserContext.AddGameEvent(editAccount.Login, GameEventType.Index, 
+                $"Задан новый индекс {editAccount.Index} и очки страховки {editAccount.InsurancePoints}");
 
             return editAccount;
         }
@@ -108,31 +109,25 @@ namespace DeusCloud.Logic.Managers
                 currentAccess = null;
             }
             else if (currentAccess == null)
-                currentAccess = CreateAccountAccess(slave, master, role);
+            {
+                currentAccess = new AccountAccess(slave, master, role);
+                UserContext.Data.AccountAccesses.Add(currentAccess);
+            }
             else
                 currentAccess.Role = role;
 
             UserContext.Data.SaveChanges();
-            SetAccessChangeGameEvents(slave, master);
+            SetAccessChangeGameEvents(slave, master, role);
             return currentAccess;
         }
 
-        public AccountAccess CreateAccountAccess(Account slave, Account master, AccountAccessRoles roles)
-        {
-            var access = new AccountAccess(slave, master, roles);
-            UserContext.Data.AccountAccesses.Add(access);
-            SetAccessChangeGameEvents(slave, master);
-            return access;
-        }
-
-        public void SetAccessChangeGameEvents(Account slave, Account master)
+        public void SetAccessChangeGameEvents(Account slave, Account master, AccountAccessRoles role)
         {
             UserContext.AddGameEvent(slave.Login, GameEventType.Rights,
-                $"Изменен доступ {master.Login} к вашему счету");
-
+                $"Доступ {master.DisplayName} к вашему счету изменен на {role}");
 
             UserContext.AddGameEvent(master.Login, GameEventType.Rights,
-                $"Изменен доступ над счетом {slave.Login}");
+                $"Доступ над счетом {slave.DisplayName} изменен на {role}");
         }
 
         public List<AccountAccess> GetAccessMasters(string slave)

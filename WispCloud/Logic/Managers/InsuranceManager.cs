@@ -6,11 +6,9 @@ using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
-using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
 using DeusCloud.Logic.Server;
-using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers
 {
@@ -63,13 +61,13 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.SaveChanges();
 
             UserContext.AddGameEvent(loyalty.LoyalName, GameEventType.Insurance, 
-                $"{loyalty.LoyalService.Login} перестал обслуживать страховку {loyalty.Insurance}", true);
+                $"{loyalty.LoyalService.DisplayName} перестал обслуживать страховку {loyalty.Insurance}", true);
 
             var corp = UserContext.Accounts.Get(loyalty.LoyalName);
             if (corp == null) return;
 
             UserContext.AddGameEvent(corp.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.Login} перестал обслуживать страховку {loyalty.Insurance}");
+                $"{loyalty.LoyalService.DisplayName} перестал обслуживать страховку {loyalty.Insurance}");
         }
 
         public Loyalty NewLoyalty(Loyalty data)
@@ -93,10 +91,10 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.SaveChanges();
 
             UserContext.AddGameEvent(loyalty.LoyalService.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.Login} начал обслуживать страховку {loyalty.Insurance}", true);
+                $"{loyalty.LoyalService.DisplayName} начал обслуживать страховку {loyalty.Insurance}", true);
 
             UserContext.AddGameEvent(corp.Login, GameEventType.Insurance,
-                $"{loyalty.LoyalService.Login} начал обслуживать страховку {loyalty.Insurance}");
+                $"{loyalty.LoyalService.DisplayName} начал обслуживать страховку {loyalty.Insurance}");
 
             return loyalty;
         }
@@ -147,20 +145,20 @@ namespace DeusCloud.Logic.Managers
             var corpAccount = GetIssuerFromType(userAccount.Insurance);
             _rightsManager.CheckForAccessOverSlave(corpAccount, AccountAccessRoles.Withdraw);
             
-            RemoveInsuranceHolder_Checked(userAccount, corpAccount.Login);
+            RemoveInsuranceHolder_Checked(userAccount, corpAccount);
         }
 
-        private void RemoveInsuranceHolder_Checked(Account userAccount, string company)
+        private void RemoveInsuranceHolder_Checked(Account userAccount, Account companyAccount)
         {
             userAccount.Insurance = InsuranceType.None;
             userAccount.InsuranceLevel = 1;
             UserContext.Accounts.Update(userAccount);
 
             UserContext.AddGameEvent(userAccount.Login, GameEventType.Insurance, 
-                $"{company} отменила вашу страховку", true);
+                $"{companyAccount.DisplayName} отменила вашу страховку", true);
 
-            UserContext.AddGameEvent(company, GameEventType.Insurance,
-                $"отменена страховка {userAccount.Login}");
+            UserContext.AddGameEvent(companyAccount.Login, GameEventType.Insurance,
+                $"Отменена страховка {userAccount.DisplayName}");
         }
 
         public void SetInsuranceHolder(SetInsuranceClientData data)
@@ -198,17 +196,17 @@ namespace DeusCloud.Logic.Managers
 
                 var txtverb = userAccount.Insurance == t ? "изменение" : "выдачу";
                 UserContext.AddGameEvent(newIssuer.Login, GameEventType.Index,
-                    $"Потрачено {price} очков на {txtverb} страховки {userAccount.Login}", true);
+                    $"Потрачено {price} очков на {txtverb} страховки {userAccount.DisplayName}", true);
             }
 
             //Отменить старую страховку, если была
             if (oldIssuer != null && userAccount.Insurance != t)
             {
                 UserContext.AddGameEvent(oldIssuer.Login, GameEventType.Insurance,
-                    $"{userAccount.Login} отказался от вашей страховки", true);
+                    $"{userAccount.DisplayName} отказался от вашей страховки", true);
 
                 UserContext.AddGameEvent(userAccount.Login, GameEventType.Insurance,
-                    $"Вы отказались от страховки {oldIssuer.Login}", true);
+                    $"Вы отказались от страховки {t}", true);
             }
 
             userAccount.Insurance = t;
@@ -217,7 +215,7 @@ namespace DeusCloud.Logic.Managers
 
             if(!isStolen)
                 UserContext.AddGameEvent(newIssuer.Login, GameEventType.Insurance,
-                    $"Выдана страховка {userAccount.Login} " +
+                    $"Выдана страховка {userAccount.DisplayName}" +
                     $"уровня {userAccount.InsuranceLevel}");
 
             UserContext.AddGameEvent(userAccount.Login, GameEventType.Insurance,
@@ -301,16 +299,17 @@ namespace DeusCloud.Logic.Managers
                     {
                         corp.InsurancePoints -= holder.InsuranceLevel;
                         UserContext.AddGameEvent(corp.Login, GameEventType.Index, 
-                            $"Продлена страховка пользователя {holder.UserLogin}," +
+                            $"Продлена страховка {holder.UserFullname}," +
                             $" потрачено {holder.InsuranceLevel} очков", true);
+
                         UserContext.AddGameEvent(holder.UserLogin, GameEventType.Index,
-                            $"{corp.Login} продлила вашу страховку", true);
+                            $"Вашу страховка {holder.Insurance} продлена", true);
                     }
                     else
                     {
                         var userAccount = UserContext.Accounts.GetOrFail(holder.UserLogin); 
 
-                        RemoveInsuranceHolder_Checked(userAccount, corp.Login);
+                        RemoveInsuranceHolder_Checked(userAccount, corp);
                     }
                 }
                 UserContext.Accounts.Update(corp);
@@ -330,7 +329,7 @@ namespace DeusCloud.Logic.Managers
                 UserContext.Accounts.Update(corp);
 
                 UserContext.AddGameEvent(corp.Login, GameEventType.Index,
-                    $"Выставлен индекс и очки страховки {corp.Index}");
+                    $"Выставлен индекс {corp.Index} и очки страховки {corp.InsurancePoints}");
             }
         }       
     }

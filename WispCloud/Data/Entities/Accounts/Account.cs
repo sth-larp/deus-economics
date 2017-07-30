@@ -78,6 +78,11 @@ namespace DeusCloud.Data.Entities.Accounts
         public int InsuranceLevel { get; set; }
 
 
+        [NotMapped]
+        [JsonIgnore]
+        public string DisplayName {
+            get { return $"{Fullname} ({Login})"; } }
+
         public Account()
         {
             Alias = Guid.NewGuid().ToString().Substring(0, 5);

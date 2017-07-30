@@ -105,7 +105,7 @@ namespace DeusCloud.Logic.Managers
             }
 
             UserContext.AddGameEvent(sellerAcc.Login, GameEventType.Index, 
-                $"Установлен имплант за {data.Index} индекса пользователю {receiverAcc.Login}", true);
+                $"Имплант за {data.Index} индекса установлен {receiverAcc.Fullname}", true);
 
             UserContext.AddGameEvent(receiverAcc.Login, GameEventType.Index,
                 $"Получен имплант от {sellerAcc.Fullname}", true);

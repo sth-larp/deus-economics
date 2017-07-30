@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
 using DeusCloud.Logic.Client;
@@ -50,6 +51,8 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.Payments.Add(payment);
             UserContext.Data.SaveChanges();
 
+            LogPaymentEvent(payment);
+
             return payment;
         }
 
@@ -74,8 +77,29 @@ namespace DeusCloud.Logic.Managers
 
                 UserContext.Data.SaveChanges();
                 dbTransact.Commit();
+
+                LogPaymentEvent(ret);
             }
             return ret;
+        }
+
+        public void LogPaymentEvent(Payment payment, bool isDeleted = false)
+        {
+            if (isDeleted)
+            {
+                UserContext.AddGameEvent(payment.Receiver, GameEventType.None,
+                    $"Отменена зарплата от {payment.EmployerName}");
+
+                UserContext.AddGameEvent(payment.Employer, GameEventType.None,
+                    $"Отменена зарплата для {payment.ReceiverName}");
+
+                return;
+            }
+            UserContext.AddGameEvent(payment.Receiver, GameEventType.None, 
+                $"Назначена зарплата от {payment.EmployerName} в {payment.Amount}");
+
+            UserContext.AddGameEvent(payment.Employer, GameEventType.None,
+                $"Назначена зарплата для {payment.ReceiverName} в {payment.Amount}");
         }
 
         public void DeletePayment(int id)
@@ -84,6 +108,8 @@ namespace DeusCloud.Logic.Managers
 
             var payment = UserContext.Data.Payments.Find(id);
             Try.NotNull(payment, $"Не удается найти зарплату с Id: {id}");
+
+            LogPaymentEvent(payment, true);
 
             UserContext.Data.Payments.Remove(payment);
             UserContext.Data.SaveChanges();

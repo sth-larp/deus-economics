@@ -237,10 +237,10 @@
         var master = document.getElementById('master_form_user').value;
         var role = document.getElementById('master_form_role').value;
         var data = JSON.stringify({ "MasterLogin": master, "SlaveLogin": selected_account, "Role": role });
+
         sendAPIRequestWarned(url + "/api/accounts/access/set", "POST", function (param, status) {
                 hide_dialog();
                 load_profile_page();
-
         }, 'add_master_warning', data);
     }
 
@@ -344,7 +344,7 @@
         sendAPIRequestWarned(url + "/api/insurance/removeholder?user=" + holder, "POST", function (param, status) {
             load_corp_page();
             hide_dialog();
-        }, "remove_ins_warning");
+        }, "rem_ins_warning");
     }
 
     function fill_add_insurance_menu() {
@@ -642,7 +642,7 @@
                 </td>
             </tr>
         </table>
-        <div class="warning-text clear-onexit" id="remove_master_warning"></div>
+        <div class="warning-text clear-onexit" id="rem_master_warning"></div>
     </div>
 </div>
 
@@ -661,7 +661,7 @@
                 </td>
             </tr>
         </table>
-        <div class="warning-text clear-onexit" id="remove_slave_warning"></div>
+        <div class="warning-text clear-onexit" id="rem_slave_warning"></div>
     </div>
 </div>
 
@@ -678,7 +678,7 @@
                     </td>
                 </tr>
             </table>
-            <div class="warning-text clear-onexit" id="remove_ins_warning"></div>
+            <div class="warning-text clear-onexit" id="rem_ins_warning"></div>
         </div>
     </div>
 </body>
