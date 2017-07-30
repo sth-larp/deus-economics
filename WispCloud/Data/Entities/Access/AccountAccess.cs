@@ -52,7 +52,6 @@ namespace DeusCloud.Data.Entities.Access
             Master = master.Login;
             SlaveAccount = slave;
             Slave = slave.Login;
-            Role = AccountAccessRoles.Admin;
         }
 
     }

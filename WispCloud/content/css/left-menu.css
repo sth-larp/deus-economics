@@ -21,6 +21,10 @@
     overflow-y: auto;
     background: inherit;
 }
+.left-menu::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; 
+}
 
 .slave-menu-head {
     vertical-align: middle;

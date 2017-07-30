@@ -192,11 +192,7 @@
             var date = customDateFormat(param.History[i].Time);
             rows[i] = format(row, [date, param.History[i].Description]);
         }
-        var pageStr = buildTabs(rows, lines_on_tab, "history-table", headRow);
-        document.getElementById("history-list").innerHTML = pageStr;
-        var t = document.getElementById("history-table_0");
-        if (t != null) t.style.display = "block";
-        initTabsControl("history-table");
+        buildTabs(rows, lines_on_tab, "history-list", headRow);
     }
 
     function cancelSlaveDialog(slave) {
@@ -281,11 +277,7 @@
                 var date = customDateFormat(payments[i].LastPaid);
                 rows[i] = format(row, [payments[i].ReceiverName, payments[i].Amount, date]);
             }
-            var page = buildTabs(rows, lines_on_tab, "payments-table", headStr);
-            document.getElementById("payments_list").innerHTML = page;
-            var t = document.getElementById("payments-table_0");
-            if (t != null) t.style.display = "block";
-            initTabsControl("payments-table");
+            buildTabs(rows, lines_on_tab, "payments_list", headStr);
         }, "payments-warning");
     }
 
@@ -296,25 +288,27 @@
         }
 
         document.getElementById("insurance-holder").style.display = 'block';
-        $("#insurance-table tbody tr").remove();
 
         sendAPIRequestWarned(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
-            $('#insurance-table').append('<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>');
             var holders = JSON.parse(param);
+
+            var firstRow = "<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_insurance_menu();\"/></td><td><select id=\"level-selector\"><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option></td><td></td></tr>";
+            var headRow = '<tr><th>Пользователь</th><th>Уровень</th><th></th></tr>';
             var row = "<tr><td>{0} ({1})</td><td>{2}</td><td><img src=\"./image/cross-icon.png\" class=\"btn-image\" onClick=\"cancelInsuranceDialog('{1}');\"/></td></tr>";
             var rowNormal = "<tr><td>{0} ({1})</td><td>{2}</td><td></td></tr>";
+            var rows = [];
 
-            if (selected_role.value < ROLE.WITHDRAW.value)
+            if (selected_role.value >= ROLE.WITHDRAW.value) 
+                rows.push(firstRow);
+            else
                 row = rowNormal;
 
             for (i = 0; i < holders.length; i++) {
                 var newRow = format(row, [holders[i].UserFullname, holders[i].UserLogin, holders[i].InsuranceLevel]);
-                $('#insurance-table').append(newRow);
+                rows.push(newRow);
             }
-
-            if (selected_role.value >= ROLE.WITHDRAW.value) {
-                $('#insurance-table').append("<tr><td><input type=\"button\" class=\"custom-button smaller\" value=\"Добавить\" onclick=\"fill_add_insurance_menu();\"/></td><td><select id=\"level-selector\"><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option></td><td></td></tr>");
-            }
+            buildTabs(rows, lines_on_tab, "insurance_list", headRow);
+            
         }, "ins-table-warning");
     }
 
@@ -391,6 +385,29 @@
         document.getElementById("trans_menu_holder").style.display = selected_role.value >= ROLE.WITHDRAW.value ? 'block' : 'none';
 
         load_transactions();
+        if (selected_acc_role == ACC_ROLE.PERSON)
+            load_salaries();
+        else
+            document.getElementById("salary-holder").style.display = 'none';
+
+
+    }
+
+    function load_salaries() {
+        document.getElementById("salary-holder").style.display = 'block';
+        $("#salary-list tbody tr").remove();
+
+        sendAPIRequestWarned(url + "/api/payments/salaries?login=" + selected_account, "GET", function (param, status) {
+            $('#salary-list').append('<tr><th>Работодатель</th><th>Сумма</th><th>Последняя выплата</th></tr>');
+            var salaries = JSON.parse(param);
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
+
+            for (i = 0; i < salaries.length; i++) {
+                var date = customDateFormat(salaries[i].LastPaid);
+                var newRow = format(row, [salaries[i].EmployerName, salaries[i].Amount, date]);
+                $('#salary-list').append(newRow);
+            }
+        }, "salary-warning");
     }
 
     function load_transactions() {
@@ -424,11 +441,7 @@
             var date = customDateFormat(tList[i].Time);
             rows[i] = format(row, [tList[i].Sender, tList[i].Receiver, date, tList[i].Amount, tList[i].Comment]); 
         }
-        var pageStr = buildTabs(rows, lines_on_tab, "transaction_table", headRow);
-        document.getElementById("transactions_list").innerHTML = pageStr;
-        var t = document.getElementById("transaction_table_0");
-        if (t != null) t.style.display = "block";
-        initTabsControl("transaction_table");
+        buildTabs(rows, lines_on_tab, "transactions_list", headRow);
     }
     
     function createHandler(obj, handler) {
@@ -457,7 +470,7 @@
         Привет, <span id="current_account"></span>
     </div>
     <div id="profile_menu" class="top-menu-elem top-menu-selected" onclick="load_profile_page();">Профиль</div>
-    <div id="corp_menu" class="top-menu-elem" style="display: none;" onclick="load_corp_page();">Управление</div>
+    <div id="corp_menu" class="top-menu-elem" style="display: none;" onclick="load_corp_page();">Компания</div>
     <div id="transactions_menu" class="top-menu-elem" onclick="load_transactions_page();">Переводы</div>
     <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
 </div>
@@ -521,7 +534,7 @@
             <div id="insurance-holder" style="display: none;">
                 <h2>Страховки</h2>
                 <p>Перечень лиц, имеющих вашу страховку. При добавлении лиц в список с вас списываются очки страховки. При удалении страховки потраченные очки не возвращаются. </p>
-                <table id="insurance-table"></table>
+                <div id="insurance_list"></div>
                 <div class="warning-text" id="ins-table-warning"></div>
             </div>
 
@@ -554,21 +567,16 @@
                 </form>
                 <div class="warning-text" id="send-tran-warning"></div>
             </div>
+
+            <div id ="salary-holder" style="display: none;">
+                <h2>Зарплаты</h2>
+                <table id="salary-list"></table>
+                <div class="warning-text" id="salary-warning"></div>
+            </div>
+
             <div>
                 <h2>История операций</h2>
-                <div style="display: none;">
-                    <span>Количество строк на странице</span>
-                    <select id="lines_on_tab">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="30">30</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <div id="transactions_list">
-                </div>
+                <div id="transactions_list"></div>
                 <div class="warning-text" id="transactions-warning"></div>
             </div>
         </div>

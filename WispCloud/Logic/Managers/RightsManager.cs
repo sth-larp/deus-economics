@@ -67,35 +67,6 @@ namespace DeusCloud.Logic.Managers
             return slaveAccount;
         }
 
-        public Account SetAccountProperties(AccPropertyClientData clientData)
-        {
-            Try.Argument(clientData, nameof(clientData));
-            CheckRole(AccountRole.Admin);
-
-            var editAccount = UserContext.Accounts.GetOrFail(clientData.Login);
-
-            if (clientData.Role != null)
-            {
-                editAccount.Role = clientData.Role.Value;
-                UserContext.AddGameEvent(editAccount.Login, GameEventType.Rights, $"Изменен тип счета");
-            }
-
-            if (clientData.Status != null)
-                editAccount.Status = clientData.Status.Value;
-
-            if (!String.IsNullOrEmpty(clientData.Fullname))
-                editAccount.Fullname = clientData.Fullname;
-
-            if (!String.IsNullOrEmpty(clientData.Email))
-                editAccount.Email = clientData.Email;
-
-            if (!String.IsNullOrEmpty(clientData.Alias))
-                editAccount.Alias = clientData.Alias;
-
-            UserContext.Accounts.Update(editAccount);
-            return editAccount;
-        }
-
         public Account SetAccountIndex(AccIndexClientData data)
         {
             CheckRole(AccountRole.Admin);
@@ -121,23 +92,28 @@ namespace DeusCloud.Logic.Managers
             if (accessData.Role != AccountAccessRoles.None)
                 CheckForAccessOverSlave(slaveAccount, AccountAccessRoles.Admin);
 
-            var currentAccess = UserContext.Data.AccountAccesses.Find(slaveAccount.Login, masterAccount.Login);
+            return SetAccountAccess_Checked(slaveAccount, masterAccount, accessData.Role);
+        }
 
-            if (accessData.Role == AccountAccessRoles.None && currentAccess == null)
+        public AccountAccess SetAccountAccess_Checked(Account slave, Account master, AccountAccessRoles role)
+        {
+            var currentAccess = UserContext.Data.AccountAccesses.Find(slave.Login, master.Login);
+
+            if (role == AccountAccessRoles.None && currentAccess == null)
                 return null;
 
-            if (accessData.Role == AccountAccessRoles.None)
+            if (role == AccountAccessRoles.None)
             {
                 UserContext.Data.AccountAccesses.Remove(currentAccess);
                 currentAccess = null;
             }
-            else if(currentAccess == null)
-                currentAccess = CreateAccountAccess(slaveAccount, masterAccount, accessData.Role);
+            else if (currentAccess == null)
+                currentAccess = CreateAccountAccess(slave, master, role);
             else
-                currentAccess.Role = accessData.Role;
+                currentAccess.Role = role;
 
             UserContext.Data.SaveChanges();
-            SetAccessChangeGameEvents(slaveAccount, masterAccount);
+            SetAccessChangeGameEvents(slave, master);
             return currentAccess;
         }
 
@@ -149,7 +125,7 @@ namespace DeusCloud.Logic.Managers
             return access;
         }
 
-        private void SetAccessChangeGameEvents(Account slave, Account master)
+        public void SetAccessChangeGameEvents(Account slave, Account master)
         {
             UserContext.AddGameEvent(slave.Login, GameEventType.Rights,
                 $"Изменен доступ {master.Login} к вашему счету");
@@ -170,7 +146,7 @@ namespace DeusCloud.Logic.Managers
         {
             var acc = CheckForAccessOverSlave(master, AccountAccessRoles.Read);
 
-            if(acc.Role != AccountRole.Admin)
+            if(acc.Role != AccountRole.Admin && acc.Role != AccountRole.Master)
                 return UserContext.Data.AccountAccesses.Where(x => x.Master == acc.Login).ToList();
 
             //Говнокод
@@ -178,7 +154,10 @@ namespace DeusCloud.Logic.Managers
                                                                  || x.Role == AccountRole.Corp
                                                                  || x.Role == AccountRole.Govt).ToList();
 
-            var accesses = companies.Select(x => new AccountAccess(x, acc)).OrderBy(x => x.SlaveAccount.Role).ToList();
+            var accesses = companies.Select(x => new AccountAccess(x, acc)
+            {
+                Role = acc.Role == AccountRole.Admin? AccountAccessRoles.Admin : AccountAccessRoles.Read
+            }).OrderBy(x => x.SlaveAccount.Role).ToList();
             return accesses;
         }
     }

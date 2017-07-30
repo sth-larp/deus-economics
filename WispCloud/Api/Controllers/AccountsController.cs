@@ -83,9 +83,9 @@ namespace DeusCloud.Api.Controllers
         [HttpPost]
         [Route("accounts/properties")]
         [ResponseType(typeof(Account))]
-        public IHttpActionResult SetAccountProperties(AccPropertyClientData clientData)
+        public IHttpActionResult SetAccountProperties(RegistrationClientData clientData)
         {
-            return Ok(UserContext.Rights.SetAccountProperties(clientData));
+            return Ok(UserContext.Accounts.SetAccountProperties(clientData));
         }
 
         /// <summary>Установить индекс аккаунта</summary>

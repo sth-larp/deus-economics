@@ -19,10 +19,17 @@ namespace DeusCloud.Logic.Managers
             _rightsManager = new RightsManager(UserContext);
         }
 
+        public List<Payment> GetSalaries(string login)
+        {
+            var acc = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
+            var ret = UserContext.Data.Payments.Where(x => x.Receiver == acc.Login);
+            return ret.ToList();
+        }
+
         public List<Payment> GetPayments(string login)
         {
             var acc = _rightsManager.CheckForAccessOverSlave(login, AccountAccessRoles.Read);
-            var ret = UserContext.Data.Payments.Where(x => x.Receiver == acc.Login || x.Employer == acc.Login);
+            var ret = UserContext.Data.Payments.Where(x => x.Employer == acc.Login);
             return ret.ToList();
         }
 

@@ -227,7 +227,11 @@ function buildTabs(elements, perPage, prefix, head) {
     result = result + "<div class=\"table-nav\"><span id='" + prefix + "_bookmark' style='display:none'>0</span>";
     result = result + "<span id='" + prefix + "_maxpage' style='display:none'>" + offs + "</span>"
     result = result + "<span id='" + prefix + "_back'><< Назад </span>" + links + "<span id='" + prefix + "_fw'> | Вперед >></span></div></div>";
-    return result;
+
+    document.getElementById(prefix).innerHTML = result;
+    var t = document.getElementById(prefix + "_0");
+    if (t != null) t.style.display = "block";
+    initTabsControl(prefix);
 }
 
 function initTabsControl(prefix) {

@@ -40,97 +40,93 @@ namespace DeusCloud.Logic.Managers
         public Account Registration(RegistrationClientData clientData)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
-
             var existing = Get(clientData.Login);
             if (existing != null)
-                return UpdateExisting(existing, clientData);
+                return SetAccountProperties(clientData);
 
-            var role = clientData.Role ?? AccountRole.Person;
-            var newUser = new Account(clientData.Login, role);
-           
-            newUser.Fullname = clientData.Fullname ?? "Нет имени";
-
-            if(!String.IsNullOrEmpty(clientData.Email))
-                newUser.Email = clientData.Email;
-
-            newUser.Cash = clientData.Cash ?? 0;
-            newUser.Insurance = clientData.Insurance ?? InsuranceType.None;
-            newUser.InsuranceLevel = newUser.Insurance.SetLevel(clientData.InsuranceLevel);
-            
+            var newUser = new Account(clientData.Login, AccountRole.Person);
+                  
             var result = _userManager.Create(newUser, clientData.Password);
-            if (!result.Succeeded)
-                throw new DeusException(result.Errors.First());
+            Try.Condition(!result.Succeeded, $"Не удалось создать счет {clientData.Login}, {result.Errors.First()}");
+            UserContext.Data.SaveChanges();
 
             UserContext.AddGameEvent(clientData.Login, GameEventType.None, $"Аккаунт создан");
-
-            if (!String.IsNullOrEmpty(clientData.Workplace) && clientData.SalaryLevel != null)
-            {
-                if (_regAlias.ContainsKey(clientData.Workplace))
-                    clientData.Workplace = _regAlias[clientData.Workplace];
-
-                var workPlace = Get(clientData.Workplace);
-                Try.NotNull(workPlace, $"Не удалось добавить место работы {clientData.Workplace}, счет {clientData.Login}");
-
-                if (workPlace == null)
-                {
-                    UserContext.AddGameEvent(clientData.Login, GameEventType.None, 
-                        $"Не удалось добавить место работы {clientData.Workplace}");
-                }
-                else
-                {
-                    var salary = _constantManager.GetSalary(clientData.SalaryLevel.Value);
-                    var payment = new Payment(workPlace, newUser, salary);
-                    UserContext.Data.Payments.Add(payment);
-                    UserContext.Data.SaveChanges();
-                }
-            }
-
-            return newUser;
+            return SetAccountProperties(clientData);
         }
 
-        public Account UpdateExisting(Account user, RegistrationClientData clientData)
+        public Account SetAccountProperties(RegistrationClientData data)
         {
-            user.Fullname = clientData.Fullname ?? user.Fullname;
+            UserContext.Rights.CheckRole(AccountRole.Admin);
 
-            if (!String.IsNullOrEmpty(clientData.Email))
-                user.Email = clientData.Email;
+            var editAccount = UserContext.Accounts.GetOrFail(data.Login);
 
-            user.Cash = clientData.Cash ?? user.Cash;
-            user.Insurance = clientData.Insurance ?? user.Insurance;
-
-            if(clientData.InsuranceLevel != null)
-                user.InsuranceLevel = user.Insurance.SetLevel(clientData.InsuranceLevel);
-
-            if (clientData.Password != null)
-                _userManager.NewPassword(user.Login, clientData.Password);
-
-            UserContext.AddGameEvent(clientData.Login, GameEventType.None, $"Аккаунт изменен при импорте Join");
-
-            if (!String.IsNullOrEmpty(clientData.Workplace) && clientData.SalaryLevel != null)
+            if (data.Role != null && data.Role != editAccount.Role)
             {
-                if (_regAlias.ContainsKey(clientData.Workplace))
-                    clientData.Workplace = _regAlias[clientData.Workplace];
-
-                var workPlace = Get(clientData.Workplace);
-                Try.NotNull(workPlace, $"Не удалось добавить место работы {clientData.Workplace}, счет {clientData.Login}");
-                if (workPlace == null)
-                {
-                    UserContext.AddGameEvent(clientData.Login, GameEventType.None,
-                        $"Не удалось добавить место работы {clientData.Workplace}");
-                }
-                else
-                {
-                    var oldPayments = UserContext.Data.Payments.Where(x => x.Receiver == user.Login).ToList();
-                    oldPayments.ForEach(x => UserContext.Data.Payments.Remove(x));
-
-                    var salary = _constantManager.GetSalary(clientData.SalaryLevel.Value);
-                    var payment = new Payment(workPlace, user, salary);
-                    UserContext.Data.Payments.Add(payment);
-                    UserContext.Data.SaveChanges();
-                }
+                editAccount.Role = data.Role.Value;
+                UserContext.AddGameEvent(editAccount.Login, GameEventType.Rights, $"Изменен тип счета на {editAccount.Role}");
             }
 
-            return user;
+            if (data.Status != null && data.Status != editAccount.Status)
+            {
+                editAccount.Status = data.Status.Value;
+                UserContext.AddGameEvent(editAccount.Login, GameEventType.Rights, $"Изменен статус счета на {editAccount.Status}");
+            }
+
+            if (!String.IsNullOrEmpty(data.Fullname))
+                editAccount.Fullname = data.Fullname;
+
+            if (!String.IsNullOrEmpty(data.Email))
+                editAccount.Email = data.Email;
+
+            if (!String.IsNullOrEmpty(data.Alias))
+                editAccount.Alias = data.Alias;
+
+            editAccount.Cash = data.Cash ?? editAccount.Cash;
+
+            if (data.Insurance != null && data.InsuranceLevel != null)
+            {
+                editAccount.Insurance = data.Insurance.Value;
+                editAccount.InsuranceLevel = editAccount.Insurance.SetLevel(data.InsuranceLevel);
+
+            }
+
+            if (!String.IsNullOrEmpty(data.Password))
+                _userManager.NewPassword(editAccount.Login, data.Password);
+
+            AddWorkPlace(editAccount, data);
+
+            UserContext.Data.SaveChanges();
+            return editAccount;
+        }
+
+        private void AddWorkPlace(Account acc, RegistrationClientData data)
+        {
+            if (String.IsNullOrEmpty(data.Workplace) || data.SalaryLevel == null)
+                return;
+
+            if (_regAlias.ContainsKey(data.Workplace))
+                data.Workplace = _regAlias[data.Workplace];
+
+            var workPlace = Get(data.Workplace);
+            Try.NotNull(workPlace, $"Не удалось добавить место работы {data.Workplace}, счет {acc.Login}");
+            if (workPlace == null)
+            {
+                UserContext.AddGameEvent(acc.Login, GameEventType.None,
+                    $"Не удалось добавить место работы {data.Workplace}");
+                return;
+            }
+
+            var oldPayments = UserContext.Data.Payments.Where(x => x.Receiver == acc.Login).ToList();
+            oldPayments.ForEach(x => UserContext.Data.Payments.Remove(x));
+
+            var salary = _constantManager.GetSalary(data.SalaryLevel.Value);
+            var payment = new Payment(workPlace, acc, salary);
+            UserContext.Data.Payments.Add(payment);
+
+            if (data.IsAdmin == true)
+            {
+                UserContext.Rights.SetAccountAccess_Checked(workPlace, acc, AccountAccessRoles.Admin);
+            }
         }
 
 
@@ -173,7 +169,6 @@ namespace DeusCloud.Logic.Managers
             if (allowAlias && account == null)
                 account = UserContext.Data.Accounts.FirstOrDefault(x => x.Alias == login);
             return account;
-            //return _userManager.FindById(login);
         }
 
         public Account GetOrFail(string login, bool allowAlias = false)

@@ -25,8 +25,8 @@ namespace DeusCloud.Api.Controllers
             return Ok(UserContext.Payments.GetAllPayments());
         }
 
-        /// <summary>Список платежей заведения</summary>
-        /// <param name="login">Payer</param>
+        /// <summary>Список зарплат, которые платит компания</summary>
+        /// <param name="login">Плательщик</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
@@ -37,6 +37,20 @@ namespace DeusCloud.Api.Controllers
         public IHttpActionResult GetPayments(string login)
         {
             return Ok(UserContext.Payments.GetPayments(login));
+        }
+
+        /// <summary>Список зарплат пользователя</summary>
+        /// <param name="login">Получатель</param>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="500">Internal Server Error</response>
+        [HttpGet]
+        [Route("payments/salaries")]
+        [ResponseType(typeof(List<Payment>))]
+        public IHttpActionResult GetSalaries(string login)
+        {
+            return Ok(UserContext.Payments.GetSalaries(login));
         }
 
         /// <summary>Создать регулярный платеж</summary>
