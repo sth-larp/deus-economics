@@ -29,7 +29,7 @@ namespace DeusCloud.Logic.Managers
             var jj = 0;
             var s = 0;
 
-            implants.ForEach(x =>
+            implants.Where(x => x.id != null).ToList().ForEach(x =>
             {
                 if (x.id.StartsWith("jj_")) jj++;
                 else if (x.id.StartsWith("pa_")) pa++;
