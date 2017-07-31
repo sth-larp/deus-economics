@@ -47,7 +47,7 @@ namespace DeusCloud.Logic.Managers
             var newUser = new Account(clientData.Login, AccountRole.Person);
                   
             var result = _userManager.Create(newUser, clientData.Password);
-            Try.Condition(!result.Succeeded, $"Не удалось создать счет {clientData.Login}, {result.Errors.First()}");
+            Try.Condition(result.Succeeded, $"Не удалось создать счет {clientData.Login}, {result.Errors.FirstOrDefault()}");
             UserContext.Data.SaveChanges();
 
             UserContext.AddGameEvent(clientData.Login, GameEventType.None, $"Аккаунт создан");
@@ -156,8 +156,7 @@ namespace DeusCloud.Logic.Managers
                     clientData.NewPassword);
             }
 
-            if (!result.Succeeded)
-                throw new DeusException(result.Errors.First());
+            Try.Condition(result.Succeeded, $"Ошибка обновления персонажа: {result.Errors.FirstOrDefault()}");
 
             UserContext.AddGameEvent(account.Login, GameEventType.None, $"Изменен пароль");
         }
@@ -206,8 +205,7 @@ namespace DeusCloud.Logic.Managers
         public void Update(Account account)
         {
             var result = _userManager.Update(account);
-            if (!result.Succeeded)
-                throw new DeusException(result.Errors.First());
+            Try.Condition(result.Succeeded, $"Ошибка обновления персонажа: {result.Errors.FirstOrDefault()}");
         }
 
         public List<Account> GetAccountList()

@@ -84,7 +84,7 @@ namespace DeusCloud.Logic.Managers
             _rightsManager.CheckForAccessOverSlave(sellerAcc, AccountAccessRoles.Withdraw);
             data.Description = data.Description ?? "";
 
-            Try.Condition(parentAcc.Role == AccountRole.Corp, $"Продавать импланты может только корпорация");
+            Try.Condition(parentAcc.Role.IsCompany(), $"Продавать импланты может только компания");
             Try.Condition(receiverAcc.Role == AccountRole.Person, $"Получать импланты может только персона");
             Try.Condition(parentAcc.Index >= data.Index, $"Недостаточно индекса");
 

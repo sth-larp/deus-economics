@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using DeusCloud.Data.Entities.Access;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.Alice;
 using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
+using DeusCloud.Helpers;
 using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
 using DeusCloud.Logic.Server;
+using DeusCloud.Serialization;
 using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers
@@ -156,6 +162,8 @@ namespace DeusCloud.Logic.Managers
 
             UserContext.AddGameEvent(companyAccount.Login, GameEventType.Insurance,
                 $"Отменена страховка {userAccount.DisplayName}", true);
+
+            UpdateInsuranceInAlice(userAccount);
         }
 
         public void SetInsuranceHolder(SetInsuranceClientData data)
@@ -218,6 +226,8 @@ namespace DeusCloud.Logic.Managers
             UserContext.AddGameEvent(userAccount.Login, GameEventType.Insurance,
                 $"Выдана страховка {userAccount.Insurance} " +
                 $"уровня {userAccount.InsuranceLevel}", true);
+
+            UpdateInsuranceInAlice(userAccount);
         }
 
         public void StealInsurance(StealInsuranceClientData data)
@@ -236,6 +246,22 @@ namespace DeusCloud.Logic.Managers
             receiverAccount.InsuranceHidden = true;
             SetInsuranceHolder_Checked(receiverAccount, loserAccount.InsuranceLevel, loserAccount.Insurance, true);
             RemoveInsuranceHolder(loserAccount.Login);
+        }
+
+        public void UpdateInsuranceInAlice(Account acc)
+        {
+            var url = AppSettings.Url("AliceUrl");
+            var client = new HttpClient();
+
+            var data = new AliceInsurance(acc);
+            var body = WispJsonSerializer.SerializeToJsonString(data);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", "ZWNvbm9taWNzOno2dHJFKnJVRHJ1OA==");
+
+            client.SendAsync(request);
         }
 
         private bool CheckInsuranceLevel(int level, InsuranceType t)
