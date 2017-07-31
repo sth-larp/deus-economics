@@ -52,7 +52,7 @@ namespace DeusCloud.Api.Controllers
         [HttpGet]
         [Route("transactions")]
         [ResponseType(typeof(List<Transaction>))]
-        public IHttpActionResult GetTransactionHistory(string login, int take = 100, int skip = 0)
+        public IHttpActionResult GetTransactionHistory(string login, int take = 200, int skip = 0)
         {
             return Ok(UserContext.Transactions.GetHistory(login, take, skip));
         }

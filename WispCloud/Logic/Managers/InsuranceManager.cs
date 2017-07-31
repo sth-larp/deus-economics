@@ -24,8 +24,7 @@ namespace DeusCloud.Logic.Managers
     {
         private RightsManager _rightsManager;
 
-        private static Dictionary<string, InsuranceType> _associations = 
-            new Dictionary<string, InsuranceType>
+        private static Dictionary<string, InsuranceType> _associations = new Dictionary<string, InsuranceType>
         {
             {"Govt", InsuranceType.Govt },
             {"JJ", InsuranceType.JJ},
@@ -279,7 +278,7 @@ namespace DeusCloud.Logic.Managers
                    || insurance == InsuranceType.Serenity;
         }
 
-        private Account GetIssuerFromType(InsuranceType t)
+        public Account GetIssuerFromType(InsuranceType t)
         {
             var pair = _associations.FirstOrDefault(x => x.Value == t);
             if (pair.Key == null) return null;

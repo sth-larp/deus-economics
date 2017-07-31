@@ -17,7 +17,7 @@ namespace DeusCloud.Data.Entities.Alice
         {
             eventType = "change-insurance";
             timestamp = (long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds);//Ticks;
-            characterId = "15776";//user.Login;
+            characterId = user.Login;
             data = new AliceInsuranceData(user);
         }
     }

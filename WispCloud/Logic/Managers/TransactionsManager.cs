@@ -82,35 +82,36 @@ namespace DeusCloud.Logic.Managers
             var parentAcc = UserContext.Accounts.Get(sellerAcc.ParentID) ?? sellerAcc;
 
             _rightsManager.CheckForAccessOverSlave(sellerAcc, AccountAccessRoles.Withdraw);
-            data.Description = data.Description ?? "";
-
             Try.Condition(parentAcc.Role.IsCompany(), $"Продавать импланты может только компания");
             Try.Condition(receiverAcc.Role == AccountRole.Person, $"Получать импланты может только персона");
-            Try.Condition(parentAcc.Index >= data.Index, $"Недостаточно индекса");
 
-            var trList = new List<Transaction>();
-            
-            if (data.Price > 0)
+            int indexCost = data.Index;
+            if (receiverAcc.Insurance == InsuranceType.SuperVip
+                || parentAcc == UserContext.Insurances.GetIssuerFromType(receiverAcc.Insurance))
             {
-                var tranData = new TransferClientData(sellerAcc.Login, receiverAcc.Login, data.Price);
-                tranData.Description = data.Description;
-                trList = P2BTransfer(receiverAcc, sellerAcc, tranData);
+                var discount = UserContext.Constants.GetDiscount(receiverAcc.EffectiveLevel);
+                indexCost = (int) Math.Ceiling(indexCost*(1 - discount));
             }
+
+            Try.Condition(parentAcc.Index >= indexCost, $"Недостаточно индекса");
+
+            var t = new Transaction(receiverAcc, sellerAcc, data.Price);
+            t.Comment = data.Description ?? "";
 
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
                 UserContext.Data.BeginFastSave();
-                trList.ForEach(TransactiontoDb);
-                parentAcc.Index -= data.Index;
+                TransactiontoDb(t);
+                parentAcc.Index -= indexCost;
                 dbTransact.Commit();
             }
 
             if(parentAcc != sellerAcc)
                 UserContext.AddGameEvent(parentAcc.Login, GameEventType.Index, 
-                    $"Имплант за {data.Index} индекса установлен магазином {sellerAcc.Fullname}", true);
+                    $"Имплант за {indexCost} индекса установлен магазином {sellerAcc.Fullname}", true);
 
             UserContext.AddGameEvent(sellerAcc.Login, GameEventType.Index,
-                $"Имплант за {data.Index} индекса установлен {receiverAcc.Fullname}", true);
+                $"Имплант за {indexCost} индекса установлен {receiverAcc.Fullname}", true);
 
             UserContext.AddGameEvent(receiverAcc.Login, GameEventType.Index,
                 $"Получен имплант от {sellerAcc.Fullname}", true);
