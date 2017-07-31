@@ -250,6 +250,7 @@
     <Compile Include="Api\Controllers\InsuranceController.cs" />
     <Compile Include="Api\Controllers\PaymentsController.cs" />
     <Compile Include="Api\Controllers\ConstantsController.cs" />
+    <Compile Include="Api\Controllers\StatisticsController.cs" />
     <Compile Include="Api\Controllers\TransactionsController.cs" />
     <Compile Include="Api\OkJsonPatchResult.cs" />
     <Compile Include="Api\DeusActionSelector.cs" />
@@ -289,6 +290,8 @@
     <Compile Include="Identity\UserStore.cs" />
     <Compile Include="Logic\Client\AccIndexClientData.cs" />
     <Compile Include="Logic\Client\SetInsuranceClientData.cs" />
+    <Compile Include="Logic\Managers\StatManager.cs" />
+    <Compile Include="Logic\Server\StatServerData.cs" />
     <Compile Include="Logic\Client\StealInsuranceClientData.cs" />
     <Compile Include="Logic\Client\SwitchCycleClientData.cs" />
     <Compile Include="Logic\Client\ImplantClientData.cs" />

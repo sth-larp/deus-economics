@@ -32,6 +32,7 @@ namespace DeusCloud.Logic
         PaymentsManager _payments;
         ConstantManager _constants;
         InsuranceManager _insurances;
+        StatManager _stat;
 
         EventsManager _events;
 
@@ -56,6 +57,17 @@ namespace DeusCloud.Logic
                     _rights = new RightsManager(this);
 
                 return _rights;
+            }
+        }
+
+        public StatManager Stat
+        {
+            get
+            {
+                if (_stat == null)
+                    _stat = new StatManager(this);
+
+                return _stat;
             }
         }
 

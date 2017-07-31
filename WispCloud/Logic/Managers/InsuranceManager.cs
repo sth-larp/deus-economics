@@ -249,7 +249,7 @@ namespace DeusCloud.Logic.Managers
 
         public void UpdateInsuranceInAlice(Account acc)
         {
-            var url = AppSettings.Url("AliceUrl");
+            var url = AppSettings.Url("AliceUrl") + "/events";
             var client = new HttpClient();
 
             var data = new AliceInsurance(acc);
