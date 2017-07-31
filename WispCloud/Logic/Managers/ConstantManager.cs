@@ -1,27 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Constants;
-using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
-using DeusCloud.Identity;
 using DeusCloud.Logic.CommonBase;
-using Microsoft.AspNet.Identity;
 
 namespace DeusCloud.Logic.Managers
 {
     public class ConstantManager : ContextHolder
     {
         private RightsManager _rightsManager;
-        private InsuranceManager _insuranceManager;
 
         public static Dictionary<ConstantType, Constant> Constants { get; protected set; }
 
         public ConstantManager(UserContext context) : base(context)
         {
             _rightsManager = new RightsManager(UserContext);
-            _insuranceManager = new InsuranceManager(UserContext);
 
             if (Constants == null)
             {
@@ -42,12 +36,28 @@ namespace DeusCloud.Logic.Managers
             return 0;
         }
 
-        public float GetSalary(int level)
+        public float GetSalary(int salaryLevel)
         {
-            if (level == 1) return 10;
-            if (level == 2) return 50;
-            if (level == 3) return 200;
+            if (salaryLevel == 1) return 10;
+            if (salaryLevel == 2) return 50;
+            if (salaryLevel == 3) return 200;
             return 0;
+        }
+
+        public int GetInsuranceCost(InsuranceType type, int level)
+        {
+            if (type == InsuranceType.None) return 0;
+            if (type == InsuranceType.SuperVip) return 0;
+            if (type == InsuranceType.Govt) return level;
+            return level;
+        }
+
+        public float GetInsuranceSalary(InsuranceType type, int level)
+        {
+            if (type == InsuranceType.None) return 0;
+            if (type == InsuranceType.SuperVip) return 100;
+            if (type == InsuranceType.Govt) return level * 20;
+            return level * 20;
         }
 
         public Constant NewConstant(string text, ConstantType type, float value)
@@ -93,5 +103,7 @@ namespace DeusCloud.Logic.Managers
             UserContext.Data.Constants.Remove(c);
             UserContext.Data.SaveChanges();
         }
+
+        
     }
 }

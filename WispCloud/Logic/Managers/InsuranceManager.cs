@@ -18,18 +18,13 @@ namespace DeusCloud.Logic.Managers
     {
         private RightsManager _rightsManager;
 
-        private static string CorpName1 = "JJ";
-        private static string CorpName2 = "Serenity";
-        private static string CorpName3 = "Panam";
-        private static string GovName = "Govt";
-
         private static Dictionary<string, InsuranceType> _associations = 
             new Dictionary<string, InsuranceType>
         {
-            {GovName, InsuranceType.Govt },
-            {CorpName1, InsuranceType.JJ},
-            {CorpName2, InsuranceType.Serenity},
-            {CorpName3, InsuranceType.Panam},
+            {"Govt", InsuranceType.Govt },
+            {"JJ", InsuranceType.JJ},
+            {"Serenity", InsuranceType.Serenity},
+            {"Panam", InsuranceType.Panam},
             {"admin", InsuranceType.SuperVip}
         }; 
 
@@ -268,9 +263,37 @@ namespace DeusCloud.Logic.Managers
         public void SwitchCycle(SwitchCycleClientData data)
         {
             _rightsManager.CheckRole(AccountRole.Admin);
-            ResetIndexValues(data);
-            RemoveStolenInsurances();
-            ProlongInsurance();
+
+            using (var dbTransact = UserContext.Data.Database.BeginTransaction())
+            {
+                UserContext.Data.BeginFastSave();
+
+                ResetIndexValues(data);
+                PayInsuranceMoney();
+                RemoveStolenInsurances();
+                ProlongInsurance();
+
+                UserContext.Data.SaveChanges();
+                dbTransact.Commit();
+            }
+        }
+
+        private void PayInsuranceMoney()
+        {
+            foreach (var kv in _associations)
+            {
+                var issuerAcc = UserContext.Accounts.Get(kv.Key);
+                if (issuerAcc == null) continue; //Corp not found in DB
+
+                var holderAccs = UserContext.Data.Accounts.Where(x => x.Insurance == kv.Value).ToList(); 
+                foreach (var holderAcc in holderAccs)
+                {
+                    var salary = UserContext.Constants.GetInsuranceSalary(holderAcc.Insurance, holderAcc.InsuranceLevel);
+                    var payment = new Payment(issuerAcc, holderAcc, salary);
+                    payment.Employer = issuerAcc.Login;
+                    UserContext.Payments.PerformPayment(payment);
+                }
+            }
         }
 
         private void RemoveStolenInsurances()
@@ -294,18 +317,18 @@ namespace DeusCloud.Logic.Managers
                 var corp = UserContext.Accounts.Get(kv.Key);
                 if (corp == null) continue; //Corp not found in DB
 
+                var totalPrice = 0;
                 var holders = GetInsuranceHolders(kv.Key).OrderByDescending(x => x.InsuranceLevel).ToList();
                 foreach (var holder in holders)
                 {
-                    if (corp.InsurancePoints >= holder.InsuranceLevel)
+                    var effectivePrice = UserContext.Constants.GetInsuranceCost(holder.Insurance, holder.InsuranceLevel);
+                    if (corp.InsurancePoints >= effectivePrice)
                     {
-                        corp.InsurancePoints -= holder.InsuranceLevel;
-                        UserContext.AddGameEvent(corp.Login, GameEventType.Index, 
-                            $"Продлена страховка {holder.UserFullname}," +
-                            $" потрачено {holder.InsuranceLevel} очков", true);
-
+                        totalPrice += effectivePrice;
+                        corp.InsurancePoints -= effectivePrice;
+                        
                         UserContext.AddGameEvent(holder.UserLogin, GameEventType.Index,
-                            $"Вашу страховка {holder.Insurance} продлена", true);
+                            $"Ваша страховка {holder.Insurance} продлена", true);
                     }
                     else
                     {
@@ -314,7 +337,9 @@ namespace DeusCloud.Logic.Managers
                         RemoveInsuranceHolder_Checked(userAccount, corp);
                     }
                 }
-                UserContext.Accounts.Update(corp);
+                UserContext.AddGameEvent(corp.Login, GameEventType.Index,
+                    $"Продлены страховки, потрачено {totalPrice} очков", true);
+                //UserContext.Accounts.Update(corp);
             }
         }
         private void ResetIndexValues(SwitchCycleClientData data)

@@ -38,7 +38,7 @@ namespace DeusCloud.Data
         {
             Database.SetInitializer(new DeusDBInitializer());
 #if DEBUG
-            Database.Log = (x => System.Diagnostics.Debug.WriteLine(x));
+            //Database.Log = (x => System.Diagnostics.Debug.WriteLine(x));
 #endif
         }
 

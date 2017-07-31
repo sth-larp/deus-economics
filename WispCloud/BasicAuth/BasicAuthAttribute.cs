@@ -35,7 +35,7 @@ namespace DeusCloud.BasicAuth
                 var account = userContext.Accounts.GetOrFail(username, password);
                 if (account.Status != AccountStatus.Active)
                     throw new DeusHttpException(HttpStatusCode.Unauthorized, "Пользователь заблокирован");
-                
+
                 userContext.SetCurrentUser(account);
             }
 

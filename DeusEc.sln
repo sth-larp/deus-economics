@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeusCloud", "WispCloud\DeusCloud.csproj", "{085353F4-AE75-43C2-B446-9F61ECA8DAAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeusClient", "Client\DeusClient.csproj", "{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,18 +27,6 @@ Global
 		{085353F4-AE75-43C2-B446-9F61ECA8DAAC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{085353F4-AE75-43C2-B446-9F61ECA8DAAC}.Release|x86.ActiveCfg = Release|Any CPU
 		{085353F4-AE75-43C2-B446-9F61ECA8DAAC}.Release|x86.Build.0 = Release|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Debug|x86.Build.0 = Debug|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Publish|Any CPU.ActiveCfg = Release|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Publish|Any CPU.Build.0 = Release|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Publish|x86.ActiveCfg = Release|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Publish|x86.Build.0 = Release|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Release|x86.ActiveCfg = Release|Any CPU
-		{3B0D49B9-CF4F-4B9E-AFFB-B969A92F972D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

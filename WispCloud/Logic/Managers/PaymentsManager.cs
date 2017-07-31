@@ -96,7 +96,7 @@ namespace DeusCloud.Logic.Managers
                 return;
             }
             UserContext.AddGameEvent(payment.Receiver, GameEventType.None, 
-                $"Назначена зарплата от {payment.EmployerName} в {payment.Amount}");
+                $"Назначена зарплата от {payment.EmployerName} в {payment.Amount}", true);
 
             UserContext.AddGameEvent(payment.Employer, GameEventType.None,
                 $"Назначена зарплата для {payment.ReceiverName} в {payment.Amount}");
@@ -122,14 +122,14 @@ namespace DeusCloud.Logic.Managers
                 UserContext.Data.BeginFastSave();
 
                 var list = UserContext.Data.Payments.ToList();
-                list.ForEach(PerformPayment);
+                list.ForEach(x => PerformPayment(x));
                 
                 UserContext.Data.SaveChanges();
                 dbTransact.Commit();
             }
         }
 
-        private void PerformPayment(Payment pay)
+        public void PerformPayment(Payment pay, bool isInsurance = false)
         {
             if (pay.EmployerAccount.Cash < pay.Amount)
             {
@@ -141,11 +141,11 @@ namespace DeusCloud.Logic.Managers
             pay.ReceiverAccount.Cash += pay.Amount;
             pay.LastPaid = DateTime.Now;
 
-            UserContext.Accounts.Update(pay.ReceiverAccount);
+            //UserContext.Accounts.Update(pay.ReceiverAccount);
 
             var transaction = new Transaction(pay.EmployerAccount, pay.ReceiverAccount, pay.Amount);
             transaction.Type |= TransactionType.Payment;
-            transaction.Comment = $"регулярные выплаты от {pay.EmployerName}";
+            transaction.Comment = $"Регулярные выплаты от {pay.EmployerName}" + (isInsurance ? " по страховке" : "");
             UserContext.Data.Transactions.Add(transaction);
         }
     }
