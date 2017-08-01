@@ -48,7 +48,7 @@ namespace DeusCloud.Logic.Managers
                 trList = B2BTransfer(senderAcc, receiverAcc, data);
 
             //Анонимные транзакции
-            if(data.Receiver == receiverAcc.Alias && receiverAcc.Role == AccountRole.Person)
+            if(data.Receiver.ToLower() == receiverAcc.Alias.ToLower() && receiverAcc.Role == AccountRole.Person)
                 trList.ForEach(x => {
                     if(x.ReceiverAccount.Login == receiverAcc.Login)
                         x.Type |= TransactionType.Anonymous;

@@ -60,6 +60,7 @@ namespace DeusCloud.Data.Entities.Transactions
         {
             if ((Type & TransactionType.Anonymous) > 0)
             {
+                Sender = SenderAccount.Alias;
                 Receiver = ReceiverAccount.Alias;
                 Comment = Comment + " (анонимно)";
             }
