@@ -140,6 +140,30 @@
         }, "ins-table-warning");
     }
 
+    function load_salaries() {
+        $("#sal-table tbody tr").remove();
+
+        sendAPIRequestWarned(url + "/api/payments/all", "GET", function (param, status) {
+            $('#sal-table').append('<tr><th>Юрлицо</th><th>Ур1</th><th>Ур2</th><th>Ур3</th></tr>');
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>";
+
+            var payments = JSON.parse(param);
+            var dict = {};
+
+            for (i = 0; i < payments.length; i++)
+                dict[payments[i].EmployerName] = [0, 0, 0, 0];
+
+            for (i = 0; i < payments.length; i++)
+                dict[payments[i].EmployerName][payments[i].SalaryLevel] += 1;
+
+            for (var key in dict) {
+                var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3]]);
+                $('#sal-table').append(txt);
+            }
+
+        }, "sal-table-warning");
+    }
+
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Страница Транзакций
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -198,7 +222,7 @@
     </div>
     <div id="const-menu" class="top-menu-elem top-menu-selected" onclick="load_const_page();">Константы</div>
     <div id="alice-menu" class="top-menu-elem" onclick="topMenuSwitch('alice');">ALICE</div>
-    <div id="ins-menu" class="top-menu-elem" onclick="topMenuSwitch('ins');">Страховки</div>
+    <div id="ins-menu" class="top-menu-elem" onclick="topMenuSwitch('ins');">Страховки и зарплаты</div>
     <div id="trans-menu" class="top-menu-elem" onclick='topMenuSwitch("trans");'>Переводы</div>
     <div id="logout_menu" class="top-menu-elem logout" onclick="window.location.assign('./main.html');">Назад в ЛК юрлица</div>
 </div>
@@ -256,6 +280,12 @@
                 <h2>Активные страховки</h2>
                 <table id="ins-table"></table>
                 <div class="warning-text" id="ins-table-warning"></div>
+
+                <input type="button" class="custom-button smaller" name="Обновить статистику зарплат" value="Обновить статистику зарплат" onclick="value = name + curUpdateStr(); load_salaries();" />
+
+                <h2>Зарплаты</h2>
+                <table id="sal-table"></table>
+                <div class="warning-text" id="sal-table-warning"></div>
             </div>
         </div>
 
