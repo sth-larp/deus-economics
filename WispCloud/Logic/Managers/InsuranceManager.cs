@@ -314,10 +314,9 @@ namespace DeusCloud.Logic.Managers
                 var holderAccs = UserContext.Data.Accounts.Where(x => x.Insurance == kv.Value).ToList(); 
                 foreach (var holderAcc in holderAccs)
                 {
-                    var salary = UserContext.Constants.GetInsuranceSalary(holderAcc.Insurance, holderAcc.InsuranceLevel);
-                    var payment = new Payment(issuerAcc, holderAcc, salary);
+                    var payment = new Payment(issuerAcc, holderAcc, holderAcc.InsuranceLevel);
                     payment.Employer = issuerAcc.Login;
-                    UserContext.Payments.PerformPayment(payment);
+                    UserContext.Payments.PerformPayment(payment, true, holderAcc.Insurance);
                 }
             }
         }

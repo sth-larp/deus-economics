@@ -412,13 +412,13 @@
         $("#salary-list tbody tr").remove();
 
         sendAPIRequestWarned(url + "/api/payments/salaries?login=" + selected_account, "GET", function (param, status) {
-            $('#salary-list').append('<tr><th>Работодатель</th><th>Сумма</th><th>Последняя выплата</th></tr>');
+            $('#salary-list').append('<tr><th>Работодатель</th><th>Уровень</th><th>Последняя выплата</th></tr>');
             var salaries = JSON.parse(param);
             var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
 
             for (i = 0; i < salaries.length; i++) {
                 var date = customDateFormat(salaries[i].LastPaid);
-                var newRow = format(row, [salaries[i].EmployerName, salaries[i].Amount, date]);
+                var newRow = format(row, [salaries[i].EmployerName, salaries[i].SalaryLevel, date]);
                 $('#salary-list').append(newRow);
             }
         }, "salary-warning");

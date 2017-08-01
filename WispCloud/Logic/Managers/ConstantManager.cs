@@ -20,10 +20,22 @@ namespace DeusCloud.Logic.Managers
             }
         }
 
+        public float Inflation
+        {
+            get { return Constants.ContainsKey("Inflation") ? Constants["Inflation"].Value : 1; }
+        }
+
         public void NewCycle()
         {
-            var t = (int) DateTime.Now.Subtract(new DateTime(2017, 1, 1)).TotalSeconds;
+            var t = (int) DateTime.Now.Subtract(new DateTime(2017, 1, 1, 3, 0, 0)).TotalSeconds;
             EditConstant(null, "LastCycle", t);
+        }
+
+        public DateTime LastCycleDate()
+        {
+            Try.Condition(Constants.ContainsKey("LastCycle"), $"Не найдено значение константы LastCycle");
+            var secValue = Constants["LastCycle"].Value;
+            return new DateTime(2017, 1, 1, 3, 0, 0).AddSeconds(secValue);
         }
 
         public float GetDiscount(int level)
@@ -36,9 +48,9 @@ namespace DeusCloud.Logic.Managers
 
         public float GetSalary(int salaryLevel)
         {
-            if (salaryLevel == 1) return 100;
-            if (salaryLevel == 2) return 200;
-            if (salaryLevel == 3) return 400;
+            if (salaryLevel == 1) return 100 * Inflation;
+            if (salaryLevel == 2) return 200 * Inflation;
+            if (salaryLevel == 3) return 400 * Inflation;
             return 0;
         }
 
@@ -61,9 +73,11 @@ namespace DeusCloud.Logic.Managers
         public float GetInsuranceSalary(InsuranceType type, int level)
         {
             if (type == InsuranceType.None) return 0;
-            if (type == InsuranceType.SuperVip) return 400;
-            if (type == InsuranceType.Govt) return level * 100;
-            return level == 3 ? 400: level * 100;
+            if (type == InsuranceType.SuperVip) return 400 * Inflation;
+            if (type == InsuranceType.Govt) return level * 100 * Inflation;
+            return level == 3 ? 
+                400 * Inflation : 
+                level * 100 * Inflation;
         }
 
         public List<Constant> GetConstants()

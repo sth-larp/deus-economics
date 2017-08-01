@@ -40,10 +40,7 @@ namespace DeusCloud.Data.Entities.Transactions
         public TimeSpan? Period { get; set; }
 
         [Required]
-        public float Debt { get; set; }
-
-        [Required]
-        public float Amount { get; set; }
+        public int SalaryLevel { get; set; }
 
         [Required]
         [JsonIgnore]
@@ -56,12 +53,11 @@ namespace DeusCloud.Data.Entities.Transactions
         {
         }
 
-        public Payment(Account employer, Account receiver, float amount)
+        public Payment(Account employer, Account receiver, int salaryLevel)
         {
             EmployerAccount = employer;
             ReceiverAccount = receiver;
-            Amount = amount;
-            Debt = 0;
+            SalaryLevel = salaryLevel;
             Type = TransactionType.Normal;
         }
     }

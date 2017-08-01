@@ -6,6 +6,7 @@ using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Exceptions;
+using DeusCloud.Identity;
 using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
 
@@ -47,7 +48,7 @@ namespace DeusCloud.Logic.Managers
             var senderAcc = UserContext.Accounts.GetOrFail(data.Sender);
             var receiverAcc = UserContext.Accounts.GetOrFail(data.Receiver);
 
-            var payment = new Payment(senderAcc, receiverAcc, data.Amount);
+            var payment = new Payment(senderAcc, receiverAcc, data.SalaryLevel);
             UserContext.Data.Payments.Add(payment);
             UserContext.Data.SaveChanges();
 
@@ -73,7 +74,7 @@ namespace DeusCloud.Logic.Managers
 
                 ret.Employer = senderAcc.Login;
                 ret.Receiver = receiverAcc.Login;
-                ret.Amount = data.Amount;
+                ret.SalaryLevel = data.SalaryLevel;
 
                 UserContext.Data.SaveChanges();
                 dbTransact.Commit();
@@ -96,10 +97,10 @@ namespace DeusCloud.Logic.Managers
                 return;
             }
             UserContext.AddGameEvent(payment.Receiver, GameEventType.None, 
-                $"Назначена зарплата от {payment.EmployerName} в {payment.Amount}", true);
+                $"Назначена зарплата от {payment.EmployerName} уровня {payment.SalaryLevel}", true);
 
             UserContext.AddGameEvent(payment.Employer, GameEventType.None,
-                $"Назначена зарплата для {payment.ReceiverName} в {payment.Amount}");
+                $"Назначена зарплата для {payment.ReceiverName} уровня {payment.SalaryLevel}");
         }
 
         public void DeletePayment(int id)
@@ -129,21 +130,17 @@ namespace DeusCloud.Logic.Managers
             }
         }
 
-        public void PerformPayment(Payment pay, bool isInsurance = false)
+        public void PerformPayment(Payment pay, bool isInsurance = false, InsuranceType t = InsuranceType.None)
         {
-            if (pay.EmployerAccount.Cash < pay.Amount)
-            {
-                pay.Debt += pay.Amount;
-                return;
-            }
+            //pay.EmployerAccount.Cash -= pay.SalaryLevel; //Payment from nowhere
+            var value = isInsurance
+                ? UserContext.Constants.GetSalary(pay.SalaryLevel)
+                : UserContext.Constants.GetInsuranceSalary(t, pay.SalaryLevel);
 
-            //pay.EmployerAccount.Cash -= pay.Amount; //Payment from nowhere
-            pay.ReceiverAccount.Cash += pay.Amount;
+            pay.ReceiverAccount.Cash += value;
             pay.LastPaid = DateTime.Now;
 
-            //UserContext.Accounts.Update(pay.ReceiverAccount);
-
-            var transaction = new Transaction(pay.EmployerAccount, pay.ReceiverAccount, pay.Amount);
+            var transaction = new Transaction(pay.EmployerAccount, pay.ReceiverAccount, value);
             transaction.Type |= TransactionType.Payment;
             transaction.Comment = $"Регулярные выплаты от {pay.EmployerName}" + (isInsurance ? " по страховке" : "");
             UserContext.Data.Transactions.Add(transaction);

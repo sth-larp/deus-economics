@@ -244,6 +244,9 @@
     <EmbeddedResource Include="Migrations\201708010900354_constants-refactor.resx">
       <DependentUpon>201708010900354_constants-refactor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708011155057_salarylevel.resx">
+      <DependentUpon>201708011155057_salarylevel.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\CommonPrefixProvider .cs" />
@@ -391,6 +394,10 @@
     <Compile Include="Migrations\201708010900354_constants-refactor.cs" />
     <Compile Include="Migrations\201708010900354_constants-refactor.Designer.cs">
       <DependentUpon>201708010900354_constants-refactor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708011155057_salarylevel.cs" />
+    <Compile Include="Migrations\201708011155057_salarylevel.Designer.cs">
+      <DependentUpon>201708011155057_salarylevel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />
