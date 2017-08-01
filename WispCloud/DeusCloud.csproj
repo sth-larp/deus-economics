@@ -218,6 +218,7 @@
     <Content Include="content\login.html">
       <BrowseToURL>~/login.html</BrowseToURL>
     </Content>
+    <Content Include="content\stat.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -239,6 +240,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201707301703371_ParentId.resx">
       <DependentUpon>201707301703371_ParentId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708010900354_constants-refactor.resx">
+      <DependentUpon>201708010900354_constants-refactor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -269,7 +273,6 @@
     <Compile Include="Data\Entities\Access\AccountAccessRoles.cs" />
     <Compile Include="Data\Entities\Alice\AliceInsurance.cs" />
     <Compile Include="Data\Entities\Constants\Constant.cs" />
-    <Compile Include="Data\Entities\Constants\ConstantType.cs" />
     <Compile Include="Data\Entities\GameEvents\GameEvent.cs" />
     <Compile Include="Data\Entities\GameEvents\GameEventType.cs" />
     <Compile Include="Data\Entities\Transactions\Loyalty.cs" />
@@ -384,6 +387,10 @@
     <Compile Include="Migrations\201707301703371_ParentId.cs" />
     <Compile Include="Migrations\201707301703371_ParentId.Designer.cs">
       <DependentUpon>201707301703371_ParentId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708010900354_constants-refactor.cs" />
+    <Compile Include="Migrations\201708010900354_constants-refactor.Designer.cs">
+      <DependentUpon>201708010900354_constants-refactor.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

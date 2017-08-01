@@ -190,9 +190,10 @@ namespace DeusCloud.Logic.Managers
 
             if (!isStolen)
             {
-                var price = level;
+                var price = (int)UserContext.Constants.GetInsuranceCost(t, level);
+                var priceOld = (int)UserContext.Constants.GetInsuranceCost(t, userAccount.InsuranceLevel);
                 if (userAccount.Insurance == t)
-                    price = Math.Max(0, level - userAccount.InsuranceLevel);
+                    price = Math.Max(0, price - priceOld);
 
                 Try.Condition(newIssuer.InsurancePoints >= price, $"Не хватает очков страховки");
                 newIssuer.InsurancePoints -= price;
@@ -217,10 +218,10 @@ namespace DeusCloud.Logic.Managers
             userAccount.InsuranceLevel = level;
             UserContext.Accounts.Update(userAccount);
 
-            if(!isStolen)
-                UserContext.AddGameEvent(newIssuer.Login, GameEventType.Insurance,
-                    $"Выдана страховка {userAccount.DisplayName}" +
-                    $"уровня {userAccount.InsuranceLevel}");
+            //if(!isStolen)
+            //    UserContext.AddGameEvent(newIssuer.Login, GameEventType.Insurance,
+            //        $"Выдана страховка {userAccount.DisplayName}" +
+            //        $"уровня {userAccount.InsuranceLevel}");
 
             UserContext.AddGameEvent(userAccount.Login, GameEventType.Insurance,
                 $"Выдана страховка {userAccount.Insurance} " +
@@ -346,7 +347,7 @@ namespace DeusCloud.Logic.Managers
                 var holders = GetInsuranceHolders(kv.Key).OrderByDescending(x => x.InsuranceLevel).ToList();
                 foreach (var holder in holders)
                 {
-                    var effectivePrice = UserContext.Constants.GetInsuranceCost(holder.Insurance, holder.InsuranceLevel);
+                    var effectivePrice = (int)UserContext.Constants.GetInsuranceCost(holder.Insurance, holder.InsuranceLevel);
                     if (corp.InsurancePoints >= effectivePrice)
                     {
                         totalPrice += effectivePrice;

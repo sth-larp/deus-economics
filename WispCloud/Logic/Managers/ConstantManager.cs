@@ -9,17 +9,13 @@ namespace DeusCloud.Logic.Managers
 {
     public class ConstantManager : ContextHolder
     {
-        private RightsManager _rightsManager;
-
-        public static Dictionary<ConstantType, Constant> Constants { get; protected set; }
+        public static Dictionary<string, Constant> Constants { get; protected set; }
 
         public ConstantManager(UserContext context) : base(context)
         {
-            _rightsManager = new RightsManager(UserContext);
-
             if (Constants == null)
             {
-                Constants = UserContext.Data.Constants.ToList().ToDictionary(x => x.Type, x => x);
+                Constants = UserContext.Data.Constants.ToList().ToDictionary(x => x.Name, x => x);
             }
         }
 
@@ -44,12 +40,20 @@ namespace DeusCloud.Logic.Managers
             return 0;
         }
 
-        public int GetInsuranceCost(InsuranceType type, int level)
+        public float GetInsuranceCost(InsuranceType type, int level)
         {
             if (type == InsuranceType.None) return 0;
             if (type == InsuranceType.SuperVip) return 0;
-            if (type == InsuranceType.Govt) return level;
-            return level;
+
+            var costs = new float[]
+            {
+                0,
+                Constants.ContainsKey("InsCost1") ? Constants["InsCost1"].Value : 1,
+                Constants.ContainsKey("InsCost2") ? Constants["InsCost2"].Value : 2,
+                Constants.ContainsKey("InsCost3") ? Constants["InsCost3"].Value : 3,
+            };
+
+            return costs[level];
         }
 
         public float GetInsuranceSalary(InsuranceType type, int level)
@@ -60,46 +64,46 @@ namespace DeusCloud.Logic.Managers
             return level * 20;
         }
 
-        public Constant NewConstant(string text, ConstantType type, float value)
+        public Constant NewConstant(string text, string name, float value)
         {
-            _rightsManager.CheckRole(AccountRole.Admin);
-            Try.Condition(!Constants.ContainsKey(type), $"This constant already exists: {type}.");
+            UserContext.Rights.CheckRole(AccountRole.Admin);
+            Try.Condition(!Constants.ContainsKey(name), $"Эта константа уже существует: {name}.");
             var c = new Constant
             {
                 Description = text,
-                PercentValue = value,
-                Type = type
+                Value = value,
+                Name = name
             };
-            Constants.Add(type, c);
+            Constants.Add(name, c);
             UserContext.Data.Constants.Add(c);
             UserContext.Data.SaveChanges();
             return c;
         }
 
-        public Constant EditConstant(string text, ConstantType type, float value)
+        public Constant EditConstant(string text, string name, float value)
         {
-            _rightsManager.CheckRole(AccountRole.Admin);
+            UserContext.Rights.CheckRole(AccountRole.Admin);
 
-            Try.Condition(Constants.ContainsKey(type), $"Cant find constant with type: {type}.");
-            var c = Constants[type];
+            Try.Condition(Constants.ContainsKey(name), $"Не найдена константа: {name}.");
+            var c = Constants[name];
             c.Description = text;
-            c.PercentValue = value;
+            c.Value = value;
 
-            var dbconst = UserContext.Data.Constants.Find(type);
+            var dbconst = UserContext.Data.Constants.Find(name);
             dbconst.Description = text;
-            dbconst.PercentValue = value;
+            dbconst.Value = value;
             UserContext.Data.SaveChanges();
             return c;
         }
 
-        public void DeleteConstant(ConstantType type)
+        public void DeleteConstant(string name)
         {
-            _rightsManager.CheckRole(AccountRole.Admin);
+            UserContext.Rights.CheckRole(AccountRole.Admin);
 
-            Try.Condition(Constants.ContainsKey(type), $"Cant find constant with type: {type}.");
-            Constants.Remove(type);
+            Try.Condition(Constants.ContainsKey(name), $"Не найдена константа: {name}.");
+            Constants.Remove(name);
 
-            var c = UserContext.Data.Constants.First(x => x.Type == type);
+            var c = UserContext.Data.Constants.First(x => x.Name == name);
             UserContext.Data.Constants.Remove(c);
             UserContext.Data.SaveChanges();
         }

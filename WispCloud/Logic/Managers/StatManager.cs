@@ -18,6 +18,7 @@ namespace DeusCloud.Logic.Managers
         public StatServerData GetStatistics(bool ingame)
         {
             var data = new StatServerData();
+            UserContext.Rights.CheckRole(AccountRole.Admin);
 
             var json = GetAliceData("/accounts/_all_docs");
             var parsed = JsonConvert.DeserializeObject<AliceModels>(json);

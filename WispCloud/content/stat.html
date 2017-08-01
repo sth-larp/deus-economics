@@ -1,0 +1,144 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>DeusEx Economics</title>
+
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/top-menu.css">
+<link rel="stylesheet" href="./css/left-menu.css">
+<link rel="stylesheet" href="./css/mobile.css" media="(max-device-width:800px)">
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="js/deus_api.js"></script>
+<script type="text/javascript" src="js/slave_box.js"></script>
+
+<script type="text/javascript">
+    var main_account = '';
+    var main_profile = {}
+    var lines_on_tab = 20;
+    var corpNames = ['Serenity', 'Panam', 'JJ', 'Govt', 'admin'];
+    var httpOK = 200; //For errors debugging
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Навигация левого меню
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    function preLoad() {
+        main_account = get_auth_tok_user();
+    }
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Страница статистики
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    function load_implants() {
+        $("#implant-table tbody tr").remove();
+
+        sendAPIRequestWarned(url + "/api/stat/alice", "GET", function (param, status) {
+            $('#implant-table').append('<tr><th>Корпорация</th><th>Импланты</th></tr>');
+            var doc = JSON.parse(param);
+            var implants = doc.Implants;
+            var vr = doc.TimeInVR;
+            var row = "<tr><td>{0}</td><td>{1}</td></tr>";
+
+            $('#implant-table').append(format(row, ["JJ", implants.JJ]));
+            $('#implant-table').append(format(row, ["Panam", implants.Panam]));
+            $('#implant-table').append(format(row, ["Serenity", implants.Serenity]));
+            $('#implant-table').append(format(row, ["Время в VR", vr]));
+        }, "implant-table-warning");
+    }
+
+    function load_alice_page() {
+        topMenuSwitch(document.getElementById("alice-page"));
+        load_implants();
+    }
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Страница страховок
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    function load_insurances() {
+        $("#ins-table tbody tr").remove();
+
+        sendAPIRequestWarned(url + "/api/accounts/list", "GET", function (param, status) {
+            $('#ins-table').append('<tr><th>Эмитент</th><th>Ур1</th><th>Ур2</th><th>Ур3</th></tr>');
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>";
+
+            var persons = JSON.parse(param);
+            var dict = {};
+
+            for (i = 0; i < persons.length; i++)
+                dict[persons[i].Insurance] = [0,0,0,0];
+
+            for (i = 0; i < persons.length; i++) 
+                dict[persons[i].Insurance][persons[i].InsuranceLevel] += 1;
+
+            for (var key in dict) {
+                var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3]]);
+                if(key != 'None')
+                    $('#ins-table').append(txt);
+            }
+            
+        }, "ins-table-warning");
+    }
+
+    function load_ins_page() {
+        topMenuSwitch(document.getElementById("ins-page"));
+
+        load_insurances();
+    }
+    
+
+    function topMenuSwitch(e) {
+        $('.top-menu-elem').removeClass('top-menu-selected');
+        e.classList.add('top-menu-selected');
+        $('.page-display').css('display', 'none');
+        e.style.display = 'block';
+    }
+
+</script>
+</head>
+
+
+<body onload="preLoad();">
+
+<div id="top_menu" class="top-menu">
+    <div id="menu-icon" class="top-menu-elem" onclick="showLeftMenu(true);">&#9776;</div>
+    <div class="top-menu-elem greetings">
+        Привет, <span id="current_account"></span>
+    </div>
+    <div id="stat-menu" class="top-menu-elem top-menu-selected" onclick="load_alice_page();">ALICE</div>
+    <div id="corp_menu" class="top-menu-elem" onclick="load_ins_page();">Страховки</div>
+    <div id="transactions_menu" class="top-menu-elem" onclick="">Ничего</div>
+    <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
+</div>
+
+<div id="content-wrapper">
+    <div id="content-preceder"></div>
+    <div id="content-body">
+
+        <!-- Страница ALICE -->
+        <div id="alice-page" class="page-display">
+            <div id="implant-holder">
+                <h2>Импланты в игре</h2>
+                <table id="implant-table"></table>
+                <div class="warning-text" id="implant-table-warning"></div>
+            </div>
+        </div>
+
+        <!-- Страница Страховки -->
+        <div id="ins-page" class="page-display">
+            <div id="ins-holder">
+                <h2>Активные страховки</h2>
+                <table id="ins-table"></table>
+                <div class="warning-text" id="ins-table-warning"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</body>
+</html>

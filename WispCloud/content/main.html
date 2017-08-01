@@ -292,6 +292,17 @@
 
         document.getElementById("insurance-holder").style.display = 'block';
 
+        sendAPIRequest(url + "/api/constant/list", "GET", function(param, status) {
+            if (status == 200) {
+                var constants = JSON.parse(param);
+                for (i = 0; i < constants.length; i++) {
+                    var doc = document.getElementById(constants[i].Name);
+                    if (doc != null)
+                        doc.innerHTML = constants[i].Value;
+                }   
+            }
+        });
+
         sendAPIRequestWarned(url + "/api/insurance/holders?company=" + selected_account, "GET", function (param, status) {
             var holders = JSON.parse(param);
 
@@ -537,6 +548,11 @@
         <div id="corp_admin" class="page-display">
             <div id="insurance-holder" style="display: none;">
                 <h2>Страховки</h2>
+                <p>Текущие стоимости продления либо покупки страховок в индексе</p>
+                <table>
+                    <tr><th>Уровень 1</th><th>Уровень 2</th><th>Уровень 3</th></tr>
+                    <tr><td id="InsCost1"></td><td id="InsCost2"></td><td id="InsCost3"></td></tr>
+                </table>
                 <p>Перечень лиц, имеющих вашу страховку. При добавлении лиц в список с вас списываются очки страховки. При удалении страховки потраченные очки не возвращаются. </p>
                 <div id="insurance_list"></div>
                 <div class="warning-text" id="ins-table-warning"></div>
