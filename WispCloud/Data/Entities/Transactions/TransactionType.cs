@@ -12,6 +12,6 @@ namespace DeusCloud.Data.Entities.Transactions
         Tax = 2,
         Anonymous = 4,
         Payment = 8,
-        Insurance = 16,
+        Implant = 16,
     }
 }

@@ -26,6 +26,35 @@
 
     function preLoad() {
         main_account = get_auth_tok_user();
+        load_const_page();
+    }
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Страница констант
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    function load_constants() {
+        $("#const-table tbody tr").remove();
+
+        sendAPIRequestWarned(url + "/api/constant/list", "GET", function (param, status) {
+            $('#const-table').append('<tr><th>Имя</th><th>Значение</th><th>Описание</th></tr>');
+            var consts = JSON.parse(param);
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
+
+            for (i = 0; i < consts.length; i++) {
+                if (consts[i].Name == "LastCycle") {
+                    var date = new Date(new Date('2017-01-01').getTime() + consts[i].Value * 1000);
+                    consts[i].Value = formatDate(date, "d MMM HH:mm:ss");
+                }
+                var txt = format(row, [consts[i].Name, consts[i].Value, consts[i].Description]);
+                $('#const-table').append(txt);
+            }
+        }, "const-table-warning");
+    }
+
+    function load_const_page() {
+        topMenuSwitch(document.getElementById("const-page"));
+        load_constants();
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -76,7 +105,7 @@
 
             for (var key in dict) {
                 var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3]]);
-                if(key != 'None')
+                if(key == 'None') continue;
                     $('#ins-table').append(txt);
             }
             
@@ -104,19 +133,27 @@
 <body onload="preLoad();">
 
 <div id="top_menu" class="top-menu">
-    <div id="menu-icon" class="top-menu-elem" onclick="showLeftMenu(true);">&#9776;</div>
     <div class="top-menu-elem greetings">
-        Привет, <span id="current_account"></span>
+        <span id="current_account"></span>
     </div>
-    <div id="stat-menu" class="top-menu-elem top-menu-selected" onclick="load_alice_page();">ALICE</div>
+    <div id="const-menu" class="top-menu-elem top-menu-selected" onclick="load_const_page();">Константы</div>
+    <div id="stat-menu" class="top-menu-elem" onclick="load_alice_page();">ALICE</div>
     <div id="corp_menu" class="top-menu-elem" onclick="load_ins_page();">Страховки</div>
-    <div id="transactions_menu" class="top-menu-elem" onclick="">Ничего</div>
     <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
 </div>
 
 <div id="content-wrapper">
     <div id="content-preceder"></div>
     <div id="content-body">
+
+        <!-- Страница Константы -->
+        <div id="const-page" class="page-display">
+            <div id="const-holder">
+                <h2>Константы</h2>
+                <table id="const-table"></table>
+                <div class="warning-text" id="const-table-warning"></div>
+            </div>
+        </div>
 
         <!-- Страница ALICE -->
         <div id="alice-page" class="page-display">

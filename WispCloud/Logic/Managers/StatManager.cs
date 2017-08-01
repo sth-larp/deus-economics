@@ -24,7 +24,8 @@ namespace DeusCloud.Logic.Managers
             var parsed = JsonConvert.DeserializeObject<AliceModels>(json);
 
             var characters = parsed.rows.Select(x => x.doc).Where(x => x.isAlive && (ingame? x.inGame : true)).ToList();
-            var implants = characters.SelectMany(x => x.modifiers).ToList(); 
+            var implants = characters.SelectMany(x => x.modifiers).ToList();
+            //var robots = characters.Select(x => x.profileType == "robot").ToList();
 
             var pa = 0;
             var jj = 0;
@@ -73,6 +74,7 @@ namespace DeusCloud.Logic.Managers
         private class AliceModel 
         {
             public string _id { get; set; }
+            public string profileType { get; set; }
             public bool isAlive { get; set; }
             public bool inGame { get; set; }
             public int totalSpentInVR { get; set; }

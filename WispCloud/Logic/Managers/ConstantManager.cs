@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Constants;
@@ -19,9 +20,10 @@ namespace DeusCloud.Logic.Managers
             }
         }
 
-        public List<Constant> GetConstants()
+        public void NewCycle()
         {
-            return Constants.Values.ToList();
+            var t = (int) DateTime.Now.Subtract(new DateTime(2017, 1, 1)).TotalSeconds;
+            EditConstant(null, "LastCycle", t);
         }
 
         public float GetDiscount(int level)
@@ -34,9 +36,9 @@ namespace DeusCloud.Logic.Managers
 
         public float GetSalary(int salaryLevel)
         {
-            if (salaryLevel == 1) return 10;
-            if (salaryLevel == 2) return 50;
-            if (salaryLevel == 3) return 200;
+            if (salaryLevel == 1) return 100;
+            if (salaryLevel == 2) return 200;
+            if (salaryLevel == 3) return 400;
             return 0;
         }
 
@@ -59,9 +61,14 @@ namespace DeusCloud.Logic.Managers
         public float GetInsuranceSalary(InsuranceType type, int level)
         {
             if (type == InsuranceType.None) return 0;
-            if (type == InsuranceType.SuperVip) return 100;
-            if (type == InsuranceType.Govt) return level * 20;
-            return level * 20;
+            if (type == InsuranceType.SuperVip) return 400;
+            if (type == InsuranceType.Govt) return level * 100;
+            return level == 3 ? 400: level * 100;
+        }
+
+        public List<Constant> GetConstants()
+        {
+            return Constants.Values.ToList();
         }
 
         public Constant NewConstant(string text, string name, float value)
@@ -86,12 +93,15 @@ namespace DeusCloud.Logic.Managers
 
             Try.Condition(Constants.ContainsKey(name), $"Не найдена константа: {name}.");
             var c = Constants[name];
-            c.Description = text;
+
+            if(!String.IsNullOrEmpty(text))
+                c.Description = text;
+
             c.Value = value;
 
             var dbconst = UserContext.Data.Constants.Find(name);
-            dbconst.Description = text;
-            dbconst.Value = value;
+            dbconst.Description = c.Description;
+            dbconst.Value = c.Value;
             UserContext.Data.SaveChanges();
             return c;
         }

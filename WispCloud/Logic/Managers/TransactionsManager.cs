@@ -97,6 +97,7 @@ namespace DeusCloud.Logic.Managers
 
             var t = new Transaction(receiverAcc, sellerAcc, data.Price);
             t.Comment = data.Description ?? "";
+            t.Type |= TransactionType.Implant;
 
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
