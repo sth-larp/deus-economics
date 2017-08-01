@@ -24,13 +24,12 @@ namespace DeusCloud.Logic.Managers
             var data = new TranStatServerData();
             var from = UserContext.Constants.LastCycleDate();
             var allTrans = UserContext.Data.Transactions
-                .Where(x => x.Type != TransactionType.Tax 
-                && x.Type != TransactionType.Payment && x.Time > from).ToList();
+                .Where(x => x.Type != TransactionType.Payment && x.Time > from).ToList();
 
             var receiverDict = new Dictionary<string, TranStatElement>();
             var senderDict = new Dictionary<string, TranStatElement>();
 
-            allTrans.ForEach(x =>
+            allTrans.Where(x => x.Type!= TransactionType.Tax).ToList().ForEach(x =>
             {
                 if (!receiverDict.ContainsKey(x.Receiver))
                     receiverDict.Add(x.Receiver, new TranStatElement(x.Receiver, 0)
@@ -64,6 +63,14 @@ namespace DeusCloud.Logic.Managers
                 .Select(x => x.Value).Where(x => x.Role == AccountRole.Person)
                 .OrderByDescending(x => x.Amount)
                 .Take(50).ToList();
+
+            var allUsers = UserContext.Data.Accounts.Where(x => x.Role != AccountRole.Master
+                                                                && x.Role != AccountRole.Admin).ToList();
+            data.Cash = allUsers.Select(x => x.Cash).Aggregate((sum, x) => x + sum);
+
+            data.CashOut = allTrans.Where(x => x.ReceiverAccount.Role == AccountRole.Master 
+                || x.ReceiverAccount.Role == AccountRole.Admin).Select(x => x.Amount)
+                .Aggregate((sum, x) => sum + x);
 
             return data;
         }

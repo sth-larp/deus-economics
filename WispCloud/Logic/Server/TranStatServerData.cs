@@ -11,6 +11,11 @@ namespace DeusCloud.Logic.Server
         public List<TranStatElement> Top20CompSenders { get; set; }
 
         public List<TranStatElement> Top50PersReceivers { get; set; }
+
+        public float Cash { get; set; }
+
+        public float CashOut { get; set; }
+
         public TranStatServerData()
         {
             Top20CompReceivers = new List<TranStatElement>();
