@@ -81,8 +81,9 @@
         var pa_in = document.getElementById("pa-idx").value;
         var se_in = document.getElementById("se-idx").value;
         var jj_in = document.getElementById("jj-idx").value;
+        var gt_in = document.getElementById("gt-idx").value;
 
-        var data = JSON.stringify({"IndexPanam": pa_in, "IndexSerenity": se_in, "IndexJJ": jj_in});
+        var data = JSON.stringify({"IndexPanam": pa_in, "IndexSerenity": se_in, "IndexJJ": jj_in, "IndexGovt": gt_in});
 
         sendAPIRequestWarned(url + "/api/cycle/new", "POST", function (param, status) {
             load_constants();
@@ -190,14 +191,13 @@
 <body onload="preLoad();">
 
 <div id="top_menu" class="top-menu">
-    <div class="top-menu-elem greetings">
-        <span id="current_account"></span>
+    <div class="top-menu-elem ">
     </div>
     <div id="const-menu" class="top-menu-elem top-menu-selected" onclick="load_const_page();">Константы</div>
     <div id="alice-menu" class="top-menu-elem" onclick="topMenuSwitch('alice');">ALICE</div>
     <div id="ins-menu" class="top-menu-elem" onclick="topMenuSwitch('ins');">Страховки</div>
     <div id="trans-menu" class="top-menu-elem" onclick='topMenuSwitch("trans");'>Переводы</div>
-    <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
+    <div id="logout_menu" class="top-menu-elem logout" onclick="window.location.assign('./main.html');">Назад в ЛК юрлица</div>
 </div>
 
 <div id="content-wrapper">
@@ -225,7 +225,8 @@
                     <table class="clear-table">
                         <tr><td>Индекс Panam</td><td><input type="number" id="pa-idx" value="200" /></td></tr>
                         <tr><td>Индекс Serenity</td><td><input type="number" id="se-idx" value="200" /></td></tr>
-                        <tr><td>Индекс JJ</td><td><input type="number" id="jj-idx" value="200" /></td></tr>
+                        <tr><td>Индекс JJ</td><td><input type="number" id="jj-idx" value="200"/></td></tr>
+                        <tr><td>Индекс США</td><td><input type="number" id="gt-idx" value="200" /></td></tr>
                         <tr><td colspan=2><input type="button" class="custom-button smaller" name="send" value="Отправить" onClick="runCycle();" /></td></tr>
                     </table>
                 </form>

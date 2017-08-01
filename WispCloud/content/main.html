@@ -41,6 +41,10 @@
             sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param, status) {
                 if (status == httpOK) {
                     main_profile = JSON.parse(param);
+
+                    if (main_profile.Role == ACC_ROLE.ADMIN.name)
+                        document.getElementById("admin_menu").style.display = 'block';
+
                     main_account = main_profile.Login;
                     selected_account = main_account;
                     document.getElementById("current_account").innerHTML = main_profile.Fullname.substring(0, 20);
@@ -487,6 +491,7 @@
     <div id="profile_menu" class="top-menu-elem top-menu-selected" onclick="load_profile_page();">Профиль</div>
     <div id="corp_menu" class="top-menu-elem" style="display: none;" onclick="load_corp_page();">Компания</div>
     <div id="transactions_menu" class="top-menu-elem" onclick="load_transactions_page();">Переводы</div>
+    <div id="admin_menu" class="top-menu-elem" style="display: none;" onclick="window.location.assign('./stat.html');">Админка</div>
     <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
 </div>
 

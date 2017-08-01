@@ -123,7 +123,11 @@ namespace DeusCloud.Logic.Managers
                 UserContext.Data.BeginFastSave();
 
                 var list = UserContext.Data.Payments.ToList();
-                list.ForEach(x => PerformPayment(x));
+                list.ForEach(x =>
+                {
+                    PerformPayment(x);
+                    UserContext.Data.Entry(x).Property(e => e.LastPaid).IsModified = true; //Entity does not track this change
+                });
                 
                 UserContext.Data.SaveChanges();
                 dbTransact.Commit();

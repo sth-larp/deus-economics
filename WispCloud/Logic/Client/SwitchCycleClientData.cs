@@ -9,16 +9,18 @@ namespace DeusCloud.Logic.Client
         public int IndexPanam { get; set; }
         public int IndexSerenity { get; set; }
         public int IndexJJ { get; set; }
+        public int IndexGovt { get; set; }
 
         [JsonIgnore]
         public KeyValuePair<string, int>[] Indexes
         {
             get
             {
-                var ret = new KeyValuePair<string, int>[3];
+                var ret = new KeyValuePair<string, int>[4];
                 ret[0] = new KeyValuePair<string, int>("Panam", IndexPanam);
                 ret[1] = new KeyValuePair<string, int>("JJ", IndexJJ);
                 ret[2] = new KeyValuePair<string, int>("Serenity", IndexSerenity);
+                ret[3] = new KeyValuePair<string, int>("Govt", IndexGovt);
                 return ret;
             }
         }
