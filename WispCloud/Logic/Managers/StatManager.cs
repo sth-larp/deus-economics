@@ -19,6 +19,8 @@ namespace DeusCloud.Logic.Managers
 
         public TranStatServerData GetTransactionStat()
         {
+            UserContext.Rights.CheckRole(AccountRole.Admin);
+
             var data = new TranStatServerData();
             var from = UserContext.Constants.LastCycleDate();
             var allTrans = UserContext.Data.Transactions

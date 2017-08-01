@@ -77,6 +77,18 @@
         }, "edit_const_warning", data);
     }
 
+    function runCycle() {
+        var pa_in = document.getElementById("pa-idx").value;
+        var se_in = document.getElementById("se-idx").value;
+        var jj_in = document.getElementById("jj-idx").value;
+
+        var data = JSON.stringify({"IndexPanam": pa_in, "IndexSerenity": se_in, "IndexJJ": jj_in});
+
+        sendAPIRequestWarned(url + "/api/cycle/new", "POST", function (param, status) {
+            load_constants();
+        }, "cycle-warning" ,data);
+    }
+
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Страница статистики
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -198,6 +210,26 @@
                 <h2>Константы</h2>
                 <table id="const-table"></table>
                 <div class="warning-text" id="const-table-warning"></div>
+            </div>
+
+            <div id="cycle-holder">
+                <h2>Обновить цикл</h2>
+                <p>Перед новым циклом:</p>
+                <ul>
+                    <li>Установить новый коэффициент инфляции</li>
+                    <li>Вручную выдать индекс подпольным лабам</li>
+                    <li>Определить и залить в базу новый список зарплат</li>
+                    <li>Посчитать индексы корпораций</li>
+                </ul>
+                <form id="new-cycle" action="">
+                    <table class="clear-table">
+                        <tr><td>Индекс Panam</td><td><input type="number" id="pa-idx" value="200" /></td></tr>
+                        <tr><td>Индекс Serenity</td><td><input type="number" id="se-idx" value="200" /></td></tr>
+                        <tr><td>Индекс JJ</td><td><input type="number" id="jj-idx" value="200" /></td></tr>
+                        <tr><td colspan=2><input type="button" class="custom-button smaller" name="send" value="Отправить" onClick="runCycle();" /></td></tr>
+                    </table>
+                </form>
+                <div class="warning-text" id="cycle-warning"></div>
             </div>
         </div>
 
