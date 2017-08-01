@@ -295,6 +295,7 @@
     <Compile Include="Identity\UserManager.cs" />
     <Compile Include="Identity\UserStore.cs" />
     <Compile Include="Logic\Client\AccIndexClientData.cs" />
+    <Compile Include="Logic\Client\ConstantClientData.cs" />
     <Compile Include="Logic\Client\SetInsuranceClientData.cs" />
     <Compile Include="Logic\Managers\StatManager.cs" />
     <Compile Include="Logic\Server\StatServerData.cs" />

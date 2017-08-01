@@ -38,6 +38,12 @@ function getParameter(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+function hide_dialog() {
+    $('.clear-onexit').html('');
+    $('.clear-onexit').val('');
+    $('.disabling-div').css('display', 'none');
+}
+
 function paymentSort(a, b) {
     if (a.ReceiverName < b.ReceiverName) return -1;
     if (a.ReceiverName > b.ReceiverName) return 1;

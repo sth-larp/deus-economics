@@ -4,6 +4,7 @@ using System.Linq;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Constants;
 using DeusCloud.Exceptions;
+using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
 
 namespace DeusCloud.Logic.Managers
@@ -28,7 +29,7 @@ namespace DeusCloud.Logic.Managers
         public void NewCycle()
         {
             var t = (int) DateTime.Now.Subtract(new DateTime(2017, 1, 1, 3, 0, 0)).TotalSeconds;
-            EditConstant(null, "LastCycle", t);
+            EditConstant(new ConstantClientData() {Name = "LastCycle", Value = t});
         }
 
         public DateTime LastCycleDate()
@@ -101,19 +102,19 @@ namespace DeusCloud.Logic.Managers
             return c;
         }
 
-        public Constant EditConstant(string text, string name, float value)
+        public Constant EditConstant(ConstantClientData data)
         {
             UserContext.Rights.CheckRole(AccountRole.Admin);
 
-            Try.Condition(Constants.ContainsKey(name), $"Не найдена константа: {name}.");
-            var c = Constants[name];
+            Try.Condition(Constants.ContainsKey(data.Name), $"Не найдена константа: {data.Name}.");
+            var c = Constants[data.Name];
 
-            if(!String.IsNullOrEmpty(text))
-                c.Description = text;
+            if(!String.IsNullOrEmpty(data.Description))
+                c.Description = data.Description;
 
-            c.Value = value;
+            c.Value = data.Value;
 
-            var dbconst = UserContext.Data.Constants.Find(name);
+            var dbconst = UserContext.Data.Constants.Find(data.Name);
             dbconst.Description = c.Description;
             dbconst.Value = c.Value;
             UserContext.Data.SaveChanges();

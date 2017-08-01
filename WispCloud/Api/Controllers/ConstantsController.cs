@@ -3,6 +3,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using DeusCloud.BasicAuth;
 using DeusCloud.Data.Entities.Constants;
+using DeusCloud.Logic.Client;
 
 namespace DeusCloud.Api.Controllers
 {
@@ -41,9 +42,7 @@ namespace DeusCloud.Api.Controllers
         }
 
         /// <summary>Edit existing constant</summary>
-        /// <param name="text">Описание</param>
-        /// <param name="name">Имя</param>
-        /// <param name="value">Значение</param>
+        /// <param name="data">Данные</param>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>
         /// <response code="401">Unauthorized</response>
@@ -51,9 +50,9 @@ namespace DeusCloud.Api.Controllers
         [HttpPost]
         [Route("constant/edit")]
         [ResponseType(typeof(Constant))]
-        public IHttpActionResult EditConstant(string text, string name, float value)
+        public IHttpActionResult EditConstant(ConstantClientData data)
         {
-            return Ok(UserContext.Constants.EditConstant(text, name, value));
+            return Ok(UserContext.Constants.EditConstant(data));
         }
 
         /// <summary>Delete existing constant</summary>
