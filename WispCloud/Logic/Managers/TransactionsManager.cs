@@ -128,7 +128,7 @@ namespace DeusCloud.Logic.Managers
             var tax = GetP2pTax(sender, receiver);
             if (tax > 0)
             {
-                var master = UserContext.Accounts.GetOrFail("master");
+                var master = UserContext.Accounts.GetOrFail("admin");
                 var t = new Transaction(sender, master, data.Amount * tax);
                 t.Comment = $"Налог на транзакции физлиц в размере {tax * 100}%";
                 t.Type = TransactionType.Tax;
@@ -160,7 +160,7 @@ namespace DeusCloud.Logic.Managers
 
             if (discount == 0)
             {
-                var master = UserContext.Accounts.GetOrFail("master");
+                var master = UserContext.Accounts.GetOrFail("admin");
                 var t = new Transaction(receiver, master, data.Amount * 0.5f);
                 t.Comment = $"Налог на доходные предприятия в размере 50%";
                 t.Type = TransactionType.Tax;

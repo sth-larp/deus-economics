@@ -18,9 +18,21 @@ namespace DeusCloud.Api.Controllers
         [HttpGet]
         [Route("stat/alice")]
         [ResponseType(typeof(StatServerData))]
-        public IHttpActionResult GetStatistics(bool ingame = true)
+        public IHttpActionResult GetAliceStat(bool ingame = true)
         {
-            return Ok(UserContext.Stat.GetStatistics(ingame));
+            return Ok(UserContext.Stat.GetAliceStat(ingame));
+        }
+
+        /// <summary>Получить статистику по транзакциям</summary>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="500">Internal Server Error</response>
+        [HttpGet]
+        [Route("stat/transfers")]
+        [ResponseType(typeof(TranStatServerData))]
+        public IHttpActionResult GetTransactionStat()
+        {
+            return Ok(UserContext.Stat.GetTransactionStat());
         }
     }
 }

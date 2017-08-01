@@ -31,6 +31,13 @@
         try {
             main_account = get_auth_tok_user(); //Временно, пока не получили истиный логин
 
+            var queryUser = getParameter("current");
+
+            if (queryUser != null) {
+                setCurrentAccount(queryUser, ACC_ROLE.ADMIN);
+                return;
+            }
+
             sendAPIRequest(url + "/api/accounts/profile?login=" + main_account, "GET", function(param, status) {
                 if (status == httpOK) {
                     main_profile = JSON.parse(param);
@@ -272,13 +279,13 @@
     function load_payments() {
         sendAPIRequestWarned(url + "/api/payments/list?login=" + selected_account, "GET", function (param, status) {
             var payments = JSON.parse(param).sort(paymentSort);
-            var headStr = "<tr><th>Сотрудник</th><th>Зарплата</th><th>Последняя выплата</th></tr>";
+            var headStr = "<tr><th>Сотрудник</th><th>Уровень з/п</th><th>Последняя выплата</th></tr>";
             var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
             var rows = [];
 
             for (i = 0; i < payments.length; i++) {
                 var date = customDateFormat(payments[i].LastPaid);
-                rows[i] = format(row, [payments[i].ReceiverName, payments[i].Amount, date]);
+                rows[i] = format(row, [payments[i].ReceiverName, payments[i].SalaryLevel, date]);
             }
             buildTabs(rows, lines_on_tab, "payments_list", headStr);
         }, "payments-warning");

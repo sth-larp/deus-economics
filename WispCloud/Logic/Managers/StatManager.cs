@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Helpers;
 using DeusCloud.Logic.CommonBase;
 using DeusCloud.Logic.Server;
@@ -15,7 +17,56 @@ namespace DeusCloud.Logic.Managers
         {
         }
 
-        public StatServerData GetStatistics(bool ingame)
+        public TranStatServerData GetTransactionStat()
+        {
+            var data = new TranStatServerData();
+            var from = UserContext.Constants.LastCycleDate();
+            var allTrans = UserContext.Data.Transactions
+                .Where(x => x.Type != TransactionType.Tax 
+                && x.Type != TransactionType.Payment && x.Time > from).ToList();
+
+            var receiverDict = new Dictionary<string, TranStatElement>();
+            var senderDict = new Dictionary<string, TranStatElement>();
+
+            allTrans.ForEach(x =>
+            {
+                if (!receiverDict.ContainsKey(x.Receiver))
+                    receiverDict.Add(x.Receiver, new TranStatElement(x.Receiver, 0)
+                    {
+                        Fullname = x.ReceiverAccount.DisplayName,
+                        Role = x.ReceiverAccount.Role
+                    });
+
+                if (!senderDict.ContainsKey(x.Sender))
+                    senderDict.Add(x.Sender, new TranStatElement(x.Sender, 0)
+                    {
+                        Fullname = x.SenderAccount.DisplayName,
+                        Role = x.SenderAccount.Role
+                    });
+
+                receiverDict[x.Receiver].Amount += x.Amount;
+                senderDict[x.Sender].Amount += x.Amount;
+            });
+
+            data.Top20CompReceivers = receiverDict
+                .Select(x => x.Value).Where(x => x.Role >= AccountRole.Corp)
+                .OrderByDescending(x => x.Amount)
+                .Take(20).ToList();
+
+            data.Top20CompSenders = senderDict
+                .Select(x => x.Value).Where(x => x.Role >= AccountRole.Corp)
+                .OrderByDescending(x => x.Amount)
+                .Take(20).ToList();
+
+            data.Top50PersReceivers = receiverDict
+                .Select(x => x.Value).Where(x => x.Role == AccountRole.Person)
+                .OrderByDescending(x => x.Amount)
+                .Take(50).ToList();
+
+            return data;
+        }
+
+        public StatServerData GetAliceStat(bool ingame)
         {
             var data = new StatServerData();
             UserContext.Rights.CheckRole(AccountRole.Admin);

@@ -24,6 +24,20 @@ var ACC_ROLE = {
     COMPANY: { value: 32, name: "Company", rusname: "Компания" }
 };
 
+function curUpdateStr() {
+    return " (последнее обновление " + formatDate(new Date(), 'HH:mm:ss') + ")";
+}
+
+function getParameter(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 function paymentSort(a, b) {
     if (a.ReceiverName < b.ReceiverName) return -1;
     if (a.ReceiverName > b.ReceiverName) return 1;

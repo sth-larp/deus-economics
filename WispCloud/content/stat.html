@@ -13,10 +13,7 @@
 
 <script type="text/javascript">
     var main_account = '';
-    var main_profile = {}
     var lines_on_tab = 20;
-    var corpNames = ['Serenity', 'Panam', 'JJ', 'Govt', 'admin'];
-    var httpOK = 200; //For errors debugging
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,9 +34,9 @@
         $("#const-table tbody tr").remove();
 
         sendAPIRequestWarned(url + "/api/constant/list", "GET", function (param, status) {
-            $('#const-table').append('<tr><th>Имя</th><th>Значение</th><th>Описание</th></tr>');
+            $('#const-table').append('<tr><th>Имя</th><th>Значение</th><th>Описание</th><th></th></tr>');
             var consts = JSON.parse(param);
-            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>";
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td></td></tr>";
 
             for (i = 0; i < consts.length; i++) {
                 if (consts[i].Name == "LastCycle") {
@@ -53,7 +50,7 @@
     }
 
     function load_const_page() {
-        topMenuSwitch(document.getElementById("const-page"));
+        topMenuSwitch("const");
         load_constants();
     }
 
@@ -76,11 +73,6 @@
             $('#implant-table').append(format(row, ["Serenity", implants.Serenity]));
             $('#implant-table').append(format(row, ["Время в VR", vr]));
         }, "implant-table-warning");
-    }
-
-    function load_alice_page() {
-        topMenuSwitch(document.getElementById("alice-page"));
-        load_implants();
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,18 +104,48 @@
         }, "ins-table-warning");
     }
 
-    function load_ins_page() {
-        topMenuSwitch(document.getElementById("ins-page"));
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Страница Транзакций
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        load_insurances();
+
+
+    function load_trans_stat() {
+        $("#trans-20in tbody tr").remove();
+        $("#trans-20out tbody tr").remove();
+        $("#trans-50 tbody tr").remove();
+
+        sendAPIRequestWarned(url + "/api/stat/transfers", "GET", function (param, status) {
+            $('#trans-20in').append('<tr><th>Компания</th><th>Входящие переводы</th></tr>');
+            $('#trans-20out').append('<tr><th>Компания</th><th>Исходящие переводы</th></tr>');
+            $('#trans-50').append('<tr><th>Персона</th><th>Входящие переводы</th></tr>');
+
+            var data = JSON.parse(param);
+            var row = "<tr><td><a href='./main.html?current={2}' target='_blank'>{0}</a></td><td>{1}</td></tr>";
+
+            for (var i in data.Top20CompReceivers) {
+                var txt = format(row, [data.Top20CompReceivers[i].Fullname, data.Top20CompReceivers[i].Amount, data.Top20CompReceivers[i].Login]);
+                $('#trans-20in').append(txt);
+            }
+
+            for (var i in data.Top20CompSenders) {
+                var txt = format(row, [data.Top20CompSenders[i].Fullname, data.Top20CompSenders[i].Amount, data.Top20CompSenders[i].Login]);
+                $('#trans-20out').append(txt);
+            }
+
+            for (var i in data.Top50PersReceivers) {
+                var txt = format(row, [data.Top50PersReceivers[i].Fullname, data.Top50PersReceivers[i].Amount, data.Top50PersReceivers[i].Login]);
+                $('#trans-50').append(txt);
+            }
+
+        }, "trans-table-warning");
     }
-    
 
-    function topMenuSwitch(e) {
+    function topMenuSwitch(prefix) {
         $('.top-menu-elem').removeClass('top-menu-selected');
-        e.classList.add('top-menu-selected');
+        document.getElementById(prefix + "-menu").classList.add('top-menu-selected');
         $('.page-display').css('display', 'none');
-        e.style.display = 'block';
+        document.getElementById(prefix + "-page").style.display = 'block';
     }
 
 </script>
@@ -137,8 +159,9 @@
         <span id="current_account"></span>
     </div>
     <div id="const-menu" class="top-menu-elem top-menu-selected" onclick="load_const_page();">Константы</div>
-    <div id="stat-menu" class="top-menu-elem" onclick="load_alice_page();">ALICE</div>
-    <div id="corp_menu" class="top-menu-elem" onclick="load_ins_page();">Страховки</div>
+    <div id="alice-menu" class="top-menu-elem" onclick="topMenuSwitch('alice');">ALICE</div>
+    <div id="ins-menu" class="top-menu-elem" onclick="topMenuSwitch('ins');">Страховки</div>
+    <div id="trans-menu" class="top-menu-elem" onclick='topMenuSwitch("trans");'>Переводы</div>
     <div id="logout_menu" class="top-menu-elem logout" onclick="loginRedirect();">Выйти</div>
 </div>
 
@@ -158,6 +181,8 @@
         <!-- Страница ALICE -->
         <div id="alice-page" class="page-display">
             <div id="implant-holder">
+                <input type="button" class="custom-button smaller" name="Обновить статистику имплантов" value="Обновить статистику имплантов" onclick="value = name + curUpdateStr(); load_implants();" />
+
                 <h2>Импланты в игре</h2>
                 <table id="implant-table"></table>
                 <div class="warning-text" id="implant-table-warning"></div>
@@ -167,9 +192,32 @@
         <!-- Страница Страховки -->
         <div id="ins-page" class="page-display">
             <div id="ins-holder">
+                <input type="button" class="custom-button smaller" name="Обновить статистику страховок" value="Обновить статистику страховок" onclick="value = name + curUpdateStr(); load_insurances();" />
+
                 <h2>Активные страховки</h2>
                 <table id="ins-table"></table>
                 <div class="warning-text" id="ins-table-warning"></div>
+            </div>
+        </div>
+
+        <!-- Страница Переводы -->
+        <div id="trans-page" class="page-display">
+            <div id="trans-holder">
+                <input type="button" class="custom-button smaller" name="Обновить статистику переводов" value="Обновить статистику переводов" onclick="value = name + curUpdateStr(); load_trans_stat();"/>
+
+                <h2>Топ-20 компаний по исходящим переводам</h2>
+                <p> Считается с начала цикла, не учитываются выплаты по зарплатам и страховкам</p>
+                <table id="trans-20out"></table>
+                <div class="warning-text" id="trans-table-warning"></div>
+
+                <h2>Топ-20 компаний по входящим переводам</h2>
+                <p> Считается с начала цикла, не учитываются выплаты по зарплатам и страховкам</p>
+                <table id="trans-20in"></table>
+
+                <h2>Топ-50 персон по входящим переводам</h2>
+                <p> Считается с начала цикла, не учитываются выплаты по зарплатам и страховкам</p>
+                <table id="trans-50"></table>
+
             </div>
         </div>
 
