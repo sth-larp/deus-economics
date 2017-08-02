@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using DeusCloud.Data.Entities.Accounts;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Helpers;
+using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
 using DeusCloud.Logic.Server;
 using Newtonsoft.Json;
@@ -104,6 +105,9 @@ namespace DeusCloud.Logic.Managers
 
             characters.ForEach(x => data.TimeInVR += x.totalSpentInVR);
             data.TimeInVR /= 1000;
+
+            UserContext.Constants.EditConstant(new ConstantClientData() { Name = "CurrentVR", Value = data.TimeInVR });
+
             return data;
         }
 

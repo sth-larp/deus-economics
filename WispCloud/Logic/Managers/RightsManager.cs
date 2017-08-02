@@ -83,6 +83,22 @@ namespace DeusCloud.Logic.Managers
             return editAccount;
         }
 
+        public Account CutAccountIndex(string login, int index)
+        {
+            CheckRole(AccountRole.Master);
+
+            var editAccount = UserContext.Accounts.GetOrFail(login);
+            Try.Condition(editAccount.Index >= index, "Недостаточно индекса");
+
+            editAccount.Index -= index;
+            UserContext.Accounts.Update(editAccount);
+
+            UserContext.AddGameEvent(editAccount.Login, GameEventType.Index,
+                $"Списано {index} индекса");
+
+            return editAccount;
+        }
+
         public AccountAccess SetAccountAccess(AccountAccessClientData accessData)
         {
             Try.Argument(accessData, nameof(accessData));

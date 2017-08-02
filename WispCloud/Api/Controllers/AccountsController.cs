@@ -102,6 +102,21 @@ namespace DeusCloud.Api.Controllers
             return Ok(UserContext.Rights.SetAccountIndex(data));
         }
 
+        /// <summary>Списать индекс</summary>
+        /// <param name="login">ID корпорации</param>
+        /// <param name="index">Объем списания</param>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="500">Internal Server Error</response>
+        [BasicAuth]
+        [HttpPost]
+        [Route("accounts/cutindex")]
+        [ResponseType(typeof(Account))]
+        public IHttpActionResult SetIndex(string login, int index)
+        {
+            return Ok(UserContext.Rights.CutAccountIndex(login, index));
+        }
+
         /// <summary>Get all accounts</summary>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>

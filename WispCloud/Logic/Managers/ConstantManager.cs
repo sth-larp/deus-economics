@@ -30,6 +30,11 @@ namespace DeusCloud.Logic.Managers
         {
             var t = (int) DateTime.Now.Subtract(new DateTime(2017, 1, 1, 3, 0, 0)).TotalSeconds;
             EditConstant(new ConstantClientData() {Name = "LastCycle", Value = t});
+            EditConstant(new ConstantClientData()
+            {
+                Name = "LastVR",
+                Value = Constants.ContainsKey("CurrentVR") ? Constants["CurrentVR"].Value : 0
+            });
         }
 
         public DateTime LastCycleDate()
