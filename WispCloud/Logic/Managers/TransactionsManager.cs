@@ -11,6 +11,7 @@ using DeusCloud.Logic.Client;
 using DeusCloud.Logic.CommonBase;
 using DeusCloud.Logic.Server;
 using Microsoft.AspNet.Identity;
+using Newtonsoft.Json;
 
 namespace DeusCloud.Logic.Managers
 {
@@ -95,27 +96,60 @@ namespace DeusCloud.Logic.Managers
 
             Try.Condition(parentAcc.Index >= indexCost, $"Недостаточно индекса");
 
-            var t = new Transaction(receiverAcc, sellerAcc, data.Price);
-            t.Comment = data.Description ?? "";
-            t.Type |= TransactionType.Implant;
+            data.Description = ParseImplantDescription(data.Description, indexCost > 0);
 
+            var tdata = new TransferClientData(receiverAcc.Login, sellerAcc.Login, data.Price)
+                    {Description = data.Description};
+
+            var trList = P2BTransfer(receiverAcc, sellerAcc, tdata);
+            
             using (var dbTransact = UserContext.Data.Database.BeginTransaction())
             {
                 UserContext.Data.BeginFastSave();
-                TransactiontoDb(t);
+                trList.ForEach(TransactiontoDb);
                 parentAcc.Index -= indexCost;
                 dbTransact.Commit();
             }
 
-            if(parentAcc != sellerAcc)
-                UserContext.AddGameEvent(parentAcc.Login, GameEventType.Index, 
-                    $"Имплант за {indexCost} индекса установлен магазином {sellerAcc.Fullname}", true);
+            if (indexCost > 0)
+            {
+                if (parentAcc != sellerAcc)
+                    UserContext.AddGameEvent(parentAcc.Login, GameEventType.Index,
+                        $"Имплант за {indexCost} индекса установлен магазином {sellerAcc.Fullname}", true);
 
-            UserContext.AddGameEvent(sellerAcc.Login, GameEventType.Index,
-                $"Имплант за {indexCost} индекса установлен {receiverAcc.Fullname}", true);
+                UserContext.AddGameEvent(sellerAcc.Login, GameEventType.Index,
+                    $"Имплант за {indexCost} индекса установлен {receiverAcc.Fullname}", true);
 
-            UserContext.AddGameEvent(receiverAcc.Login, GameEventType.Index,
-                $"Получен имплант от {sellerAcc.Fullname}", true);
+                UserContext.AddGameEvent(receiverAcc.Login, GameEventType.Index,
+                    $"Получен имплант от {sellerAcc.Fullname}", true);
+            }
+        }
+
+        private string ParseImplantDescription(string text, bool isImplent)
+        {
+            var b = isImplent ? "импланта " : "";
+            var res = $"Продажа {b}через магазин ";
+            if (text == null) return res;
+
+            try
+            {
+                var start = text.IndexOf("{");
+                var end = text.IndexOf("}");
+                if (start < 0 || end < 0) return res;
+
+                var substr = text.Substring(start, end - start + 1);
+                var parsed = JsonConvert.DeserializeObject<ShopModel>(substr);
+                res = res + parsed.shopName;
+            }
+            catch (Exception){}
+            return res;
+        }
+
+        private class ShopModel
+        {
+            public string assetName { get; set; }
+            public float amount { get; set; }
+            public string shopName { get; set; }
         }
 
         

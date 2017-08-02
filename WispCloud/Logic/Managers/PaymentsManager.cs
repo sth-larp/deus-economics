@@ -122,6 +122,8 @@ namespace DeusCloud.Logic.Managers
             {
                 UserContext.Data.BeginFastSave();
 
+                UserContext.Data.Accounts.ToList().ForEach(x => x.PaidSalary = 0);
+
                 var list = UserContext.Data.Payments.ToList();
                 list.ForEach(x =>
                 {
@@ -138,15 +140,20 @@ namespace DeusCloud.Logic.Managers
         {
             //pay.EmployerAccount.Cash -= pay.SalaryLevel; //Payment from nowhere
             var value = isInsurance
-                ? UserContext.Constants.GetSalary(pay.SalaryLevel)
-                : UserContext.Constants.GetInsuranceSalary(t, pay.SalaryLevel);
+                ? UserContext.Constants.GetInsuranceSalary(t, pay.SalaryLevel)
+                : UserContext.Constants.GetSalary(pay.SalaryLevel);
 
+            if (isInsurance)
+            {
+                value = Math.Max(0, value - pay.ReceiverAccount.PaidSalary);
+            }
             pay.ReceiverAccount.Cash += value;
+            pay.ReceiverAccount.PaidSalary += value;
             pay.LastPaid = DateTime.Now;
 
             var transaction = new Transaction(pay.EmployerAccount, pay.ReceiverAccount, value);
             transaction.Type |= TransactionType.Payment;
-            transaction.Comment = $"Регулярные выплаты от {pay.EmployerName}" + (isInsurance ? " по страховке" : "");
+            transaction.Comment = $"Выплаты от {pay.EmployerName}" + (isInsurance ? " по страховке. Выплачен max(страховка, зп)" : "");
             UserContext.Data.Transactions.Add(transaction);
         }
     }

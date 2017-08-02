@@ -86,6 +86,9 @@ namespace DeusCloud.Data.Entities.Accounts
         public string DisplayName {
             get { return $"{Fullname} ({Login})"; } }
 
+        [JsonIgnore]
+        public float PaidSalary { get; set; }
+
         public Account()
         {
             Alias = Guid.NewGuid().ToString().Substring(0, 5);

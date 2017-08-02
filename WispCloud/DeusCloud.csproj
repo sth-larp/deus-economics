@@ -219,6 +219,7 @@
       <BrowseToURL>~/login.html</BrowseToURL>
     </Content>
     <Content Include="content\stat.html" />
+    <Content Include="content\test.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -246,6 +247,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708011155057_salarylevel.resx">
       <DependentUpon>201708011155057_salarylevel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708021340237_PaidSalary.resx">
+      <DependentUpon>201708021340237_PaidSalary.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -400,6 +404,10 @@
     <Compile Include="Migrations\201708011155057_salarylevel.cs" />
     <Compile Include="Migrations\201708011155057_salarylevel.Designer.cs">
       <DependentUpon>201708011155057_salarylevel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708021340237_PaidSalary.cs" />
+    <Compile Include="Migrations\201708021340237_PaidSalary.Designer.cs">
+      <DependentUpon>201708021340237_PaidSalary.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Serialization\JsonIntolerantEnumConverter.cs" />

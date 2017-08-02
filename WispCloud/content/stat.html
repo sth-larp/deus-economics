@@ -119,8 +119,8 @@
         $("#ins-table tbody tr").remove();
 
         sendAPIRequestWarned(url + "/api/accounts/list", "GET", function (param, status) {
-            $('#ins-table').append('<tr><th>Эмитент</th><th>Ур1</th><th>Ур2</th><th>Ур3</th></tr>');
-            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>";
+            $('#ins-table').append('<tr><th>Эмитент</th><th>Ур1</th><th>Ур2</th><th>Ур3</th><th>Всего</th></tr>');
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>";
 
             var persons = JSON.parse(param);
             var dict = {};
@@ -132,7 +132,7 @@
                 dict[persons[i].Insurance][persons[i].InsuranceLevel] += 1;
 
             for (var key in dict) {
-                var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3]]);
+                var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3], dict[key][1] + dict[key][2] + dict[key][3]]);
                 if(key == 'None') continue;
                     $('#ins-table').append(txt);
             }
@@ -144,8 +144,8 @@
         $("#sal-table tbody tr").remove();
 
         sendAPIRequestWarned(url + "/api/payments/all", "GET", function (param, status) {
-            $('#sal-table').append('<tr><th>Юрлицо</th><th>Ур1</th><th>Ур2</th><th>Ур3</th></tr>');
-            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>";
+            $('#sal-table').append('<tr><th>Юрлицо</th><th>Ур1</th><th>Ур2</th><th>Ур3</th><th>Всего</th></tr>');
+            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>";
 
             var payments = JSON.parse(param);
             var dict = {};
@@ -157,7 +157,7 @@
                 dict[payments[i].EmployerName][payments[i].SalaryLevel] += 1;
 
             for (var key in dict) {
-                var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3]]);
+                var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3], dict[key][1] + dict[key][2] + dict[key][3]]);
                 $('#sal-table').append(txt);
             }
 
@@ -222,7 +222,7 @@
     </div>
     <div id="const-menu" class="top-menu-elem top-menu-selected" onclick="load_const_page();">Константы</div>
     <div id="alice-menu" class="top-menu-elem" onclick="topMenuSwitch('alice');">ALICE</div>
-    <div id="ins-menu" class="top-menu-elem" onclick="topMenuSwitch('ins');">Страховки и зарплаты</div>
+    <div id="ins-menu" class="top-menu-elem" onclick="topMenuSwitch('ins');">Страховки и зп</div>
     <div id="trans-menu" class="top-menu-elem" onclick='topMenuSwitch("trans");'>Переводы</div>
     <div id="logout_menu" class="top-menu-elem logout" onclick="window.location.assign('./main.html');">Назад в ЛК юрлица</div>
 </div>

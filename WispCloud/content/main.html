@@ -344,7 +344,8 @@
 
             for (i = 0; i < loyals.length; i++) {
                 if (loyals[i].Insurance != selected_account
-                    && loyals[i].LoyalName != selected_account)
+                    && loyals[i].LoyalName != selected_account
+                    && selected_account != "admin")
                     continue;
 
                 var newRow = format(row, [loyals[i].Insurance, loyals[i].LoyalFullName, loyals[i].LoyalName]);
