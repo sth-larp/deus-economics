@@ -27,8 +27,26 @@
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Страница констант
+    // Страница цикла
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    function load_index() {
+        $("#index-table tbody tr").remove();
+
+        sendAPIRequestWarned(url + "/api/accounts/list", "GET", function (param, status) {
+            $('#index-table').append('<tr><th>Компания</th><th>Индекс</th><th>Очки страховки</th></tr>');
+            var accounts = JSON.parse(param);
+            var row = "<tr><td><a href='./main.html?current={3}' target='_blank'>{0}</a></td><td>{1}</td><td>{2}</td></tr>";
+
+            for (i = 0; i < accounts.length; i++) {
+                if (accounts[i].Index > 0 || accounts[i].InsurancePoints > 0) {
+                    var txt = format(row, [accounts[i].Fullname, accounts[i].Index, accounts[i].InsurancePoints, accounts[i].Login]);
+                    $('#index-table').append(txt);
+                }
+            }
+
+        }, "index-table-warning");
+    }
 
     function load_constants() {
         $("#const-table tbody tr").remove();
@@ -124,19 +142,27 @@
 
             var persons = JSON.parse(param);
             var dict = {};
+            var totals = ["Итого", 0, 0, 0, 0];
 
             for (i = 0; i < persons.length; i++)
                 dict[persons[i].Insurance] = [0,0,0,0];
 
-            for (i = 0; i < persons.length; i++) 
+            for (i = 0; i < persons.length; i++) {
                 dict[persons[i].Insurance][persons[i].InsuranceLevel] += 1;
+                if (persons[i].Insurance != "None" && persons[i].InsuranceLevel > 0) {
+                    totals[persons[i].InsuranceLevel] += 1;
+                    totals[4] += 1;
+                }
+            }
+
+            $('#ins-table').append(format(row, totals));
 
             for (var key in dict) {
                 var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3], dict[key][1] + dict[key][2] + dict[key][3]]);
                 if(key == 'None') continue;
                     $('#ins-table').append(txt);
             }
-            
+
         }, "ins-table-warning");
     }
 
@@ -145,19 +171,26 @@
 
         sendAPIRequestWarned(url + "/api/payments/all", "GET", function (param, status) {
             $('#sal-table').append('<tr><th>Юрлицо</th><th>Ур1</th><th>Ур2</th><th>Ур3</th><th>Всего</th></tr>');
-            var row = "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>";
+            var row = "<tr><td><a href='./main.html?current={5}' target='_blank'>{0}</a></td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>";
 
             var payments = JSON.parse(param);
             var dict = {};
+            var totals = ["Итого", 0, 0, 0, 0, 'admin'];
 
             for (i = 0; i < payments.length; i++)
-                dict[payments[i].EmployerName] = [0, 0, 0, 0];
+                dict[payments[i].EmployerName] = [payments[i].Employer, 0, 0, 0];
 
-            for (i = 0; i < payments.length; i++)
+            for (i = 0; i < payments.length; i++) {
                 dict[payments[i].EmployerName][payments[i].SalaryLevel] += 1;
+                totals[payments[i].SalaryLevel] += 1;
+                totals[4] += 1;
+            }
+
+            $('#sal-table').append(format(row, totals));
 
             for (var key in dict) {
-                var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3], dict[key][1] + dict[key][2] + dict[key][3]]);
+                var txt = format(row, [key, dict[key][1], dict[key][2], dict[key][3],
+                    dict[key][1] + dict[key][2] + dict[key][3], dict[key][0]]);
                 $('#sal-table').append(txt);
             }
 
@@ -220,7 +253,7 @@
 <div id="top_menu" class="top-menu">
     <div class="top-menu-elem ">
     </div>
-    <div id="const-menu" class="top-menu-elem top-menu-selected" onclick="load_const_page();">Константы</div>
+    <div id="const-menu" class="top-menu-elem top-menu-selected" onclick="load_const_page();">Индекс и цикл</div>
     <div id="alice-menu" class="top-menu-elem" onclick="topMenuSwitch('alice');">ALICE</div>
     <div id="ins-menu" class="top-menu-elem" onclick="topMenuSwitch('ins');">Страховки и зп</div>
     <div id="trans-menu" class="top-menu-elem" onclick='topMenuSwitch("trans");'>Переводы</div>
@@ -237,6 +270,14 @@
                 <h2>Константы</h2>
                 <table id="const-table"></table>
                 <div class="warning-text" id="const-table-warning"></div>
+            </div>
+
+            <div id="index-holder">
+                <h2>Индексы</h2>
+                <input type="button" class="custom-button smaller" name="Обновить статистику индексов" value="Обновить статистику индексов" onclick="value = name + curUpdateStr(); load_index();" />
+
+                <table id="index-table"></table>
+                <div class="warning-text" id="index-table-warning"></div>
             </div>
 
             <div id="cycle-holder">

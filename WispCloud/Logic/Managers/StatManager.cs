@@ -69,9 +69,13 @@ namespace DeusCloud.Logic.Managers
 
             var allUsers = UserContext.Data.Accounts.Where(x => x.Role != AccountRole.Master
                                                                 && x.Role != AccountRole.Admin).ToList();
-            data.Cash = allUsers.Select(x => x.Cash).Aggregate((sum, x) => x + sum);
+            data.Cash = allUsers
+                .Where(x => x.Status == AccountStatus.Active)
+                .Select(x => x.Cash)
+                .Aggregate((sum, x) => x + sum);
 
-            data.CashOut = allTrans.Where(x => x.ReceiverAccount.Role == AccountRole.Master 
+            data.CashOut = allTrans
+                .Where(x => x.ReceiverAccount.Role == AccountRole.Master 
                 || x.ReceiverAccount.Role == AccountRole.Admin).Select(x => x.Amount)
                 .Aggregate((sum, x) => sum + x);
 
@@ -111,7 +115,7 @@ namespace DeusCloud.Logic.Managers
             return data;
         }
 
-        public void BanAndroids()
+        public BlockedServerData BanAndroids()
         {
             UserContext.Rights.CheckRole(AccountRole.Admin);
             var data = new BlockedServerData();
@@ -127,6 +131,7 @@ namespace DeusCloud.Logic.Managers
                 else if (x.profileType != "human")
                     data.Robots += BlockCharWithReason(x._id, "вы не человек") ? 1 : 0;
             });
+            return data;
         }
 
         private bool BlockCharWithReason(string login, string reason)

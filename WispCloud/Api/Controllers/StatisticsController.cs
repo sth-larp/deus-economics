@@ -29,11 +29,10 @@ namespace DeusCloud.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
         [Route("stat/ban")]
-        [ResponseType(typeof(int))]
+        [ResponseType(typeof(BlockedServerData))]
         public IHttpActionResult BanAndroids()
         {
-            UserContext.Stat.BanAndroids();
-            return Ok();
+            return Ok(UserContext.Stat.BanAndroids());
         }
 
         /// <summary>Получить статистику по транзакциям</summary>

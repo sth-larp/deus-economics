@@ -41,6 +41,10 @@ namespace DeusCloud.Logic.Managers
         {
             _rightsManager.CheckRole(AccountRole.Admin);
             var existing = Get(clientData.Login);
+
+            if(clientData.Status != AccountStatus.Blocked)
+                clientData.Status = AccountStatus.Active;
+
             if (existing != null)
                 return SetAccountProperties(clientData);
 
