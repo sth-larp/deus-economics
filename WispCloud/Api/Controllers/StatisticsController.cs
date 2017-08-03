@@ -23,6 +23,19 @@ namespace DeusCloud.Api.Controllers
             return Ok(UserContext.Stat.GetAliceStat(ingame));
         }
 
+        /// <summary>Забанить андроидов, программ, мертвых, тех кто не в игре</summary>
+        /// <response code="200">OK</response>
+        /// <response code="400">Bad request</response>
+        /// <response code="500">Internal Server Error</response>
+        [HttpPost]
+        [Route("stat/ban")]
+        [ResponseType(typeof(int))]
+        public IHttpActionResult BanAndroids()
+        {
+            UserContext.Stat.BanAndroids();
+            return Ok();
+        }
+
         /// <summary>Получить статистику по транзакциям</summary>
         /// <response code="200">OK</response>
         /// <response code="400">Bad request</response>

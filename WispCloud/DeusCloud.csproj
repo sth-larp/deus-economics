@@ -279,6 +279,7 @@
     <Compile Include="Data\Entities\Accounts\UserAccountSettings.cs" />
     <Compile Include="Data\Entities\Access\AccountAccessRoles.cs" />
     <Compile Include="Data\Entities\Alice\AliceInsurance.cs" />
+    <Compile Include="Data\Entities\Alice\AliceModels.cs" />
     <Compile Include="Data\Entities\Constants\Constant.cs" />
     <Compile Include="Data\Entities\GameEvents\GameEvent.cs" />
     <Compile Include="Data\Entities\GameEvents\GameEventType.cs" />
@@ -302,6 +303,7 @@
     <Compile Include="Logic\Client\ConstantClientData.cs" />
     <Compile Include="Logic\Client\SetInsuranceClientData.cs" />
     <Compile Include="Logic\Managers\StatManager.cs" />
+    <Compile Include="Logic\Server\BlockedServerData.cs" />
     <Compile Include="Logic\Server\StatServerData.cs" />
     <Compile Include="Logic\Client\StealInsuranceClientData.cs" />
     <Compile Include="Logic\Client\SwitchCycleClientData.cs" />

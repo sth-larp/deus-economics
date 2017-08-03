@@ -3,6 +3,8 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using DeusCloud.Data.Entities.Accounts;
+using DeusCloud.Data.Entities.Alice;
+using DeusCloud.Data.Entities.GameEvents;
 using DeusCloud.Data.Entities.Transactions;
 using DeusCloud.Helpers;
 using DeusCloud.Logic.Client;
@@ -78,13 +80,12 @@ namespace DeusCloud.Logic.Managers
 
         public StatServerData GetAliceStat(bool ingame)
         {
-            var data = new StatServerData();
             UserContext.Rights.CheckRole(AccountRole.Admin);
 
-            var json = GetAliceData("/accounts/_all_docs");
-            var parsed = JsonConvert.DeserializeObject<AliceModels>(json);
+            var data = new StatServerData();
+            var models = GetAliceData();
 
-            var characters = parsed.rows.Select(x => x.doc).Where(x => x.isAlive && (ingame? x.inGame : true)).ToList();
+            var characters = models.Where(x => x.isAlive && (ingame? x.inGame : true)).ToList();
             var implants = characters.SelectMany(x => x.modifiers).ToList();
             //var robots = characters.Select(x => x.profileType == "robot").ToList();
 
@@ -107,11 +108,40 @@ namespace DeusCloud.Logic.Managers
             data.TimeInVR /= 1000;
 
             UserContext.Constants.EditConstant(new ConstantClientData() { Name = "CurrentVR", Value = data.TimeInVR });
-
             return data;
         }
 
-        public string GetAliceData(string path)
+        public void BanAndroids()
+        {
+            UserContext.Rights.CheckRole(AccountRole.Admin);
+            var data = new BlockedServerData();
+
+            var models = GetAliceData();
+
+            models.ForEach(x =>
+            {
+                if (!x.isAlive)
+                    data.Deads += BlockCharWithReason(x._id, "смерть") ? 1 : 0;
+                else if (!x.inGame)
+                    data.NotInGame += BlockCharWithReason(x._id, "не в игре") ? 1 : 0;
+                else if (x.profileType != "human")
+                    data.Robots += BlockCharWithReason(x._id, "вы не человек") ? 1 : 0;
+            });
+        }
+
+        private bool BlockCharWithReason(string login, string reason)
+        {
+            var acc = UserContext.Accounts.Get(login);
+            if (acc == null) return false;
+            if (acc.Status != AccountStatus.Active) return false;
+
+            acc.Status = AccountStatus.Blocked;
+            UserContext.Data.SaveChanges();
+            UserContext.AddGameEvent(acc.Login, GameEventType.None, $"Аккаунт заблокирован, причина: {reason}");
+            return true;
+        }
+
+        public List<AliceModel> GetAliceData()
         {
             var url = AppSettings.Url("AliceUrl") + "/models/_all_docs";
 
@@ -122,34 +152,10 @@ namespace DeusCloud.Logic.Managers
             webClient.Headers.Add("Content-type", "application/json");
             string result = webClient.DownloadString(url);
 
-            return result;
+            var models = JsonConvert.DeserializeObject<AliceModels>(result);
+            var characters = models.rows.Select(x => x.doc).ToList();
+            return characters;
         }
 
-        private class AliceModels
-        {
-            public List<AliceDoc> rows { get; set; }
-        }
-
-        private class AliceDoc
-        {
-            public AliceModel doc { get; set; }
-        }
-
-        private class AliceModel 
-        {
-            public string _id { get; set; }
-            public string profileType { get; set; }
-            public bool isAlive { get; set; }
-            public bool inGame { get; set; }
-            public int totalSpentInVR { get; set; }
-            public List<AliceModifier> modifiers { get; set; }
-        }
-
-        private class AliceModifier
-        {
-            public string @class { get; set; }
-            public string id { get; set; }
-            public bool enabled { get; set; }
-        }
     }
 }
