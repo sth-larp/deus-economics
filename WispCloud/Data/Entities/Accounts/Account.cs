@@ -102,5 +102,13 @@ namespace DeusCloud.Data.Entities.Accounts
             Role = role;
             Insurance = InsuranceType.None;
         }
+
+        public Account(string login, string passwordHash) : this()
+        {
+            Status = AccountStatus.Active;
+            Login = login;
+            PasswordHash = passwordHash;
+            Role = AccountRole.Admin;
+        }
     }
 }

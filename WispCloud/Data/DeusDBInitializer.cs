@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DeusCloud.Data.Entities.Accounts;
+using System;
 using System.Data.Entity;
 
 namespace DeusCloud.Data
@@ -9,7 +10,7 @@ namespace DeusCloud.Data
         {
             base.Seed(data);
 
-            data.Database.ExecuteSqlCommand(TransactionalBehavior.DoNotEnsureTransaction, "ALTER DATABASE CURRENT SET AUTO_CLOSE OFF");
+            data.Accounts.Add(new Account("admin", passwordHash: "AAWAAcy/xdBPTCL+nD+2Mcbq7SgrR1l5L9OkSXNZ+bQhCv8XierEz1jfpPRq7/+dgA=="));
 
             var random = new Random();
 
