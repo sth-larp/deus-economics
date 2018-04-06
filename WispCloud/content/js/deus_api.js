@@ -1,6 +1,6 @@
 ﻿//Basic web resources location
 //var url = "http://localhost:54294";
-var url = "https://alice.digital/econ";
+var url = "http://localhost:54294";
 
 var cookieId = 'local_arm_id';
 
